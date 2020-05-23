@@ -66,8 +66,6 @@ export default {
       // 10% of biggest circle radius
       let curCircleRadius = this.userCircleRadius
 
-      let i = 0
-
       while (curCircleRadius < biggestCircleRadius) {
         this.svg.append('circle')
           .attr('r', curCircleRadius)
@@ -76,35 +74,36 @@ export default {
           .attr('stroke', '#CCC')
           .attr('fill', 'transparent')
 
-        if (i === 0) {
-          this.addUserCircle(startingX, startingY)
-        }
-
         curCircleRadius += biggestCircleRadius * 0.15
-        i++
       }
+
+      this.addUserCircle('me', startingX, startingY)
     },
 
-    addUserCircle (x, y) {
-      const circle = this.svg.append('circle')
+    addUserCircle (userID, x, y) {
+      this.svg.append('circle')
+        .attr('class', 'user')
+        .attr('id', userID)
         .attr('r', this.userCircleRadius)
         .attr('cx', x)
         .attr('cy', y)
         .attr('stroke', '#CCC')
         .attr('fill', randomColor())
-        .addEventListener('click', this.onUserClick)
+        .on('click', this.onUserClick)
 
-      this.svg.insert('text')
+      this.svg.append('text')
+        .attr('class', 'user-text')
+        .attr('id', userID)
         .attr('dominant-baseline', 'middle')
         .attr('text-anchor', 'middle')
         .attr('x', x)
         .attr('y', y - this.userCircleRadius - 10)
         .text(anonymus.create())
-        .addEventListener('click', this.onUserClick)
+        .on('click', this.onUserClick)
     },
 
     onUserClick () {
-      
+      console.log('a')
     }
   },
 
