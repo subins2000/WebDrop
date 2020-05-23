@@ -12,40 +12,104 @@
         </b-navbar-item>
       </template>
     </b-navbar>
-    <div id="bg-wrapper">
-      <svg id="bg" viewbox="0 0 1170 1170">
-        <circle class="circle" cx="570" cy="570" r="500" stroke="rgba(160,160,160,.5)" fill="transparent"></circle>
-      </svg>
+    <div id="earth-wrapper">
+      <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
   </div>
 </template>
 
 <script>
-import { P2PT } from 'p2pt'
+import * as P2PT from 'p2pt'
+import * as d3 from 'd3'
+import * as anonymus from 'anonymus'
+
+const randomColor = () => {
+  return `hsla(${~~(360 * Math.random())},70%,50%,0.8)`
+}
 
 export default {
   name: 'Index',
 
-  p2pt: null,
+  p2pt: P2PT,
+  earth: HTMLElement,
+  svg: null,
+
+  userCircleRadius: 50,
 
   data () {
     return {
-      status: 'ss',
-
-      circles: [
-        []
-      ]
+      status: 'ss'
     }
   },
 
   methods: {
     init () {
+      this.setUpP2PT()
+      this.setUpEarth()
+    },
+
+    setUpP2PT () {
       this.p2pt = new P2PT(this.$GAME_ANNOUNCE_URLS, 'vett')
+    },
+
+    setUpEarth () {
+      this.earth = this.$refs.earth
+      this.svg = d3.select(this.earth)
+
+      const startingX = window.innerWidth / 2
+      const startingY = window.innerHeight - 100
+
+      const biggestCircleRadius = startingX
+
+      this.userCircleRadius = biggestCircleRadius * 0.05
+
+      // 10% of biggest circle radius
+      let curCircleRadius = this.userCircleRadius
+
+      let i = 0
+
+      while (curCircleRadius < biggestCircleRadius) {
+        this.svg.append('circle')
+          .attr('r', curCircleRadius)
+          .attr('cx', startingX)
+          .attr('cy', startingY)
+          .attr('stroke', '#CCC')
+          .attr('fill', 'transparent')
+
+        if (i === 0) {
+          this.addUserCircle(startingX, startingY)
+        }
+
+        curCircleRadius += biggestCircleRadius * 0.15
+        i++
+      }
+    },
+
+    addUserCircle (x, y) {
+      const circle = this.svg.append('circle')
+        .attr('r', this.userCircleRadius)
+        .attr('cx', x)
+        .attr('cy', y)
+        .attr('stroke', '#CCC')
+        .attr('fill', randomColor())
+        .addEventListener('click', this.onUserClick)
+
+      this.svg.insert('text')
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('x', x)
+        .attr('y', y - this.userCircleRadius - 10)
+        .text(anonymus.create())
+        .addEventListener('click', this.onUserClick)
+    },
+
+    onUserClick () {
+      
     }
   },
 
-  components: {
-
+  mounted () {
+    this.init()
   }
 }
 </script>
@@ -56,7 +120,7 @@ export default {
   color: #fff;
 }
 
-#bg-wrapper {
+#earth-wrapper {
   position: fixed;
   top: 52px;
   bottom: 0;
@@ -64,7 +128,7 @@ export default {
   right: 0;
 }
 
-#bg {
+#earth {
   margin: 0 auto;
   width: 100%;
   height: 100%;
