@@ -62,10 +62,10 @@ export default {
     },
 
     startP2PT (ip) {
-      this.p2pt = new P2PT(this.$GAME_ANNOUNCE_URLS, ip)
+      this.p2pt = new P2PT(this.$ANNOUNCE_URLS, ip)
 
-      this.p2pt.on('peerconnect', () => {
-        this.p2pt.send(JSON.stringify({
+      this.p2pt.on('peerconnect', (peer) => {
+        this.p2pt.send(peer, JSON.stringify({
           type: 'init',
           name: this.myName,
           color: this.myColor
@@ -93,7 +93,9 @@ export default {
         color: color
       }
 
-      this.addUserCircle(id, name, color)
+      console.log(id)
+
+      this.addUserCircle(id, name, color, 100, 100)
     },
 
     setUpEarth () {
