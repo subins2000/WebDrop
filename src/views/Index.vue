@@ -25,7 +25,7 @@ import * as anonymus from 'anonymus'
 import * as publicIP from 'public-ip'
 
 const randomColor = () => {
-  return `hsla(${~~(360 * Math.random())},70%,50%,0.8)`
+  return `hsla(${~~(360 * Math.random())},70%,50%,1)`
 }
 
 export default {
@@ -35,6 +35,8 @@ export default {
   earth: HTMLElement,
   svg: null,
 
+  circleStartingX: 0,
+  circleStartingY: 0,
   userCircleRadius: 50,
 
   data () {
@@ -42,7 +44,8 @@ export default {
       status: 'ss',
       myName: anonymus.create(),
       myColor: randomColor(),
-      peers: {}
+      peers: {},
+      circles: []
     }
   },
 
@@ -93,19 +96,17 @@ export default {
         color: color
       }
 
-      console.log(id)
-
-      this.addUserCircle(id, name, color, 100, 100)
+      this.addUserCircle(id, name, color, this.circleStartingX, this.circleStartingY - this.circles[2])
     },
 
     setUpEarth () {
       this.earth = this.$refs.earth
       this.svg = d3.select(this.earth)
 
-      const startingX = window.innerWidth / 2
-      const startingY = window.innerHeight - 100
+      this.circleStartingX = window.innerWidth / 2
+      this.circleStartingY = window.innerHeight - 100
 
-      const biggestCircleRadius = startingX
+      const biggestCircleRadius = this.circleStartingX
 
       this.userCircleRadius = biggestCircleRadius * 0.05
 
@@ -115,15 +116,17 @@ export default {
       while (curCircleRadius < biggestCircleRadius) {
         this.svg.append('circle')
           .attr('r', curCircleRadius)
-          .attr('cx', startingX)
-          .attr('cy', startingY)
+          .attr('cx', this.circleStartingX)
+          .attr('cy', this.circleStartingY)
           .attr('stroke', '#CCC')
           .attr('fill', 'transparent')
+
+        this.circles.push(curCircleRadius)
 
         curCircleRadius += biggestCircleRadius * 0.15
       }
 
-      this.addUserCircle('me', this.myName, this.myColor, startingX, startingY)
+      this.addUserCircle('me', this.myName, this.myColor, this.circleStartingX, this.circleStartingY)
     },
 
     addUserCircle (userID, userName, userColor, x, y) {
