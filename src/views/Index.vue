@@ -22,6 +22,7 @@
 import * as P2PT from 'p2pt'
 import * as d3 from 'd3'
 import * as anonymus from 'anonymus'
+import * as publicIP from 'public-ip'
 
 const randomColor = () => {
   return `hsla(${~~(360 * Math.random())},70%,50%,0.8)`
@@ -38,7 +39,10 @@ export default {
 
   data () {
     return {
-      status: 'ss'
+      status: 'ss',
+      myName: anonymus.create(),
+      myColor: randomColor(),
+      peers: {}
     }
   },
 
@@ -49,7 +53,47 @@ export default {
     },
 
     setUpP2PT () {
-      this.p2pt = new P2PT(this.$GAME_ANNOUNCE_URLS, 'vett')
+      publicIP.v4().then((ip) => {
+        this.startP2PT(ip)
+      }).catch(error => {
+        console.log(error)
+        this.status = 'Could not find your IP address'
+      })
+    },
+
+    startP2PT (ip) {
+      this.p2pt = new P2PT(this.$GAME_ANNOUNCE_URLS, ip)
+
+      this.p2pt.on('peerconnect', () => {
+        this.p2pt.send(JSON.stringify({
+          type: 'init',
+          name: this.myName,
+          color: this.myColor
+        }))
+      })
+
+      this.p2pt.on('msg', (peer, msg) => {
+        try {
+          msg = JSON.parse(msg)
+        } catch (_) {
+          return
+        }
+
+        if (msg.type === 'init') {
+          this.addUser(peer.id, msg.name, msg.color)
+        }
+      })
+
+      this.p2pt.start()
+    },
+
+    addUser (id, name, color) {
+      this.peers[id] = {
+        name: name,
+        color: color
+      }
+
+      this.addUserCircle(id, name, color)
     },
 
     setUpEarth () {
@@ -77,10 +121,10 @@ export default {
         curCircleRadius += biggestCircleRadius * 0.15
       }
 
-      this.addUserCircle('me', startingX, startingY)
+      this.addUserCircle('me', this.myName, this.myColor, startingX, startingY)
     },
 
-    addUserCircle (userID, x, y) {
+    addUserCircle (userID, userName, userColor, x, y) {
       this.svg.append('circle')
         .attr('class', 'user')
         .attr('id', userID)
@@ -88,7 +132,7 @@ export default {
         .attr('cx', x)
         .attr('cy', y)
         .attr('stroke', '#CCC')
-        .attr('fill', randomColor())
+        .attr('fill', userColor)
         .on('click', this.onUserClick)
 
       this.svg.append('text')
@@ -98,7 +142,7 @@ export default {
         .attr('text-anchor', 'middle')
         .attr('x', x)
         .attr('y', y - this.userCircleRadius - 10)
-        .text(anonymus.create())
+        .text(userName)
         .on('click', this.onUserClick)
     },
 
