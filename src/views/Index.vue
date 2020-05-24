@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar v-if="userSelected === 0" class="navbar has-text-white has-shadow" mobile-burger="false">
+    <b-navbar v-if="userSelected === 0" class="navbar has-text-white has-shadow" :mobile-burger="false">
       <template slot="brand">
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <b-button>WebDrop</b-button>
@@ -12,7 +12,7 @@
         </b-navbar-item>
       </template>
     </b-navbar>
-    <b-navbar v-else class="navbar selected has-text-white has-shadow" mobile-burger="false">
+    <b-navbar v-else class="navbar selected has-text-white has-shadow" :mobile-burger="false">
       <template slot="brand">
         <b-navbar-item>
           <b-button v-on:click="cancelAllUserSelection">X</b-button>
@@ -34,7 +34,6 @@
 </template>
 
 <script>
-import * as P2PT from 'p2pt'
 import * as d3 from 'd3'
 import * as anonymus from 'anonymus'
 import * as publicIP from 'public-ip'
@@ -46,7 +45,6 @@ const randomColor = () => {
 export default {
   name: 'Index',
 
-  p2pt: P2PT,
   earth: HTMLElement,
   svg: null,
 
@@ -70,6 +68,20 @@ export default {
     init () {
       this.setUpP2PT()
       this.setUpEarth()
+
+      this.$store.subscribe((mutation) => {
+        if (mutation.type === 'addUser') {
+          this.addUserCircle(
+            mutation.payload.id,
+            mutation.payload.name,
+            mutation.payload.color,
+            this.circleSlots[this.circleSlotIndex][0],
+            this.circleSlots[this.circleSlotIndex][1]
+          )
+
+          this.circleSlotIndex++
+        }
+      })
     },
 
     setUpP2PT () {
@@ -82,17 +94,17 @@ export default {
     },
 
     startP2PT (ip) {
-      this.p2pt = new P2PT(this.$ANNOUNCE_URLS, ip)
+      this.$p2pt.setIdentifier(ip)
 
-      this.p2pt.on('peerconnect', (peer) => {
-        this.p2pt.send(peer, JSON.stringify({
+      this.$p2pt.on('peerconnect', (peer) => {
+        this.$p2pt.send(peer, JSON.stringify({
           type: 'init',
           name: this.myName,
           color: this.myColor
         }))
       })
 
-      this.p2pt.on('msg', (peer, msg) => {
+      this.$p2pt.on('msg', (peer, msg) => {
         try {
           msg = JSON.parse(msg)
         } catch (_) {
@@ -100,22 +112,15 @@ export default {
         }
 
         if (msg.type === 'init') {
-          this.addUser(peer.id, msg.name, msg.color)
+          this.$store.commit('addUser', {
+            id: peer.id,
+            name: msg.name,
+            color: msg.color
+          })
         }
       })
 
-      this.p2pt.start()
-    },
-
-    addUser (id, name, color) {
-      this.peers[id] = {
-        name: name,
-        color: color
-      }
-
-      this.addUserCircle(id, name, color, this.circleSlots[this.circleSlotIndex][0], this.circleSlots[this.circleSlotIndex][1])
-
-      this.circleSlotIndex++
+      this.$p2pt.start()
     },
 
     setUpEarth () {

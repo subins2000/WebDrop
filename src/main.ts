@@ -7,6 +7,8 @@ import './registerServiceWorker'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 
+import * as P2PT from 'p2pt'
+
 Vue.use(Buefy)
 
 Vue.config.productionTip = false
@@ -22,7 +24,7 @@ if (window.location.hostname === 'localhost') {
   announceURLs = ['ws://localhost:5000']
 }
 
-Vue.prototype.$ANNOUNCE_URLS = announceURLs
+Vue.prototype.$p2pt = new P2PT(announceURLs, 'aa')
 
 new Vue({
   router,
