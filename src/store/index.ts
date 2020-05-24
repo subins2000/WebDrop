@@ -11,7 +11,8 @@ export default new Vuex.Store({
     addUser (state, payload) {
       Vue.set(state.users, payload.id, {
         name: payload.name,
-        color: payload.color
+        color: payload.color,
+        conn: payload.conn
       })
     }
   },

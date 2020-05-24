@@ -6,6 +6,7 @@ import './registerServiceWorker'
 
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
+import FileUpload from 'vue-upload-component'
 
 import * as P2PT from 'p2pt'
 
@@ -29,6 +30,7 @@ if (window.location.hostname === 'localhost') {
 Vue.prototype.$p2pt = new P2PT(announceURLs, 'aa')
 
 Vue.component('Send', Send)
+Vue.component('FileUpload', FileUpload)
 
 new Vue({
   router,

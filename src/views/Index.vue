@@ -2,7 +2,7 @@
   <div>
     <Send v-if="sendScreen" :back="cancelAllUserSelection" :userSelected="userSelected" />
     <div v-show="!sendScreen">
-      <b-navbar v-if="userSelected === 0" class="navbar has-text-white has-shadow" :mobile-burger="false">
+      <b-navbar v-if="userSelectedCount === 0" class="navbar has-text-white has-shadow" :mobile-burger="false">
         <template slot="brand">
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
             <b-button>WebDrop</b-button>
@@ -20,7 +20,7 @@
             <b-button v-on:click="cancelAllUserSelection">X</b-button>
           </b-navbar-item>
           <b-navbar-item tag="div">
-            {{ this.userSelectedCount }} users selected
+            {{ userSelectedCount }} users selected
           </b-navbar-item>
           <div class="actions">
             <b-navbar-item tag="div">
@@ -63,10 +63,9 @@ export default {
 
       circleSlots: [],
       circleSlotIndex: 0,
-      
+
       userSelected: [],
-      userSelectedCount: 0,
-      sendScreen: false
+      sendScreen: true
     }
   },
 
@@ -127,7 +126,8 @@ export default {
           this.$store.commit('addUser', {
             id: peer.id,
             name: msg.name,
-            color: msg.color
+            color: msg.color,
+            conn: peer
           })
         }
       })
@@ -207,7 +207,7 @@ export default {
 
       if (target.classList.contains('selected')) {
         delete this.userSelected[this.userSelected.indexOf(userID)]
-        
+
         this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
           elem.classList.remove('selected')
         })
@@ -218,13 +218,11 @@ export default {
 
         this.userSelected.push(userID)
       }
-
-      this.userSelected = this.earth.querySelectorAll('.user.selected').length
     },
 
     cancelAllUserSelection () {
       this.sendScreen = false
-      this.userSelected = 0
+      this.userSelected = []
 
       this.earth.querySelectorAll('.selected').forEach(elem => {
         elem.classList.remove('selected')
