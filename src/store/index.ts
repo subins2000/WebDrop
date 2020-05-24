@@ -17,8 +17,8 @@ export default new Vuex.Store({
       })
     },
 
-    receiveFile (state, infoHash) {
-      Vue.set(state.receivedFiles, infoHash, {})
+    receiveFile (state, payload) {
+      Vue.set(state.receivedFiles, payload.infoHash, payload.name)
     }
   },
   actions: {

@@ -1,11 +1,15 @@
 <template>
   <div>
     <Send v-if="sendScreen" :back="cancelAllUserSelection" :userSelected="userSelected" />
-    <div v-show="!sendScreen">
-      <b-navbar v-if="userSelectedCount === 0" class="navbar has-text-white has-shadow" :mobile-burger="false">
+    <Receive v-else-if="receiveScreen" :back="cancelAllUserSelection" />
+    <div v-show="!sendScreen && !receiveScreen">
+      <b-navbar v-if="userSelectedCount === 0" class="navbar is-info has-text-white has-shadow" :mobile-burger="false">
         <template slot="brand">
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
             <b-button>WebDrop</b-button>
+          </b-navbar-item>
+          <b-navbar-item>
+            Share Files Easily Across Devices !
           </b-navbar-item>
         </template>
         <template slot="end">
@@ -65,7 +69,8 @@ export default {
       circleSlotIndex: 0,
 
       userSelected: [],
-      sendScreen: true
+      sendScreen: false,
+      receiveScreen: false
     }
   },
 
@@ -133,7 +138,7 @@ export default {
           this.$buefy.dialog.confirm({
             message: `${this.$store.state.users[peer.id].name} wants to send you file <b class="is-bold">${msg.name}</b>`,
             onConfirm: () => {
-              this.receiveFile(msg.infoHash)
+              this.receiveFile(msg.name, msg.infoHash)
             }
           })
         }
@@ -142,8 +147,13 @@ export default {
       this.$p2pt.start()
     },
 
-    receiveFile (infoHash) {
-      this.$store.commit('receiveFile', infoHash)
+    receiveFile (name, infoHash) {
+      this.$store.commit('receiveFile', {
+        infoHash,
+        name
+      })
+      this.sendScreen = false
+      this.receiveScreen = true
     },
 
     setUpEarth () {
@@ -233,6 +243,7 @@ export default {
 
     cancelAllUserSelection () {
       this.sendScreen = false
+      this.receiveScreen = false
       this.userSelected = []
 
       this.earth.querySelectorAll('.selected').forEach(elem => {
@@ -249,8 +260,13 @@ export default {
 
 <style lang="sass">
 .navbar
-  background-color: #209CEE !important
+  background-color: #209CEE
   color: #fff
+  padding-top: 10px
+  padding-bottom: 10px
+
+  .navbar-item
+    color: #fff
 
   &.selected
     background-color: #26D985 !important

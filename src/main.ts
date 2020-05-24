@@ -12,6 +12,7 @@ import * as P2PT from 'p2pt'
 import WebTorrent from 'webtorrent'
 
 import Send from '@/components/Send.vue'
+import Receive from '@/components/Receive.vue'
 
 Vue.use(Buefy)
 
@@ -33,6 +34,7 @@ Vue.prototype.$p2pt = new P2PT(announceURLs, 'aa')
 Vue.prototype.$wt = new WebTorrent()
 
 Vue.component('Send', Send)
+Vue.component('Receive', Receive)
 Vue.component('FileUpload', FileUpload)
 
 Vue.filter('formatSize', function (size: number) {

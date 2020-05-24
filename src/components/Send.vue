@@ -6,7 +6,7 @@
           <b-button v-on:click="back">WebDrop</b-button>
         </b-navbar-item>
         <b-navbar-item>
-          Send
+          <h4 class="is-size-4">Send</h4>
         </b-navbar-item>
       </template>
     </b-navbar>
@@ -96,7 +96,6 @@ export default {
         name: files[0].name
       }, (torrent) => {
         for (const userID of this.userSelected) {
-          console.log(userID, this.$store.state.users)
           const conn = this.$store.state.users[userID].conn
           this.$p2pt.send(conn, JSON.stringify({
             type: 'send',
