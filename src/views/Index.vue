@@ -45,7 +45,8 @@ export default {
       myName: anonymus.create(),
       myColor: randomColor(),
       peers: {},
-      circles: []
+      circleSlots: [],
+      circleSlotIndex: 0
     }
   },
 
@@ -96,7 +97,11 @@ export default {
         color: color
       }
 
-      this.addUserCircle(id, name, color, this.circleStartingX, this.circleStartingY - this.circles[2])
+      console.log(this.circleSlots)
+
+      this.addUserCircle(id, name, color, this.circleSlots[this.circleSlotIndex][0], this.circleSlots[this.circleSlotIndex][1])
+
+      this.circleSlotIndex++
     },
 
     setUpEarth () {
@@ -113,6 +118,7 @@ export default {
       // 10% of biggest circle radius
       let curCircleRadius = this.userCircleRadius
 
+      let i = 0
       while (curCircleRadius < biggestCircleRadius) {
         this.svg.append('circle')
           .attr('r', curCircleRadius)
@@ -121,9 +127,20 @@ export default {
           .attr('stroke', '#CCC')
           .attr('fill', 'transparent')
 
-        this.circles.push(curCircleRadius)
+        if (i > 1) {
+          this.circleSlots.push(
+            [this.circleStartingX, this.circleStartingY - curCircleRadius]
+          )
+          this.circleSlots.push(
+            [this.circleStartingX + curCircleRadius * Math.cos(10), this.circleStartingY + curCircleRadius * Math.sin(10)]
+          )
+          this.circleSlots.push(
+            [this.circleStartingX - curCircleRadius * Math.cos(10), this.circleStartingY + curCircleRadius * Math.sin(10)]
+          )
+        }
 
         curCircleRadius += biggestCircleRadius * 0.15
+        i++
       }
 
       this.addUserCircle('me', this.myName, this.myColor, this.circleStartingX, this.circleStartingY)
