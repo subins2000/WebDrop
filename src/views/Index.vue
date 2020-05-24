@@ -66,7 +66,6 @@ export default {
       myColor: randomColor(),
 
       circleSlots: [],
-      circleSlotIndex: 0,
 
       userSelected: [],
       sendScreen: false,
@@ -87,15 +86,25 @@ export default {
 
       this.$store.subscribe((mutation) => {
         if (mutation.type === 'addUser') {
+          const slot = this.circleSlots.shift()
           this.addUserCircle(
             mutation.payload.id,
             mutation.payload.name,
             mutation.payload.color,
-            this.circleSlots[this.circleSlotIndex][0],
-            this.circleSlots[this.circleSlotIndex][1]
+            slot[0],
+            slot[1]
           )
 
           this.circleSlotIndex++
+        } else if (mutation.type === 'removeUser') {
+          const userID = mutation.payload
+          const elem = this.earth.querySelector(`.user[id="${userID}"]`)
+
+          const item = [elem.getAttribute('cx'), elem.getAttribute('cy')]
+          this.circleSlots.push(item)
+
+          this.earth.querySelector(`.user-text[id="${userID}"]`).remove()
+          elem.remove()
         }
       })
     },
@@ -143,6 +152,10 @@ export default {
             }
           })
         }
+      })
+
+      this.$p2pt.on('peerclose', (peer) => {
+        this.$store.commit('removeUser', peer.id)
       })
 
       let warningCount = 0
@@ -249,7 +262,7 @@ export default {
       if (userID === 'me') return
 
       if (target.classList.contains('selected')) {
-        delete this.userSelected[this.userSelected.indexOf(userID)]
+        this.userSelected.splice(this.userSelected.indexOf(userID), 1)
 
         this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
           elem.classList.remove('selected')

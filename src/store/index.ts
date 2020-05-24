@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    users: {},
+    users: {} as any,
     receivedFiles: {}
   },
   mutations: {
@@ -15,6 +15,10 @@ export default new Vuex.Store({
         color: payload.color,
         conn: payload.conn
       })
+    },
+
+    removeUser (state, peerID: string) {
+      delete state.users[peerID]
     },
 
     receiveFile (state, payload) {
