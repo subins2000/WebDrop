@@ -5,7 +5,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    users: {}
+    users: {},
+    receivedFiles: {}
   },
   mutations: {
     addUser (state, payload) {
@@ -14,6 +15,10 @@ export default new Vuex.Store({
         color: payload.color,
         conn: payload.conn
       })
+    },
+
+    receiveFile (state, infoHash) {
+      Vue.set(state.receivedFiles, infoHash, {})
     }
   },
   actions: {

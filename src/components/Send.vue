@@ -20,12 +20,11 @@
           :multiple="true"
           :size="1024 * 1024 * 10"
           v-model="files"
-          @input-file="inputFile"
           ref="upload">
           <i class="fa fa-plus"></i>
           Select files
         </FileUpload>
-        <b-button class="is-success" v-bind:click="sendAll" v-bind:disabled="files.length === 0">Send All</b-button>
+        <b-button class="is-success" v-on:click="sendAll" v-bind:disabled="files.length === 0">Send All</b-button>
         <span>
           <b-button class="is-text">
             {{ userSelected.length }} users
@@ -39,17 +38,12 @@
             <th>Name</th>
             <th>Size</th>
             <th>Speed</th>
-            <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(file, index) in files" :key="file.id">
-            <td>{{index}}</td>
-            <td>
-              <img v-if="file.thumb" :src="file.thumb" width="40" height="auto" />
-              <span v-else>No Image</span>
-            </td>
+            <td>{{index + 1}}</td>
             <td>
               <div class="filename">
                 {{file.name}}
@@ -90,12 +84,27 @@ export default {
   },
 
   methods: {
-    inputFile (file) {
-      console.log(file)
-    },
-
     sendAll () {
-      
+      const files = []
+
+      for (const key in this.files) {
+        files.push(this.files[key].file)
+      }
+
+      this.$wt.seed(files, {
+        announceList: [this.$ANNOUNCE_URLS],
+        name: files[0].name
+      }, (torrent) => {
+        for (const userID of this.userSelected) {
+          console.log(userID, this.$store.state.users)
+          const conn = this.$store.state.users[userID].conn
+          this.$p2pt.send(conn, JSON.stringify({
+            type: 'send',
+            name: this.files[0].name,
+            infoHash: torrent.infoHash
+          }))
+        }
+      })
     }
   }
 }

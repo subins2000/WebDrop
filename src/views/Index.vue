@@ -129,10 +129,21 @@ export default {
             color: msg.color,
             conn: peer
           })
+        } else if (msg.type === 'send') {
+          this.$buefy.dialog.confirm({
+            message: `${this.$store.state.users[peer.id].name} wants to send you file <b class="is-bold">${msg.name}</b>`,
+            onConfirm: () => {
+              this.receiveFile(msg.infoHash)
+            }
+          })
         }
       })
 
       this.$p2pt.start()
+    },
+
+    receiveFile (infoHash) {
+      this.$store.commit('receiveFile', infoHash)
     },
 
     setUpEarth () {
