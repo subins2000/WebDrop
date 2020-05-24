@@ -169,7 +169,20 @@ export default {
     },
 
     onUserClick () {
-      console.log('a')
+      const target = d3.event.target
+      const userID = target.id
+
+      console.log(userID)
+
+      if (target.classList.contains('selected')) {
+        this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
+          elem.classList.remove('selected')
+        })
+      } else {
+        this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
+          elem.classList.add('selected')
+        })
+      }
     }
   },
 
@@ -179,23 +192,24 @@ export default {
 }
 </script>
 
-<style scoped>
-.navbar {
-  background: #209CEE;
-  color: #fff;
-}
+<style lang="sass">
+.navbar
+  background: #209CEE
+  color: #fff
 
-#earth-wrapper {
-  position: fixed;
-  top: 52px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
+#earth-wrapper
+  position: fixed
+  top: 52px
+  bottom: 0
+  left: 0
+  right: 0
 
-#earth {
-  margin: 0 auto;
-  width: 100%;
-  height: 100%;
-}
+#earth
+  margin: 0 auto
+  width: 100%
+  height: 100%
+
+  circle.selected
+    stroke-width: 5px
+    filter: drop-shadow(3px 3px 2px #209CEE)
 </style>
