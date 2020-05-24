@@ -9,6 +9,8 @@ import 'buefy/dist/buefy.css'
 
 import * as P2PT from 'p2pt'
 
+import Send from '@/components/Send.vue'
+
 Vue.use(Buefy)
 
 Vue.config.productionTip = false
@@ -25,6 +27,8 @@ if (window.location.hostname === 'localhost') {
 }
 
 Vue.prototype.$p2pt = new P2PT(announceURLs, 'aa')
+
+Vue.component('Send', Send)
 
 new Vue({
   router,

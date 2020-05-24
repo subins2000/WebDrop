@@ -1,34 +1,37 @@
 <template>
   <div>
-    <b-navbar v-if="userSelected === 0" class="navbar has-text-white has-shadow" :mobile-burger="false">
-      <template slot="brand">
-        <b-navbar-item tag="router-link" :to="{ path: '/' }">
-          <b-button>WebDrop</b-button>
-        </b-navbar-item>
-      </template>
-      <template slot="end">
-        <b-navbar-item tag="div" class="has-text-white">
-          {{ status }}
-        </b-navbar-item>
-      </template>
-    </b-navbar>
-    <b-navbar v-else class="navbar selected has-text-white has-shadow" :mobile-burger="false">
-      <template slot="brand">
-        <b-navbar-item>
-          <b-button v-on:click="cancelAllUserSelection">X</b-button>
-        </b-navbar-item>
-        <b-navbar-item tag="div">
-          {{ this.userSelected }} users selected
-        </b-navbar-item>
-      </template>
-      <template slot="end">
-        <b-navbar-item tag="router-link" :to="{ path: '/send' }">
-          <b-button>Send</b-button>
-        </b-navbar-item>
-      </template>
-    </b-navbar>
-    <div id="earth-wrapper">
-      <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet"></svg>
+    <Send v-if="sendScreen" :back="cancelAllUserSelection" :userSelected="userSelected" />
+    <div v-show="!sendScreen">
+      <b-navbar v-if="userSelected === 0" class="navbar has-text-white has-shadow" :mobile-burger="false">
+        <template slot="brand">
+          <b-navbar-item tag="router-link" :to="{ path: '/' }">
+            <b-button>WebDrop</b-button>
+          </b-navbar-item>
+        </template>
+        <template slot="end">
+          <b-navbar-item tag="div" class="has-text-white">
+            {{ status }}
+          </b-navbar-item>
+        </template>
+      </b-navbar>
+      <b-navbar v-else class="navbar selected is-active has-text-white has-shadow" :mobile-burger="false">
+        <template slot="brand">
+          <b-navbar-item>
+            <b-button v-on:click="cancelAllUserSelection">X</b-button>
+          </b-navbar-item>
+          <b-navbar-item tag="div">
+            {{ this.userSelectedCount }} users selected
+          </b-navbar-item>
+          <div class="actions">
+            <b-navbar-item tag="div">
+              <b-button v-on:click="sendScreen = true">Send</b-button>
+            </b-navbar-item>
+          </div>
+        </template>
+      </b-navbar>
+      <div id="earth-wrapper">
+        <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
     </div>
   </div>
 </template>
@@ -54,13 +57,22 @@ export default {
 
   data () {
     return {
-      status: 'ss',
+      status: 'Connecting...',
       myName: anonymus.create(),
       myColor: randomColor(),
-      peers: {},
+
       circleSlots: [],
       circleSlotIndex: 0,
-      userSelected: 0
+      
+      userSelected: [],
+      userSelectedCount: 0,
+      sendScreen: false
+    }
+  },
+
+  computed: {
+    userSelectedCount () {
+      return this.userSelected.length
     }
   },
 
@@ -194,6 +206,8 @@ export default {
       if (userID === 'me') return
 
       if (target.classList.contains('selected')) {
+        delete this.userSelected[this.userSelected.indexOf(userID)]
+        
         this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
           elem.classList.remove('selected')
         })
@@ -201,16 +215,20 @@ export default {
         this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
           elem.classList.add('selected')
         })
+
+        this.userSelected.push(userID)
       }
 
       this.userSelected = this.earth.querySelectorAll('.user.selected').length
     },
 
     cancelAllUserSelection () {
+      this.sendScreen = false
+      this.userSelected = 0
+
       this.earth.querySelectorAll('.selected').forEach(elem => {
         elem.classList.remove('selected')
       })
-      this.userSelected = 0
     }
   },
 
@@ -227,6 +245,16 @@ export default {
 
   &.selected
     background-color: #26D985 !important
+
+    // disable start & end and only use brand
+    .navbar-brand
+      width: 100%
+
+    .actions
+      display: flex
+      align-items: stretch
+      justify-content: flex-end
+      margin-left: auto
 
 #earth-wrapper
   position: fixed
