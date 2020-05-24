@@ -8,8 +8,8 @@
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
             <b-button>WebDrop</b-button>
           </b-navbar-item>
-          <b-navbar-item>
-            Share Files Easily Across Devices !
+          <b-navbar-item tag="router-link" :to="{ path: '/about' }">
+            <b-button class="is-warning">About & Help</b-button>
           </b-navbar-item>
         </template>
         <template slot="end">
@@ -113,6 +113,7 @@ export default {
       this.$p2pt.setIdentifier(ip)
 
       this.$p2pt.on('peerconnect', (peer) => {
+        this.status = ''
         this.$p2pt.send(peer, JSON.stringify({
           type: 'init',
           name: this.myName,
@@ -142,6 +143,27 @@ export default {
             }
           })
         }
+      })
+
+      let warningCount = 0
+      this.$p2pt.on('trackerwarning', (blah, stats) => {
+        warningCount++
+
+        if (warningCount >= stats.total) {
+          this.status = 'Cannot connect to WebTorrent trackers'
+
+          this.$buefy.toast.open({
+            message: 'We couldn\'t connect to any WebTorrent trackers. A page refresh might help.\nYour ISP might be blocking them 🤔',
+            position: 'is-top',
+            type: 'is-danger',
+            duration: 6000
+          })
+        }
+      })
+
+      this.$p2pt.on('trackerconnect', () => {
+        this.status = 'Connected!'
+        warningCount--
       })
 
       this.$p2pt.start()
