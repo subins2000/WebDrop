@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar class="navbar has-text-white has-shadow">
+    <b-navbar v-if="userSelected === 0" class="navbar has-text-white has-shadow" mobile-burger="false">
       <template slot="brand">
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <b-button>WebDrop</b-button>
@@ -9,6 +9,21 @@
       <template slot="end">
         <b-navbar-item tag="div" class="has-text-white">
           {{ status }}
+        </b-navbar-item>
+      </template>
+    </b-navbar>
+    <b-navbar v-else class="navbar selected has-text-white has-shadow" mobile-burger="false">
+      <template slot="brand">
+        <b-navbar-item>
+          <b-button v-on:click="cancelAllUserSelection">X</b-button>
+        </b-navbar-item>
+        <b-navbar-item tag="div">
+          {{ this.userSelected }} users selected
+        </b-navbar-item>
+      </template>
+      <template slot="end">
+        <b-navbar-item tag="router-link" :to="{ path: '/send' }">
+          <b-button>Send</b-button>
         </b-navbar-item>
       </template>
     </b-navbar>
@@ -46,7 +61,8 @@ export default {
       myColor: randomColor(),
       peers: {},
       circleSlots: [],
-      circleSlotIndex: 0
+      circleSlotIndex: 0,
+      userSelected: 0
     }
   },
 
@@ -96,8 +112,6 @@ export default {
         name: name,
         color: color
       }
-
-      console.log(this.circleSlots)
 
       this.addUserCircle(id, name, color, this.circleSlots[this.circleSlotIndex][0], this.circleSlots[this.circleSlotIndex][1])
 
@@ -172,7 +186,7 @@ export default {
       const target = d3.event.target
       const userID = target.id
 
-      console.log(userID)
+      if (userID === 'me') return
 
       if (target.classList.contains('selected')) {
         this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
@@ -183,6 +197,15 @@ export default {
           elem.classList.add('selected')
         })
       }
+
+      this.userSelected = this.earth.querySelectorAll('.user.selected').length
+    },
+
+    cancelAllUserSelection () {
+      this.earth.querySelectorAll('.selected').forEach(elem => {
+        elem.classList.remove('selected')
+      })
+      this.userSelected = 0
     }
   },
 
@@ -194,8 +217,11 @@ export default {
 
 <style lang="sass">
 .navbar
-  background: #209CEE
+  background-color: #209CEE !important
   color: #fff
+
+  &.selected
+    background-color: #26D985 !important
 
 #earth-wrapper
   position: fixed
@@ -208,8 +234,15 @@ export default {
   margin: 0 auto
   width: 100%
   height: 100%
+  user-select: none
 
-  circle.selected
-    stroke-width: 5px
-    filter: drop-shadow(3px 3px 2px #209CEE)
+  .user
+    stroke: #000
+    stroke-width: 0
+
+    &.selected
+      stroke-width: 3px
+
+  .user-text.selected
+    font-weight: bold
 </style>
