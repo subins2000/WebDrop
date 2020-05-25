@@ -3,7 +3,7 @@
     <b-navbar class="navbar is-warning has-text-white has-shadow" :mobile-burger="false">
       <template slot="brand">
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
-          <b-button>WebDrop</b-button>
+          <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
         <b-navbar-item>
           Share Files Easily Across Devices !

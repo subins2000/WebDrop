@@ -6,10 +6,10 @@
       <b-navbar v-if="userSelectedCount === 0" class="navbar is-info has-text-white has-shadow" :mobile-burger="false">
         <template slot="brand">
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
-            <b-button>WebDrop</b-button>
+            <h1 class="is-size-4">WebDrop</h1>
           </b-navbar-item>
           <b-navbar-item tag="router-link" :to="{ path: '/about' }">
-            <b-button class="is-warning">About & Help</b-button>
+            How-To
           </b-navbar-item>
         </template>
         <template slot="end">
