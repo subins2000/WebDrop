@@ -162,8 +162,10 @@ export default {
       this.$p2pt.on('trackerwarning', (blah, stats) => {
         warningCount++
 
-        if (warningCount >= stats.total) {
+        if (warningCount >= stats.total && stats.connected === 0) {
           this.status = 'Cannot connect to WebTorrent trackers'
+
+          console.error(blah)
 
           this.$buefy.toast.open({
             message: 'We couldn\'t connect to any WebTorrent trackers. A page refresh might help.\nYour ISP might be blocking them 🤔',

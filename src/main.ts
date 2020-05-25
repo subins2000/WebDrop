@@ -30,7 +30,7 @@ if (window.location.hostname === 'localhost') {
 }
 
 Vue.prototype.$ANNOUNCE_URLS = announceURLs
-Vue.prototype.$p2pt = new P2PT(announceURLs, 'aa')
+Vue.prototype.$p2pt = new P2PT(announceURLs)
 Vue.prototype.$wt = new WebTorrent()
 
 Vue.component('Send', Send)
