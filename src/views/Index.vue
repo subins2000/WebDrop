@@ -302,10 +302,7 @@ export default {
   transition: 0.2s all
 
   &.has-shadow
-    box-shadow: 0 0px 30px 0 #AAA !important
-
-  .navbar-item
-    color: #fff
+    box-shadow: 0 5px 30px 0 #AAA !important
 
   // disable start & end and only use brand
   .navbar-brand

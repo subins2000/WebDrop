@@ -2,11 +2,11 @@
   <div>
     <b-navbar class="navbar is-primary is-active has-text-white has-shadow" :mobile-burger="false">
       <template slot="brand">
-        <b-navbar-item>
-          <b-button v-on:click="back">WebDrop</b-button>
+        <b-navbar-item v-on:click="back">
+          <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
-        <b-navbar-item>
-          <h4 class="is-size-4">Receive</h4>
+        <b-navbar-item tag="div">
+          Receive Files
         </b-navbar-item>
       </template>
     </b-navbar>
