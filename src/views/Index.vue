@@ -1,9 +1,9 @@
 <template>
   <div>
-    <Send v-if="sendScreen" :back="cancelAllUserSelection" :userSelected="userSelected" />
-    <Receive v-else-if="receiveScreen" :back="cancelAllUserSelection" />
+    <Send v-show="sendScreen" :back="cancelAllUserSelection" :userSelected="userSelected" />
+    <Receive v-show="receiveScreen" :back="cancelAllUserSelection" />
     <div v-show="!sendScreen && !receiveScreen">
-      <b-navbar v-if="userSelectedCount === 0" class="navbar is-info has-text-white has-shadow" :mobile-burger="false">
+      <b-navbar v-if="userSelectedCount === 0" class="navbar is-info has-text-white" :mobile-burger="false">
         <template slot="brand">
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
             <h1 class="is-size-4">WebDrop</h1>
@@ -18,17 +18,17 @@
           </b-navbar-item>
         </template>
       </b-navbar>
-      <b-navbar v-else class="navbar selected is-active has-text-white has-shadow" :mobile-burger="false">
+      <b-navbar v-else class="navbar is-success has-text-white has-shadow" :mobile-burger="false">
         <template slot="brand">
           <b-navbar-item>
-            <b-button v-on:click="cancelAllUserSelection">X</b-button>
+            <b-button type="is-danger" size="is-medium" v-on:click="cancelAllUserSelection">X</b-button>
           </b-navbar-item>
           <b-navbar-item tag="div">
             {{ userSelectedCount }} users selected
           </b-navbar-item>
           <div class="actions">
             <b-navbar-item tag="div">
-              <b-button v-on:click="sendScreen = true">Send</b-button>
+              <b-button type="is-primary" size="is-medium" v-on:click="sendScreen = true">Send</b-button>
             </b-navbar-item>
           </div>
         </template>
@@ -297,26 +297,25 @@ export default {
 
 <style lang="sass">
 .navbar
-  background-color: #209CEE
-  color: #fff
   padding-top: 10px
   padding-bottom: 10px
+  transition: 0.2s all
+
+  &.has-shadow
+    box-shadow: 0 0px 30px 0 #AAA !important
 
   .navbar-item
     color: #fff
 
-  &.selected
-    background-color: #26D985 !important
+  // disable start & end and only use brand
+  .navbar-brand
+    width: 100%
 
-    // disable start & end and only use brand
-    .navbar-brand
-      width: 100%
-
-    .actions
-      display: flex
-      align-items: stretch
-      justify-content: flex-end
-      margin-left: auto
+  .actions
+    display: flex
+    align-items: stretch
+    justify-content: flex-end
+    margin-left: auto
 
 #earth-wrapper
   position: fixed
@@ -340,4 +339,15 @@ export default {
 
   .user-text.selected
     font-weight: bold
+
+.container
+  padding: 20px 0
+
+@media screen and (max-width: 960px)
+  .container
+    padding: 20px 5%
+
+@media screen and (min-width: 900px)
+  .container
+    max-width: 900px
 </style>

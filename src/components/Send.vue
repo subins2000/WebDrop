@@ -1,19 +1,21 @@
 <template>
   <div>
-    <b-navbar class="navbar selected is-active has-text-white has-shadow" :mobile-burger="false">
+    <b-navbar class="navbar has-text-white has-shadow" v-bind:class="files.length > 0 ? 'is-warning' : 'is-success'" :mobile-burger="false">
       <template slot="brand">
-        <b-navbar-item>
-          <b-button v-on:click="back">WebDrop</b-button>
+        <b-navbar-item v-on:click="back">
+          <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
-        <b-navbar-item>
-          <h4 class="is-size-4">Send</h4>
-        </b-navbar-item>
+        <div class="actions">
+          <b-navbar-item tag="div">
+            <b-button type="is-primary" size="is-medium" v-on:click="sendAll" v-show="files.length > 0">Send All</b-button>
+          </b-navbar-item>
+        </div>
       </template>
     </b-navbar>
     <div class="container">
       <div class="actions">
         <FileUpload
-          class="button is-primary"
+          class="button is-success"
           post-action="#"
           extensions="*"
           accept="*"
@@ -21,10 +23,8 @@
           :size="1024 * 1024 * 10"
           v-model="files"
           ref="upload">
-          <i class="fa fa-plus"></i>
           Select files
         </FileUpload>
-        <b-button class="is-success" v-on:click="sendAll" v-bind:disabled="files.length === 0">Send All</b-button>
         <span>
           <b-button class="is-text">
             {{ userSelected.length }} users
@@ -109,21 +109,11 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style scoped lang="sass">
 .container
-  padding: 20px 0
-
   .actions .button
     margin-right: 10px
 
 .table
   margin-top: 20px
-
-@media screen and (max-width: 960px)
-  .container
-    padding: 20px 5%
-
-@media screen and (min-width: 900px)
-  .container
-    max-width: 900px
 </style>
