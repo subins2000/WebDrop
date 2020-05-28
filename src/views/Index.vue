@@ -1,7 +1,5 @@
 <template>
   <div>
-    <Send v-show="sendScreen" :back="cancelAllUserSelection" :userSelected="userSelected" />
-    <Receive v-show="receiveScreen" :back="cancelAllUserSelection" />
     <div v-show="!sendScreen && !receiveScreen">
       <b-navbar v-if="userSelectedCount === 0" class="navbar is-info has-text-white" :mobile-burger="false">
         <template slot="brand">
@@ -27,8 +25,8 @@
             {{ userSelectedCount }} users selected
           </b-navbar-item>
           <div class="actions">
-            <b-navbar-item tag="div">
-              <b-button type="is-primary" size="is-medium" v-on:click="sendScreen = true">Send</b-button>
+            <b-navbar-item tag="router-link" :to="{ path: '/send' }">
+              <b-button type="is-primary" size="is-medium">Send</b-button>
             </b-navbar-item>
           </div>
         </template>
@@ -67,13 +65,16 @@ export default {
 
       circleSlots: [],
 
-      userSelected: [],
       sendScreen: false,
       receiveScreen: false
     }
   },
 
   computed: {
+    userSelected () {
+      return this.$store.state.selectedUsers
+    },
+
     userSelectedCount () {
       return this.userSelected.length
     }
@@ -197,14 +198,18 @@ export default {
       this.earth = this.$refs.earth
       this.svg = d3.select(this.earth)
 
-      this.circleStartingX = window.innerWidth / 2
-      this.circleStartingY = window.innerHeight - 100
+      const canvasSize = [window.innerWidth, window.innerHeight]
 
-      const biggestCircleRadius = this.circleStartingX
+      this.svg.attr('viewBox', `0 0 ${canvasSize[0]} ${canvasSize[1]}`)
 
-      this.userCircleRadius = biggestCircleRadius * 0.05
+      this.circleStartingX = canvasSize[0] / 2
+      this.circleStartingY = canvasSize[1] - canvasSize[1] * 0.1
 
-      // 10% of biggest circle radius
+      const biggestCircleRadius = Math.max(canvasSize[0] / 2, canvasSize[1])
+
+      // 5% of width
+      this.userCircleRadius = canvasSize[1] * 0.05
+
       let curCircleRadius = this.userCircleRadius
 
       let i = 0
@@ -261,20 +266,20 @@ export default {
       const target = d3.event.target
       const userID = target.id
 
-      if (userID === 'me') return
+      // if (userID === 'me') return
 
       if (target.classList.contains('selected')) {
-        this.userSelected.splice(this.userSelected.indexOf(userID), 1)
+        this.$store.commit('deselectUser', userID)
 
         this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
           elem.classList.remove('selected')
         })
       } else {
+        this.$store.commit('selectUser', userID)
+
         this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
           elem.classList.add('selected')
         })
-
-        this.userSelected.push(userID)
       }
     },
 
@@ -324,7 +329,7 @@ export default {
 #earth
   margin: 0 auto
   width: 100%
-  height: 100%
+  max-height: 100%
   user-select: none
 
   .user

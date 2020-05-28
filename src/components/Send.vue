@@ -2,7 +2,7 @@
   <div>
     <b-navbar class="navbar has-text-white has-shadow" v-bind:class="files.length > 0 ? 'is-warning' : 'is-success'" :mobile-burger="false">
       <template slot="brand">
-        <b-navbar-item v-on:click="back">
+        <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
         <div class="actions">
@@ -27,7 +27,7 @@
         </FileUpload>
         <span>
           <b-button class="is-text">
-            {{ userSelected.length }} users
+            {{ selectedUsers.length }} users
           </b-button>
         </span>
       </div>
@@ -72,14 +72,10 @@
 export default {
   name: 'Send',
 
-  props: [
-    'back',
-    'userSelected'
-  ],
-
   data () {
     return {
-      files: []
+      files: [],
+      selectedUsers: this.$store.state.selectedUsers
     }
   },
 
@@ -95,7 +91,7 @@ export default {
         announceList: [this.$ANNOUNCE_URLS],
         name: files[0].name
       }, (torrent) => {
-        for (const userID of this.userSelected) {
+        for (const userID of this.selectedUsers) {
           const conn = this.$store.state.users[userID].conn
           this.$p2pt.send(conn, JSON.stringify({
             type: 'send',
@@ -105,6 +101,17 @@ export default {
         }
       })
     }
+  },
+
+  mounted () {
+    if (this.selectedUsers.length === 0) {
+      this.$router.push('/')
+    }
+  },
+
+  beforeRouteLeave (to, from, next) {
+    this.$store.commit('clearSelectedUsers')
+    next(true)
   }
 }
 </script>

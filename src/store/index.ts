@@ -6,6 +6,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     users: {} as any,
+    selectedUsers: [] as any,
     receivedFiles: {}
   },
   mutations: {
@@ -17,8 +18,21 @@ export default new Vuex.Store({
       })
     },
 
-    removeUser (state, peerID: string) {
-      delete state.users[peerID]
+    removeUser (state, userID: string) {
+      // userID == peerID
+      delete state.users[userID]
+    },
+
+    selectUser (state, userID) {
+      state.selectedUsers.push(userID)
+    },
+
+    deselectUser (state, userID) {
+      state.selectedUsers.splice(state.selectedUsers.indexOf(userID), 1)
+    },
+
+    clearSelectedUsers (state) {
+      state.selectedUsers = []
     },
 
     receiveFile (state, payload) {
