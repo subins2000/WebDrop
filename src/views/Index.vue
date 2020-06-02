@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-show="!sendScreen && !receiveScreen">
-      <b-navbar v-if="userSelectedCount === 0" class="navbar is-info has-text-white" :mobile-burger="false">
+      <b-navbar v-if="userSelectedCount === 0" class="navbar is-info main-navbar has-text-white">
         <template slot="brand">
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
             <h1 class="is-size-4">WebDrop</h1>
@@ -11,7 +11,11 @@
           </b-navbar-item>
         </template>
         <template slot="end">
-          <b-navbar-item tag="div" class="has-text-white">
+          <b-navbar-item tag="div" @click="shareViaInternet">
+            <b-button v-if="internetShare" type="is-text is-danger" title="Share Via Internet Mode On">🌐</b-button>
+            <b-button v-else type="is-primary">Share Via Internet 🌐</b-button>
+          </b-navbar-item>
+          <b-navbar-item tag="div">
             {{ status }}
           </b-navbar-item>
         </template>
@@ -60,6 +64,7 @@ export default {
   data () {
     return {
       status: 'Connecting...',
+
       myName: anonymus.create(),
       myColor: randomColor(),
 
@@ -77,6 +82,14 @@ export default {
 
     userSelectedCount () {
       return this.userSelected.length
+    },
+
+    internetShare () {
+      return this.$store.state.internetShare
+    },
+
+    internetRoomID () {
+      return this.$store.state.internetRoomID
     }
   },
 
@@ -111,12 +124,17 @@ export default {
     },
 
     setUpP2PT () {
-      publicIP.v4().then((ip) => {
-        this.startP2PT(ip)
-      }).catch(error => {
-        console.log(error)
-        this.status = 'Could not find your IP address'
-      })
+      if (this.internetShare) {
+        this.status = ''
+        this.startP2PT('webdrop' + this.internetRoomID)
+      } else {
+        publicIP.v4().then((ip) => {
+          this.startP2PT(ip)
+        }).catch(error => {
+          console.log(error)
+          this.status = 'Could not find your IP address'
+        })
+      }
     },
 
     startP2PT (ip) {
@@ -183,6 +201,31 @@ export default {
       })
 
       this.$p2pt.start()
+    },
+
+    shareViaInternet () {
+      let roomID = this.internetRoomID
+      if (!roomID) {
+        roomID = Math.random().toString(36).substr(2, this.$INTERNET_ROOM_CODE_LENGTH)
+        this.$store.commit('activateInternetShare', roomID)
+      }
+
+      this.$buefy.modal.open(`
+        <div class="container content modal-card-body has-background-white has-text-centered">
+          <p>Share this code with your friends</p>
+          <pre class="is-size-4">${roomID}</pre>
+          <h3 style="margin-top: 0">OR</h3>
+          <p>Share this link</p>
+          <div>
+            <input class='input is-medium is-flat' onclick="this.select()" value='${this.$INTERNET_ROOM_SHARE_LINK}${roomID}' readonly /><br/><br/>
+            <span class='button is-primary is-medium' style='width: 100%' @click='copyGameLink' v-clipboard='gameLink'>Copy</span>
+          </div>
+        </div>
+        `
+      )
+
+      this.$p2pt.destroy()
+      this.setUpP2PT()
     },
 
     receiveFile (name, infoHash) {
@@ -306,18 +349,21 @@ export default {
   padding-bottom: 10px
   transition: 0.2s all
 
-  &.has-shadow
-    box-shadow: 0 5px 30px 0 #AAA !important
-
   // disable start & end and only use brand
   .navbar-brand
     width: 100%
+
+  &.has-shadow
+    box-shadow: 0 5px 30px 0 #AAA !important
 
   .actions
     display: flex
     align-items: stretch
     justify-content: flex-end
     margin-left: auto
+
+.main-navbar .navbar-brand
+  width: auto
 
 #earth-wrapper
   position: fixed
