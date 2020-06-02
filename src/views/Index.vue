@@ -46,6 +46,7 @@
 import * as d3 from 'd3'
 import * as anonymus from 'anonymus'
 import * as publicIP from 'public-ip'
+import * as hashSum from 'hash-sum'
 
 const randomColor = () => {
   return `hsla(${~~(360 * Math.random())},70%,50%,1)`
@@ -88,8 +89,8 @@ export default {
       return this.$store.state.internetShare
     },
 
-    internetRoomID () {
-      return this.$store.state.internetRoomID
+    roomID () {
+      return this.$store.state.roomID
     }
   },
 
@@ -124,21 +125,17 @@ export default {
     },
 
     setUpP2PT () {
-      if (this.internetShare) {
-        this.status = ''
-        this.startP2PT('webdrop' + this.internetRoomID)
-      } else {
-        publicIP.v4().then((ip) => {
-          this.startP2PT(ip)
-        }).catch(error => {
-          console.log(error)
-          this.status = 'Could not find your IP address'
-        })
-      }
+      publicIP.v4().then((ip) => {
+        this.roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
+        this.startP2PT(this.roomID)
+      }).catch(error => {
+        console.log(error)
+        this.status = 'Could not find your IP address'
+      })
     },
 
-    startP2PT (ip) {
-      this.$p2pt.setIdentifier(ip)
+    startP2PT (identifier) {
+      this.$p2pt.setIdentifier('webdrop' + identifier)
 
       this.$p2pt.on('peerconnect', (peer) => {
         this.status = ''
@@ -204,10 +201,12 @@ export default {
     },
 
     shareViaInternet () {
-      let roomID = this.internetRoomID
+      let roomID = this.roomID
       if (!roomID) {
         roomID = Math.random().toString(36).substr(2, this.$INTERNET_ROOM_CODE_LENGTH)
         this.$store.commit('activateInternetShare', roomID)
+
+        this.startP2PT(roomID)
       }
 
       this.$buefy.modal.open(`
@@ -223,9 +222,6 @@ export default {
         </div>
         `
       )
-
-      this.$p2pt.destroy()
-      this.setUpP2PT()
     },
 
     receiveFile (name, infoHash) {

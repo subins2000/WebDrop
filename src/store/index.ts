@@ -10,7 +10,7 @@ export default new Vuex.Store({
     receivedFiles: {},
 
     internetShare: false,
-    internetRoomID: ''
+    roomID: ''
   },
   mutations: {
     addUser (state, payload) {
@@ -44,7 +44,7 @@ export default new Vuex.Store({
 
     activateInternetShare (state, roomID: string) {
       state.internetShare = true
-      state.internetRoomID = roomID
+      state.roomID = roomID
     }
   },
   actions: {
