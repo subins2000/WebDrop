@@ -35,16 +35,25 @@
         <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet"></svg>
       </div>
     </div>
+    <div class="is-hidden">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 48 48" id="phone-icon"><defs><linearGradient xlink:href="#4" id="3" x1="159.46" y1="668.03" x2="160.66" y2="596.97" gradientUnits="userSpaceOnUse"/><linearGradient id="4"><stop stop-color="#08f"/><stop offset="1" stop-color="#02c3ff"/></linearGradient><linearGradient xlink:href="#4" id="2" x1="159.46" y1="668.03" x2="160.66" y2="596.97" gradientUnits="userSpaceOnUse"/><linearGradient xlink:href="#4" id="0" x1="169.5" y1="624.72" x2="159.24" y2="63.27" gradientUnits="userSpaceOnUse" gradientTransform="matrix(.93022 0 0 .91891 14.815 32.587)"/><linearGradient id="1" x1="8.167" y1="1050.47" x2="8.115" y2="1038.35" gradientUnits="userSpaceOnUse"><stop stop-color="#141414"/><stop offset="1" stop-color="#2d2d2f"/></linearGradient></defs><g transform="matrix(.07976 0 0 .06939 11.129.212)"><rect width="292.69" height="525.81" x="18.553" y="87.91" fill="url(#0)" fill-rule="evenodd" rx="9.302"/><path d="m11.404 1037.36h-6.807c-.31 0-.561.251-.561.561v12.877c0 .31.251.561.561.561h6.807c.31 0 .561-.251.561-.561v-12.877c0-.31-.251-.561-.561-.561m-.082 11.778h-6.644v-9.555h6.644z" transform="matrix(42.98335 0 0 49.4146-182.52-51263.92)" fill="url(#1)"/><ellipse cx="161.34" cy="637.98" rx="25.23" ry="29" fill="url(#2)" fill-rule="evenodd" stroke="url(#3)" stroke-linecap="round" stroke-width="7.411"/></g></svg>
+    </div>
   </div>
 </template>
 
 <script>
 import * as d3 from 'd3'
-import * as anonymus from 'anonymus'
+import Bowser from 'bowser'
 import * as publicIP from 'public-ip'
 
 const randomColor = () => {
   return `hsla(${~~(360 * Math.random())},70%,50%,1)`
+}
+
+const getName = () => {
+  const bowser = Bowser.getParser(window.navigator.userAgent)
+
+  return `${bowser.getOSName()} ${bowser.getBrowserName()}`
 }
 
 export default {
@@ -60,7 +69,7 @@ export default {
   data () {
     return {
       status: 'Connecting...',
-      myName: anonymus.create(),
+      myName: getName(),
       myColor: randomColor(),
 
       circleSlots: [],
@@ -241,7 +250,9 @@ export default {
     },
 
     addUserCircle (userID, userName, userColor, x, y) {
-      this.svg.append('circle')
+      const group = this.svg.append('g')
+
+      group.append('circle')
         .attr('class', 'user')
         .attr('id', userID)
         .attr('r', this.userCircleRadius)
@@ -251,7 +262,14 @@ export default {
         .attr('fill', userColor)
         .on('click', this.onUserClick)
 
-      this.svg.append('text')
+      group.append('image')
+        .attr('xlink:href', '#phone-icon')
+        .attr('width', this.userCircleRadius)
+        .attr('height', '100px')
+        .attr('x', x)
+        .attr('y', y)
+
+      group.append('text')
         .attr('class', 'user-text')
         .attr('id', userID)
         .attr('dominant-baseline', 'middle')
