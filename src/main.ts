@@ -7,6 +7,7 @@ import './registerServiceWorker'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 import FileUpload from 'vue-upload-component'
+import VueClipboard from 'vue-clipboard2'
 
 import * as P2PT from 'p2pt'
 import WebTorrent from 'webtorrent'
@@ -15,6 +16,7 @@ import Send from '@/components/Send.vue'
 import Receive from '@/components/Receive.vue'
 
 Vue.use(Buefy)
+Vue.use(VueClipboard)
 
 Vue.config.productionTip = false
 

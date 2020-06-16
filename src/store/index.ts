@@ -42,6 +42,10 @@ export default new Vuex.Store({
       Vue.set(state.receivedFiles, payload.infoHash, payload.name)
     },
 
+    setRoom (state, roomID: string) {
+      state.roomID = roomID
+    },
+
     activateInternetShare (state, roomID: string) {
       state.internetShare = true
       state.roomID = roomID

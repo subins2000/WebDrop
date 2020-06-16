@@ -12,8 +12,7 @@
         </template>
         <template slot="end">
           <b-navbar-item tag="div" @click="shareViaInternet">
-            <b-button v-if="internetShare" type="is-text is-danger" title="Share Via Internet Mode On">🌐</b-button>
-            <b-button v-else type="is-primary">Share Via Internet 🌐</b-button>
+            <b-button type="is-primary">Share Via Internet 🌐</b-button>
           </b-navbar-item>
           <b-navbar-item tag="div">
             {{ status }}
@@ -39,10 +38,38 @@
         <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet"></svg>
       </div>
     </div>
+    <b-modal :active.sync="internetShareModelActive" class="has-text-centered">
+      <div class="card">
+        <div class="card-content content">
+          <b-tabs v-model="internetShareModelActiveTab" type="is-info">
+            <b-tab-item label="Invite People">
+              <p>Share this room code with people you want to share files with :</p>
+              <pre class="is-size-4">{{ roomID }}</pre>
+              <h3 style="margin-top: 0">OR</h3>
+              <p>Share this link</p>
+              <div class="columns">
+                <div class="column is-four-fifths">
+                  <input class="input is-info is-medium is-flat" onclick="this.select()" v-bind:value='internetInviteLink' readonly />
+                </div>
+                <div class="column">
+                  <span class="button is-info is-primary is-medium" @click="copyInviteLink" v-clipboard="internetInviteLink" style="width: 100%">Copy</span>
+                </div>
+              </div>
+            </b-tab-item>
+            <b-tab-item label="Join Room">
+              <p>Paste the room code here :</p>
+              <input class="input is-info is-medium is-flat" v-model='internetRoomInput' /><br/><br/>
+              <div class="button is-info is-medium" @click="joinInternetRoom" style="width: 100%;">Join</div>
+            </b-tab-item>
+          </b-tabs>
+        </div>
+      </div>
+    </b-modal>
   </div>
 </template>
 
 <script>
+import * as P2PT from 'p2pt'
 import * as d3 from 'd3'
 import * as anonymus from 'anonymus'
 import * as publicIP from 'public-ip'
@@ -72,7 +99,11 @@ export default {
       circleSlots: [],
 
       sendScreen: false,
-      receiveScreen: false
+      receiveScreen: false,
+
+      internetShareModelActive: false,
+      internetShareModelActiveTab: 0,
+      internetRoomInput: ''
     }
   },
 
@@ -91,6 +122,10 @@ export default {
 
     roomID () {
       return this.$store.state.roomID
+    },
+
+    internetInviteLink () {
+      return this.$INTERNET_ROOM_SHARE_LINK + this.roomID
     }
   },
 
@@ -126,8 +161,9 @@ export default {
 
     setUpP2PT () {
       publicIP.v4().then((ip) => {
-        this.roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
-        this.startP2PT(this.roomID)
+        const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
+        this.$store.commit('setRoom', roomID)
+        this.startP2PT(roomID)
       }).catch(error => {
         console.log(error)
         this.status = 'Could not find your IP address'
@@ -135,6 +171,10 @@ export default {
     },
 
     startP2PT (identifier) {
+      if (this.$p2pt) {
+        this.$p2pt.destroy()
+      }
+      this.$p2pt = new P2PT(this.$ANNOUNCE_URLS)
       this.$p2pt.setIdentifier('webdrop' + identifier)
 
       this.$p2pt.on('peerconnect', (peer) => {
@@ -209,19 +249,33 @@ export default {
         this.startP2PT(roomID)
       }
 
-      this.$buefy.modal.open(`
-        <div class="container content modal-card-body has-background-white has-text-centered">
-          <p>Share this code with your friends</p>
-          <pre class="is-size-4">${roomID}</pre>
-          <h3 style="margin-top: 0">OR</h3>
-          <p>Share this link</p>
-          <div>
-            <input class='input is-medium is-flat' onclick="this.select()" value='${this.$INTERNET_ROOM_SHARE_LINK}${roomID}' readonly /><br/><br/>
-            <span class='button is-primary is-medium' style='width: 100%' @click='copyGameLink' v-clipboard='gameLink'>Copy</span>
-          </div>
-        </div>
-        `
-      )
+      this.internetShareModelActive = true
+    },
+
+    copyInviteLink () {
+      this.$buefy.toast.open({
+        duration: 2000,
+        message: 'Invite Link Copied !',
+        position: 'is-top',
+        type: 'is-success'
+      })
+    },
+
+    joinInternetRoom () {
+      if (this.internetRoomInput.length !== this.$INTERNET_ROOM_CODE_LENGTH) {
+        return
+      }
+      this.$store.commit('activateInternetShare', this.internetRoomInput)
+
+      this.startP2PT(this.internetRoomInput)
+
+      this.$buefy.toast.open({
+        duration: 2000,
+        message: `Joined Room ${this.internetRoomInput}`,
+        position: 'is-top',
+        type: 'is-success'
+      })
+      this.internetShareModelActive = false
     },
 
     receiveFile (name, infoHash) {
