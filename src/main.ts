@@ -7,6 +7,7 @@ import './registerServiceWorker'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 import FileUpload from 'vue-upload-component'
+import VueClipboard from 'vue-clipboard2'
 
 import * as P2PT from 'p2pt'
 import WebTorrent from 'webtorrent'
@@ -15,6 +16,7 @@ import Send from '@/components/Send.vue'
 import Receive from '@/components/Receive.vue'
 
 Vue.use(Buefy)
+Vue.use(VueClipboard)
 
 Vue.config.productionTip = false
 
@@ -30,6 +32,8 @@ if (window.location.hostname === 'localhost') {
 }
 
 Vue.prototype.$ANNOUNCE_URLS = announceURLs
+Vue.prototype.$INTERNET_ROOM_CODE_LENGTH = 4
+Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://ShareThisFile.Online/#/?room='
 Vue.prototype.$p2pt = new P2PT(announceURLs)
 Vue.prototype.$wt = new WebTorrent()
 

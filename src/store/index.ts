@@ -7,7 +7,10 @@ export default new Vuex.Store({
   state: {
     users: {} as any,
     selectedUsers: [] as any,
-    receivedFiles: {}
+    receivedFiles: {},
+
+    internetShare: false,
+    roomID: ''
   },
   mutations: {
     addUser (state, payload) {
@@ -23,11 +26,11 @@ export default new Vuex.Store({
       delete state.users[userID]
     },
 
-    selectUser (state, userID) {
+    selectUser (state, userID: string) {
       state.selectedUsers.push(userID)
     },
 
-    deselectUser (state, userID) {
+    deselectUser (state, userID: string) {
       state.selectedUsers.splice(state.selectedUsers.indexOf(userID), 1)
     },
 
@@ -37,6 +40,15 @@ export default new Vuex.Store({
 
     receiveFile (state, payload) {
       Vue.set(state.receivedFiles, payload.infoHash, payload.name)
+    },
+
+    setRoom (state, roomID: string) {
+      state.roomID = roomID
+    },
+
+    activateInternetShare (state, roomID: string) {
+      state.internetShare = true
+      state.roomID = roomID
     }
   },
   actions: {

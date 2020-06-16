@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-show="!sendScreen && !receiveScreen">
-      <b-navbar v-if="userSelectedCount === 0" class="navbar is-info has-text-white" :mobile-burger="false">
+      <b-navbar v-if="userSelectedCount === 0" class="navbar is-info main-navbar has-text-white">
         <template slot="brand">
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
             <h1 class="is-size-4">WebDrop</h1>
@@ -11,7 +11,10 @@
           </b-navbar-item>
         </template>
         <template slot="end">
-          <b-navbar-item tag="div" class="has-text-white">
+          <b-navbar-item tag="div" @click="shareViaInternet">
+            <b-button type="is-primary">Share Via Internet 🌐</b-button>
+          </b-navbar-item>
+          <b-navbar-item tag="div">
             {{ status }}
           </b-navbar-item>
         </template>
@@ -35,13 +38,42 @@
         <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet"></svg>
       </div>
     </div>
+    <b-modal :active.sync="internetShareModelActive" class="has-text-centered">
+      <div class="card">
+        <div class="card-content content">
+          <b-tabs v-model="internetShareModelActiveTab" type="is-info">
+            <b-tab-item label="Invite People">
+              <p>Share this room code with people you want to share files with :</p>
+              <pre class="is-size-4">{{ roomID }}</pre>
+              <h3 style="margin-top: 0">OR</h3>
+              <p>Share this link</p>
+              <div class="columns">
+                <div class="column is-four-fifths">
+                  <input class="input is-info is-medium is-flat" onclick="this.select()" v-bind:value='internetInviteLink' readonly />
+                </div>
+                <div class="column">
+                  <span class="button is-info is-primary is-medium" @click="copyInviteLink" v-clipboard="internetInviteLink" style="width: 100%">Copy</span>
+                </div>
+              </div>
+            </b-tab-item>
+            <b-tab-item label="Join Room">
+              <p>Paste the room code here :</p>
+              <input class="input is-info is-medium is-flat" v-model='internetRoomInput' /><br/><br/>
+              <div class="button is-info is-medium" @click="joinInternetRoom" style="width: 100%;">Join</div>
+            </b-tab-item>
+          </b-tabs>
+        </div>
+      </div>
+    </b-modal>
   </div>
 </template>
 
 <script>
+import * as P2PT from 'p2pt'
 import * as d3 from 'd3'
 import * as anonymus from 'anonymus'
 import * as publicIP from 'public-ip'
+import * as hashSum from 'hash-sum'
 
 const randomColor = () => {
   return `hsla(${~~(360 * Math.random())},70%,50%,1)`
@@ -60,13 +92,18 @@ export default {
   data () {
     return {
       status: 'Connecting...',
+
       myName: anonymus.create(),
       myColor: randomColor(),
 
       circleSlots: [],
 
       sendScreen: false,
-      receiveScreen: false
+      receiveScreen: false,
+
+      internetShareModelActive: false,
+      internetShareModelActiveTab: 0,
+      internetRoomInput: ''
     }
   },
 
@@ -77,6 +114,18 @@ export default {
 
     userSelectedCount () {
       return this.userSelected.length
+    },
+
+    internetShare () {
+      return this.$store.state.internetShare
+    },
+
+    roomID () {
+      return this.$store.state.roomID
+    },
+
+    internetInviteLink () {
+      return this.$INTERNET_ROOM_SHARE_LINK + this.roomID
     }
   },
 
@@ -112,15 +161,21 @@ export default {
 
     setUpP2PT () {
       publicIP.v4().then((ip) => {
-        this.startP2PT(ip)
+        const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
+        this.$store.commit('setRoom', roomID)
+        this.startP2PT(roomID)
       }).catch(error => {
         console.log(error)
         this.status = 'Could not find your IP address'
       })
     },
 
-    startP2PT (ip) {
-      this.$p2pt.setIdentifier(ip)
+    startP2PT (identifier) {
+      if (this.$p2pt) {
+        this.$p2pt.destroy()
+      }
+      this.$p2pt = new P2PT(this.$ANNOUNCE_URLS)
+      this.$p2pt.setIdentifier('webdrop' + identifier)
 
       this.$p2pt.on('peerconnect', (peer) => {
         this.status = ''
@@ -183,6 +238,44 @@ export default {
       })
 
       this.$p2pt.start()
+    },
+
+    shareViaInternet () {
+      let roomID = this.roomID
+      if (!roomID) {
+        roomID = Math.random().toString(36).substr(2, this.$INTERNET_ROOM_CODE_LENGTH)
+        this.$store.commit('activateInternetShare', roomID)
+
+        this.startP2PT(roomID)
+      }
+
+      this.internetShareModelActive = true
+    },
+
+    copyInviteLink () {
+      this.$buefy.toast.open({
+        duration: 2000,
+        message: 'Invite Link Copied !',
+        position: 'is-top',
+        type: 'is-success'
+      })
+    },
+
+    joinInternetRoom () {
+      if (this.internetRoomInput.length !== this.$INTERNET_ROOM_CODE_LENGTH) {
+        return
+      }
+      this.$store.commit('activateInternetShare', this.internetRoomInput)
+
+      this.startP2PT(this.internetRoomInput)
+
+      this.$buefy.toast.open({
+        duration: 2000,
+        message: `Joined Room ${this.internetRoomInput}`,
+        position: 'is-top',
+        type: 'is-success'
+      })
+      this.internetShareModelActive = false
     },
 
     receiveFile (name, infoHash) {
@@ -306,18 +399,21 @@ export default {
   padding-bottom: 10px
   transition: 0.2s all
 
-  &.has-shadow
-    box-shadow: 0 5px 30px 0 #AAA !important
-
   // disable start & end and only use brand
   .navbar-brand
     width: 100%
+
+  &.has-shadow
+    box-shadow: 0 5px 30px 0 #AAA !important
 
   .actions
     display: flex
     align-items: stretch
     justify-content: flex-end
     margin-left: auto
+
+.main-navbar .navbar-brand
+  width: auto
 
 #earth-wrapper
   position: fixed
