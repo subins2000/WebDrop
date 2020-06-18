@@ -35,7 +35,16 @@
         </template>
       </b-navbar>
       <div id="earth-wrapper">
-        <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet"></svg>
+        <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient xlink:href="#4" id="3" x1="159.46" y1="668.03" x2="160.66" y2="596.97" gradientUnits="userSpaceOnUse"/><linearGradient id="4"><stop stop-color="#08f"/><stop offset="1" stop-color="#02c3ff"/></linearGradient><linearGradient xlink:href="#4" id="2" x1="159.46" y1="668.03" x2="160.66" y2="596.97" gradientUnits="userSpaceOnUse"/><linearGradient xlink:href="#4" id="0" x1="169.5" y1="624.72" x2="159.24" y2="63.27" gradientUnits="userSpaceOnUse" gradientTransform="matrix(.93022 0 0 .91891 14.815 32.587)"/><linearGradient id="1" x1="8.167" y1="1050.47" x2="8.115" y2="1038.35" gradientUnits="userSpaceOnUse"><stop stop-color="#141414"/><stop offset="1" stop-color="#2d2d2f"/></linearGradient><g id="phone-icon" transform="matrix(.07976 0 0 .06939 11.129.212)"><rect width="292.69" height="525.81" x="18.553" y="87.91" fill="url(#0)" fill-rule="evenodd" rx="9.302"/><path d="m11.404 1037.36h-6.807c-.31 0-.561.251-.561.561v12.877c0 .31.251.561.561.561h6.807c.31 0 .561-.251.561-.561v-12.877c0-.31-.251-.561-.561-.561m-.082 11.778h-6.644v-9.555h6.644z" transform="matrix(42.98335 0 0 49.4146-182.52-51263.92)" fill="url(#1)"/><ellipse cx="161.34" cy="637.98" rx="25.23" ry="29" fill="url(#2)" fill-rule="evenodd" stroke="url(#3)" stroke-linecap="round" stroke-width="7.411"/></g>
+            <filter id="shadow" x="-20%" y="-20%" width="200%" height="200%">
+              <feOffset result="offOut" in="SourceAlpha" dx="0" dy="0" />
+              <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
+              <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+            </filter>
+          </defs>
+        </svg>
       </div>
     </div>
     <b-modal :active.sync="internetShareModelActive" class="has-text-centered">
@@ -71,12 +80,19 @@
 <script>
 import * as P2PT from 'p2pt'
 import * as d3 from 'd3'
-import * as anonymus from 'anonymus'
+import Bowser from 'bowser'
 import * as publicIP from 'public-ip'
 import * as hashSum from 'hash-sum'
 
-const randomColor = () => {
-  return `hsla(${~~(360 * Math.random())},70%,50%,1)`
+const getAColor = () => {
+  // l in 'hsla' stands for lightness
+  return `hsla(${~~(360 * Math.random())},70%,60%,1)`
+}
+
+const getName = () => {
+  const bowser = Bowser.getParser(window.navigator.userAgent)
+
+  return `${bowser.getOSName()} ${bowser.getBrowserName()}`
 }
 
 export default {
@@ -92,9 +108,8 @@ export default {
   data () {
     return {
       status: 'Connecting...',
-
-      myName: anonymus.create(),
-      myColor: randomColor(),
+      myName: getName(),
+      myColor: null,
 
       circleSlots: [],
 
@@ -131,6 +146,12 @@ export default {
 
   methods: {
     init () {
+      this.myColor = sessionStorage.getItem('myColor')
+      if (!this.myColor) {
+        this.myColor = getAColor()
+        sessionStorage.setItem('myColor', this.myColor)
+      }
+
       this.setUpP2PT()
       this.setUpEarth()
 
@@ -153,7 +174,6 @@ export default {
           const item = [elem.getAttribute('cx'), elem.getAttribute('cy')]
           this.circleSlots.push(item)
 
-          this.earth.querySelector(`.user-text[id="${userID}"]`).remove()
           elem.remove()
         }
       })
@@ -334,17 +354,29 @@ export default {
     },
 
     addUserCircle (userID, userName, userColor, x, y) {
-      this.svg.append('circle')
+      const group = this.svg.append('g')
+
+      group
         .attr('class', 'user')
         .attr('id', userID)
+        .on('click', this.onUserClick)
+
+      group.append('circle')
         .attr('r', this.userCircleRadius)
         .attr('cx', x)
         .attr('cy', y)
         .attr('stroke', '#CCC')
         .attr('fill', userColor)
-        .on('click', this.onUserClick)
+        .attr('filter', 'url(#shadow)')
 
-      this.svg.append('text')
+      const mid = this.userCircleRadius / 2
+      group.append('use')
+        .attr('xlink:href', '#phone-icon')
+        .attr('height', this.userCircleRadius)
+        .attr('x', x - mid)
+        .attr('y', y - mid)
+
+      group.append('text')
         .attr('class', 'user-text')
         .attr('id', userID)
         .attr('dominant-baseline', 'middle')
@@ -352,27 +384,22 @@ export default {
         .attr('x', x)
         .attr('y', y - this.userCircleRadius - 10)
         .text(userName)
-        .on('click', this.onUserClick)
     },
 
     onUserClick () {
-      const target = d3.event.target
-      const userID = target.id
+      const user = d3.event.target.parentElement
+      const userID = user.id
 
-      // if (userID === 'me') return
+      if (userID === 'me') return
 
-      if (target.classList.contains('selected')) {
+      if (user.classList.contains('selected')) {
         this.$store.commit('deselectUser', userID)
 
-        this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
-          elem.classList.remove('selected')
-        })
+        user.classList.remove('selected')
       } else {
         this.$store.commit('selectUser', userID)
 
-        this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
-          elem.classList.add('selected')
-        })
+        user.classList.add('selected')
       }
     },
 
@@ -433,7 +460,8 @@ export default {
     stroke-width: 0
 
     &.selected
-      stroke-width: 3px
+      circle
+        stroke-width: 3px
 
   .user-text.selected
     font-weight: bold
