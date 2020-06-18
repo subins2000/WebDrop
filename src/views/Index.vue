@@ -52,8 +52,9 @@ import * as d3 from 'd3'
 import Bowser from 'bowser'
 import * as publicIP from 'public-ip'
 
-const randomColor = () => {
-  return `hsla(${~~(360 * Math.random())},70%,50%,1)`
+const getAColor = () => {
+  // l in 'hsla' stands for lightness
+  return `hsla(${~~(360 * Math.random())},70%,60%,1)`
 }
 
 const getName = () => {
@@ -76,7 +77,7 @@ export default {
     return {
       status: 'Connecting...',
       myName: getName(),
-      myColor: randomColor(),
+      myColor: null,
 
       circleSlots: [],
 
@@ -97,6 +98,12 @@ export default {
 
   methods: {
     init () {
+      this.myColor = sessionStorage.getItem('myColor')
+      if (!this.myColor) {
+        this.myColor = getAColor()
+        sessionStorage.setItem('myColor', this.myColor)
+      }
+
       this.setUpP2PT()
       this.setUpEarth()
 
@@ -119,7 +126,6 @@ export default {
           const item = [elem.getAttribute('cx'), elem.getAttribute('cy')]
           this.circleSlots.push(item)
 
-          this.earth.querySelector(`.user-text[id="${userID}"]`).remove()
           elem.remove()
         }
       })
@@ -258,16 +264,18 @@ export default {
     addUserCircle (userID, userName, userColor, x, y) {
       const group = this.svg.append('g')
 
-      group.append('circle')
+      group
         .attr('class', 'user')
         .attr('id', userID)
+        .on('click', this.onUserClick)
+
+      group.append('circle')
         .attr('r', this.userCircleRadius)
         .attr('cx', x)
         .attr('cy', y)
         .attr('stroke', '#CCC')
         .attr('fill', userColor)
         .attr('filter', 'url(#shadow)')
-        .on('click', this.onUserClick)
 
       const mid = this.userCircleRadius / 2
       group.append('use')
@@ -284,27 +292,22 @@ export default {
         .attr('x', x)
         .attr('y', y - this.userCircleRadius - 10)
         .text(userName)
-        .on('click', this.onUserClick)
     },
 
     onUserClick () {
-      const target = d3.event.target
-      const userID = target.id
+      const user = d3.event.target.parentElement
+      const userID = user.id
 
-      // if (userID === 'me') return
+      if (userID === 'me') return
 
-      if (target.classList.contains('selected')) {
+      if (user.classList.contains('selected')) {
         this.$store.commit('deselectUser', userID)
 
-        this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
-          elem.classList.remove('selected')
-        })
+        user.classList.remove('selected')
       } else {
         this.$store.commit('selectUser', userID)
 
-        this.earth.querySelectorAll(`[id="${userID}"]`).forEach(elem => {
-          elem.classList.add('selected')
-        })
+        user.classList.add('selected')
       }
     },
 
@@ -362,7 +365,8 @@ export default {
     stroke-width: 0
 
     &.selected
-      stroke-width: 3px
+      circle
+        stroke-width: 3px
 
   .user-text.selected
     font-weight: bold
