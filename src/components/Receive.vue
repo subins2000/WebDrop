@@ -2,7 +2,7 @@
   <div>
     <b-navbar class="navbar is-primary is-active has-text-white has-shadow" :mobile-burger="false">
       <template slot="brand">
-        <b-navbar-item v-on:click="back">
+        <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
         <b-navbar-item tag="div">
@@ -34,7 +34,7 @@
             </td>
             <td>{{file.length | formatSize}}</td>
             <td>{{file.downloadSpeed | formatSize}}</td>
-            <td><a class="button is-primary" v-on:click="download" download="download" v-bind:href="file.download">Download</a></td>
+            <td><a class="button is-primary" v-on:click="download" v-bind:download="file.name" v-bind:href="file.download">Download</a></td>
           </tr>
         </tbody>
       </table>

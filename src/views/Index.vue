@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-show="!sendScreen && !receiveScreen">
+    <div>
       <b-navbar v-if="userSelectedCount === 0" class="navbar is-info main-navbar has-text-white">
         <template slot="brand">
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
@@ -113,9 +113,6 @@ export default {
 
       circleSlots: [],
 
-      sendScreen: false,
-      receiveScreen: false,
-
       internetShareModelActive: false,
       internetShareModelActiveTab: 0,
       internetRoomInput: ''
@@ -180,10 +177,11 @@ export default {
     },
 
     setUpP2PT () {
+      this.startP2PT('a')
       publicIP.v4().then((ip) => {
         const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
         this.$store.commit('setRoom', roomID)
-        this.startP2PT(roomID)
+        // this.startP2PT(roomID)
       }).catch(error => {
         console.log(error)
         this.status = 'Could not find your IP address'
@@ -303,8 +301,7 @@ export default {
         infoHash,
         name
       })
-      this.sendScreen = false
-      this.receiveScreen = true
+      this.$router.push('/receive')
     },
 
     setUpEarth () {
@@ -354,6 +351,10 @@ export default {
     },
 
     addUserCircle (userID, userName, userColor, x, y) {
+      const elem = this.earth.querySelector(`.user[id="${userID}"]`)
+
+      if (elem) return
+
       const group = this.svg.append('g')
 
       group
@@ -404,8 +405,6 @@ export default {
     },
 
     cancelAllUserSelection () {
-      this.sendScreen = false
-      this.receiveScreen = false
       this.userSelected = []
 
       this.earth.querySelectorAll('.selected').forEach(elem => {
