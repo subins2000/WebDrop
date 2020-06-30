@@ -16,7 +16,7 @@
     "end-of-stream": "1.4.1",
     "external-ip": "^2.3.1",
     "hash-sum": "^1.0.2",
-    "p2pt": "^1.2.0",
+    "p2pt": "https://github.com/subins2000/p2pt#master",
     "public-ip": "^4.0.1",
     "register-service-worker": "^1.7.1",
     "vue": "^2.6.11",
