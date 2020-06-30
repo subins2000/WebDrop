@@ -26,30 +26,59 @@
           {{ status }}
         </b-button>
       </b-field>
-      <div>
+      <div v-if="tableCheckedRows.length > 0">
+        <span v-if="tableCheckedRows.length === 1">
+          <b-field grouped group-multiline>
+            <div class="control" v-if="tableCheckedRows[0].paused">
+              <b-button @click="resumeTorrent">Resume</b-button>
+            </div>
+            <div class="control" v-else>
+              <b-button type="is-warning" @click="pauseTorrent">Pause</b-button>
+            </div>
+          </b-field>
+        </span>
+        <span v-else>
+          <b-field grouped group-multiline>
+            <div class="control">
+              <b-button @click="resumeTorrent">Resume</b-button>
+            </div>
+            <div class="control">
+              <b-button type="is-warning" @click="pauseTorrent">Pause</b-button>
+            </div>
+          </b-field>
+        </span>
+      </div>
+      <div v-else>
         <b-field grouped group-multiline>
           <div class="control">
-            <b-button @click="resumeTorrent">Resume</b-button>
+            <b-button disabled>Resume</b-button>
           </div>
           <div class="control">
-            <b-button type="is-warning" @click="pauseTorrent">Pause</b-button>
+            <b-button disabled>Pause</b-button>
           </div>
         </b-field>
-        <b-table
-          :data="torrents"
-          :checked-rows.sync="tableCheckedRows"
-          checkable
-          checkbox-position="left">
-          <template slot-scope="props">
-            <b-table-column field="name" label="Name" width="40" v-bind:class="{ 'is-warning' : props.row.paused }">
-              {{ props.row.name }}
-            </b-table-column>
-            <b-table-column field="size" label="Size" v-bind:class="{ 'is-warning' : props.row.paused }">
-              {{ props.row.length | formatSize }}
-            </b-table-column>
-          </template>
-        </b-table>
       </div>
+      <b-table
+        :data="torrents"
+        :checked-rows.sync="tableCheckedRows"
+        checkable
+        checkbox-position="left">
+        <template slot-scope="props">
+          <b-table-column field="name" label="Name" width="40" v-bind:class="{ 'is-warning' : props.row.paused }">
+            {{ props.row.name }}
+          </b-table-column>
+          <b-table-column field="size" label="Size" v-bind:class="{ 'is-warning' : props.row.paused }">
+            {{ props.row.length | formatSize }}
+          </b-table-column>
+        </template>
+        <template slot="empty">
+          <b-upload v-model="files" @input="onFileChange"
+            multiple
+            drag-drop>
+            <p class="drop-area">Drop your files here or click to upload</p>
+          </b-upload>
+        </template>
+      </b-table>
     </div>
   </div>
 </template>
@@ -80,6 +109,7 @@ export default {
       for (const key in files) {
         this.makeTorrent(files[key])
       }
+      this.files = []
     },
 
     makeTorrent (file) {
@@ -132,4 +162,7 @@ export default {
 <style scoped lang="sass">
 .table
   margin-top: 20px
+
+.drop-area
+  padding: 40% 20px
 </style>
