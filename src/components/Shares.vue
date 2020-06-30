@@ -27,7 +27,7 @@
         </FileUpload>
         <span>
           <b-button class="is-text">
-            {{ selectedUsers.length }} users
+            {{ users.length }} users
           </b-button>
         </span>
       </div>
@@ -79,6 +79,12 @@ export default {
     }
   },
 
+  computed: {
+    users () {
+      return this.$store.state.users
+    }
+  },
+
   methods: {
     sendAll () {
       const files = []
@@ -104,14 +110,7 @@ export default {
   },
 
   mounted () {
-    if (this.selectedUsers.length === 0) {
-      this.$router.push('/')
-    }
-  },
-
-  beforeRouteLeave (to, from, next) {
-    this.$store.commit('clearSelectedUsers')
-    next(true)
+    
   }
 }
 </script>

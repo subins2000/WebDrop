@@ -12,9 +12,6 @@ import VueClipboard from 'vue-clipboard2'
 import * as P2PT from 'p2pt'
 import WebTorrent from 'webtorrent'
 
-import Send from '@/components/Send.vue'
-import Receive from '@/components/Receive.vue'
-
 Vue.use(Buefy)
 Vue.use(VueClipboard)
 
@@ -34,11 +31,10 @@ if (window.location.hostname === 'localhost') {
 Vue.prototype.$ANNOUNCE_URLS = announceURLs
 Vue.prototype.$INTERNET_ROOM_CODE_LENGTH = 4
 Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://ShareThisFile.Online/#/?room='
+
 Vue.prototype.$p2pt = new P2PT(announceURLs)
 Vue.prototype.$wt = new WebTorrent()
 
-Vue.component('Send', Send)
-Vue.component('Receive', Receive)
 Vue.component('FileUpload', FileUpload)
 
 Vue.filter('formatSize', function (size: number) {

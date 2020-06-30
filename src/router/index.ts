@@ -1,8 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Index from '../views/Index.vue'
-import Send from '../components/Send.vue'
-import Receive from '../components/Receive.vue'
+import Shares from '../components/Shares.vue'
 
 Vue.use(VueRouter)
 
@@ -13,14 +12,9 @@ const routes: Array<RouteConfig> = [
     component: Index
   },
   {
-    path: '/send',
-    name: 'Send',
-    component: Send
-  },
-  {
-    path: '/receive',
-    name: 'Receive',
-    component: Receive
+    path: '/shares',
+    name: 'Shares',
+    component: Shares
   },
   {
     path: '/about',

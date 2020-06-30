@@ -6,6 +6,9 @@
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
             <h1 class="is-size-4">WebDrop</h1>
           </b-navbar-item>
+          <b-navbar-item tag="router-link" :to="{ path: '/shares' }">
+            Shares
+          </b-navbar-item>
           <b-navbar-item tag="router-link" :to="{ path: '/about' }">
             How-To
           </b-navbar-item>
