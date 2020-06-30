@@ -7,7 +7,7 @@ export default new Vuex.Store({
   state: {
     users: {} as any,
     selectedUsers: [] as any,
-    receivedFiles: {},
+    torrents: {},
 
     internetShare: false,
     roomID: ''
@@ -38,8 +38,8 @@ export default new Vuex.Store({
       state.selectedUsers = []
     },
 
-    receiveFile (state, payload) {
-      Vue.set(state.receivedFiles, payload.infoHash, payload.name)
+    addTorrent (state, payload) {
+      Vue.set(state.torrents, payload.i, payload.n)
     },
 
     setRoom (state, roomID: string) {

@@ -32,7 +32,7 @@ Vue.prototype.$ANNOUNCE_URLS = announceURLs
 Vue.prototype.$INTERNET_ROOM_CODE_LENGTH = 4
 Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://ShareThisFile.Online/#/?room='
 
-Vue.prototype.$p2pt = new P2PT(announceURLs)
+Vue.prototype.$p2pt = null
 Vue.prototype.$wt = new WebTorrent()
 
 Vue.component('FileUpload', FileUpload)

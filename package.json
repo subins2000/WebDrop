@@ -13,6 +13,7 @@
     "buefy": "^0.8.19",
     "core-js": "^3.6.4",
     "d3": "^5.16.0",
+    "date-fns": "^2.14.0",
     "end-of-stream": "1.4.1",
     "external-ip": "^2.3.1",
     "hash-sum": "^1.0.2",

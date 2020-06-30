@@ -1,19 +1,19 @@
 <template>
   <div>
-    <b-navbar class="navbar has-text-white has-shadow" v-bind:class="files.length > 0 ? 'is-warning' : 'is-success'" :mobile-burger="false">
+    <b-navbar class="is-success" :mobile-burger="false">
       <template slot="brand">
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
         <div class="actions">
           <b-navbar-item tag="div">
-            <b-button type="is-primary" size="is-medium" v-on:click="sendAll" v-show="files.length > 0">Send All</b-button>
+            <b-button type="is-primary" v-show="files.length > 0">Notify All</b-button>
           </b-navbar-item>
         </div>
       </template>
     </b-navbar>
     <div class="container">
-      <div class="actions">
+      <div class="actions content">
         <FileUpload
           class="button is-success"
           post-action="#"
@@ -22,48 +22,45 @@
           :multiple="true"
           :size="1024 * 1024 * 10"
           v-model="files"
+          @input-file="makeTorrent"
           ref="upload">
-          Select files
+          Add File
         </FileUpload>
         <span>
           <b-button class="is-text">
-            {{ users.length }} users
+            {{ usersCount }} users
+          </b-button>
+        </span>
+        <span>
+          <b-button class="is-text">
+            {{ status }}
           </b-button>
         </span>
       </div>
-      <table class="table is-fullwidth">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Size</th>
-            <th>Speed</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(file, index) in files" :key="file.id">
-            <td>{{index + 1}}</td>
-            <td>
-              <div class="filename">
-                {{file.name}}
-              </div>
-              <div class="progress" v-if="file.active || file.progress !== '0.00'">
-                <div :class="{'progress-bar': true, 'progress-bar-striped': true, 'bg-danger': file.error, 'progress-bar-animated': file.active}" role="progressbar" :style="{width: file.progress + '%'}">{{file.progress}}%</div>
-              </div>
-            </td>
-            <td>{{file.size | formatSize}}</td>
-            <td>{{file.speed | formatSize}}</td>
-
-            <td v-if="file.error">{{file.error}}</td>
-            <td v-else-if="file.success">success</td>
-            <td v-else-if="file.active">active</td>
-            <td v-else>
-              <b-button @click.prevent="$refs.upload.remove(file)">Remove</b-button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div>
+        <b-field grouped group-multiline>
+          <div class="control">
+            <b-button @click="resumeTorrent">Resume</b-button>
+          </div>
+          <div class="control">
+            <b-button type="is-warning" @click="pauseTorrent">Pause</b-button>
+          </div>
+        </b-field>
+        <b-table
+          :data="torrents"
+          :checked-rows.sync="tableCheckedRows"
+          checkable
+          checkbox-position="left">
+          <template slot-scope="props">
+            <b-table-column field="name" label="Name" width="40" v-bind:class="{ 'is-warning' : props.row.paused }">
+              {{ props.row.name }}
+            </b-table-column>
+            <b-table-column field="size" label="Size" v-bind:class="{ 'is-warning' : props.row.paused }">
+              {{ props.row.length | formatSize }}
+            </b-table-column>
+          </template>
+        </b-table>
+      </div>
     </div>
   </div>
 </template>
@@ -75,42 +72,72 @@ export default {
   data () {
     return {
       files: [],
-      selectedUsers: this.$store.state.selectedUsers
+      torrents: [],
+      selectedUsers: this.$store.state.selectedUsers,
+      status: '',
+
+      tableCheckedRows: []
     }
   },
 
   computed: {
-    users () {
-      return this.$store.state.users
+    usersCount () {
+      return Object.keys(this.$store.state.users).length
     }
   },
 
   methods: {
-    sendAll () {
-      const files = []
-
+    makeTorrent () {
       for (const key in this.files) {
-        files.push(this.files[key].file)
-      }
+        this.status = 'Preparing files'
 
-      this.$wt.seed(files, {
-        announceList: [this.$ANNOUNCE_URLS],
-        name: files[0].name
-      }, (torrent) => {
-        for (const userID of this.selectedUsers) {
-          const conn = this.$store.state.users[userID].conn
-          this.$p2pt.send(conn, JSON.stringify({
-            type: 'send',
-            name: this.files[0].name,
-            infoHash: torrent.infoHash
-          }))
-        }
-      })
+        const file = this.files[key].file
+
+        this.$wt.seed(file, {
+          announceList: [this.$ANNOUNCE_URLS],
+          name: file.name
+        }, (torrent) => {
+          this.status = ''
+
+          this.onTorrent(torrent)
+
+          this.$store.commit('addTorrent', {
+            i: torrent.infoHash,
+            n: torrent.name
+          })
+        })
+
+        console.log(this.files)
+        this.$refs.upload.remove(key)
+        console.log(this.files)
+      }
+    },
+
+    onTorrent (torrent) {
+      // torrent will have only one file
+      const file = torrent.files[0]
+
+      torrent.remaining = ''
+      this.$set(this.torrents, this.torrents.length, torrent)
+    },
+
+    resumeTorrent () {
+      for (const key in this.tableCheckedRows) {
+        this.torrents[key].resume()
+      }
+    },
+
+    pauseTorrent () {
+      for (const key in this.tableCheckedRows) {
+        this.torrents[key].pause()
+      }
     }
   },
 
   mounted () {
-    
+    if (this.$p2pt === null) {
+      this.$router.push('/')
+    }
   }
 }
 </script>
