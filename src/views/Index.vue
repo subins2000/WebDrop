@@ -175,6 +175,8 @@ export default {
           this.circleSlots.push(item)
 
           elem.remove()
+        } else if (mutation.type === '') {
+
         }
       })
     },

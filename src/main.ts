@@ -6,10 +6,8 @@ import './registerServiceWorker'
 
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
-import FileUpload from 'vue-upload-component'
 import VueClipboard from 'vue-clipboard2'
 
-import * as P2PT from 'p2pt'
 import WebTorrent from 'webtorrent'
 
 Vue.use(Buefy)
@@ -34,8 +32,6 @@ Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://ShareThisFile.Online/#/?room=
 
 Vue.prototype.$p2pt = null
 Vue.prototype.$wt = new WebTorrent()
-
-Vue.component('FileUpload', FileUpload)
 
 Vue.filter('formatSize', function (size: number) {
   if (size > 1024 * 1024 * 1024 * 1024) {

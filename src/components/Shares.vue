@@ -7,36 +7,25 @@
         </b-navbar-item>
         <div class="actions">
           <b-navbar-item tag="div">
-            <b-button type="is-primary" v-show="files.length > 0">Notify All</b-button>
+            <b-button type="is-primary">Notify All</b-button>
           </b-navbar-item>
         </div>
       </template>
     </b-navbar>
     <div class="container">
-      <div class="actions content">
-        <FileUpload
-          class="button is-success"
-          post-action="#"
-          extensions="*"
-          accept="*"
-          :multiple="true"
-          :size="1024 * 1024 * 10"
-          v-model="files"
-          @input-file="makeTorrent"
-          ref="upload">
-          Add File
-        </FileUpload>
-        <span>
-          <b-button class="is-text">
-            {{ usersCount }} users
-          </b-button>
-        </span>
-        <span>
-          <b-button class="is-text">
-            {{ status }}
-          </b-button>
-        </span>
-      </div>
+      <b-field class="actions content" grouped>
+        <b-upload v-model="files" multiple @input="onFileChange">
+          <a class="button is-success">
+            <span>Add File</span>
+          </a>
+        </b-upload>
+        <b-button class="is-text">
+          {{ usersCount }} users
+        </b-button>
+        <b-button class="is-text">
+          {{ status }}
+        </b-button>
+      </b-field>
       <div>
         <b-field grouped group-multiline>
           <div class="control">
@@ -87,30 +76,28 @@ export default {
   },
 
   methods: {
-    makeTorrent () {
-      for (const key in this.files) {
-        this.status = 'Preparing files'
-
-        const file = this.files[key].file
-
-        this.$wt.seed(file, {
-          announceList: [this.$ANNOUNCE_URLS],
-          name: file.name
-        }, (torrent) => {
-          this.status = ''
-
-          this.onTorrent(torrent)
-
-          this.$store.commit('addTorrent', {
-            i: torrent.infoHash,
-            n: torrent.name
-          })
-        })
-
-        console.log(this.files)
-        this.$refs.upload.remove(key)
-        console.log(this.files)
+    onFileChange (files) {
+      for (const key in files) {
+        this.makeTorrent(files[key])
       }
+    },
+
+    makeTorrent (file) {
+      this.status = 'Preparing files'
+
+      this.$wt.seed(file, {
+        announceList: [this.$ANNOUNCE_URLS],
+        name: file.name
+      }, (torrent) => {
+        this.status = ''
+
+        this.onTorrent(torrent)
+
+        this.$store.commit('addTorrent', {
+          i: torrent.infoHash,
+          n: torrent.name
+        })
+      })
     },
 
     onTorrent (torrent) {
@@ -143,10 +130,6 @@ export default {
 </script>
 
 <style scoped lang="sass">
-.container
-  .actions .button
-    margin-right: 10px
-
 .table
   margin-top: 20px
 </style>
