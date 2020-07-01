@@ -157,6 +157,7 @@ export default {
 
       this.$store.subscribe((mutation) => {
         if (mutation.type === 'addUser') {
+          console.log(mutation)
           const slot = this.circleSlots.shift()
           this.addUserCircle(
             mutation.payload.id,
@@ -171,10 +172,12 @@ export default {
           const userID = mutation.payload
           const elem = this.earth.querySelector(`.user[id="${userID}"]`)
 
-          const item = [elem.getAttribute('cx'), elem.getAttribute('cy')]
-          this.circleSlots.push(item)
+          if (elem) {
+            const item = [elem.getAttribute('cx'), elem.getAttribute('cy')]
+            this.circleSlots.push(item)
 
-          elem.remove()
+            elem.remove()
+          }
         } else if (mutation.type === '') {
 
         }
@@ -223,13 +226,9 @@ export default {
             color: msg.color,
             conn: peer
           })
-        } else if (msg.type === 'send') {
-          this.$buefy.dialog.confirm({
-            message: `${this.$store.state.users[peer.id].name} wants to send you file <b class="is-bold">${msg.name}</b>`,
-            onConfirm: () => {
-              this.receiveFile(msg.name, msg.infoHash)
-            }
-          })
+        } else if (msg.type === 'newTorrent') {
+          delete msg.type
+          this.$store.commit('newTorrent', msg)
         }
       })
 

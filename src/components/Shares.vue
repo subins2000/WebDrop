@@ -125,7 +125,8 @@ export default {
 
         this.$store.commit('addTorrent', {
           i: torrent.infoHash,
-          n: torrent.name
+          n: torrent.name,
+          l: torrent.length
         })
       })
     },
@@ -155,6 +156,26 @@ export default {
     if (this.$p2pt === null) {
       this.$router.push('/')
     }
+
+    this.$store.subscribe((mutation) => {
+      // new torrent is torrent received from peers
+      if (mutation.type === 'newTorrent') {
+        this.$set(this.torrents, this.torrents.length, {
+          infoHash: mutation.payload.i,
+          name: mutation.payload.n,
+          length: mutation.payload.l
+        })
+      } else if (mutation.type === 'addTorrent') {
+        // let peers know of this torrent
+        console.log(this.$p2pt)
+        for (const key in this.$store.state.users) {
+          const user = this.$store.state.users[key]
+          this.$p2pt.send(user.conn, mutation.payload, ...{
+            type: 'newTorrent'
+          })
+        }
+      }
+    })
   }
 }
 </script>
