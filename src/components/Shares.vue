@@ -37,7 +37,7 @@
       <div v-if="tableCheckedRows.length > 0">
         <span v-if="tableCheckedRows.length === 1">
           <b-field grouped group-multiline>
-            <div class="control" v-if="tableCheckedRows[0].mine">
+            <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
               <b-button @click="resumeTorrent">Start</b-button>
             </div>
             <div class="control" v-else-if="tableCheckedRows[0].paused">
@@ -75,15 +75,17 @@
         checkable
         checkbox-position="left">
         <template slot-scope="props">
-          <b-table-column field="name" label="Name" width="40" v-bind:class="{ 'is-warning' : props.row.paused }">
-            {{ props.row.name }}
+          <b-table-column field="name" label="Name" v-bind:class="{ 'is-warning' : props.row.paused }">
+            <span>{{ props.row.name }}</span>
+            <b-progress v-if="!props.row.mine" type="is-success" :value="parseInt((100 * props.row.progress).toFixed(1))" size="is-medium" show-value format="percent"></b-progress>
           </b-table-column>
-          <b-table-column field="size" label="Size" v-bind:class="{ 'is-warning' : props.row.paused }">
+          <b-table-column field="size" label="Size" width="120" v-bind:class="{ 'is-warning' : props.row.paused }">
             {{ props.row.length | formatSize }}
           </b-table-column>
-          <b-table-column v-if="props.row.done" field="finish" label="" class="is-success">
-            <a v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
-              <b-button>Download</b-button>
+          <b-table-column v-if="!props.row.mine" field="finish" label="">
+            <b-button v-if="!props.row.done" disabled>Download</b-button>
+            <a v-else v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
+              <b-button type="is-success">Download</b-button>
             </a>
           </b-table-column>
         </template>
@@ -145,6 +147,9 @@ export default {
           l: torrent.length
         })
 
+        // this torrent was added by user
+        torrent.mine = true
+
         this.onTorrent(torrent)
       })
     },
@@ -186,12 +191,11 @@ export default {
     },
 
     resumeTorrent () {
-      for (const key in this.tableCheckedRows) {
-        const torrent = this.torrents[key]
-        if (torrent.mine) {
+      for (const torrent of this.tableCheckedRows) {
+        if (!torrent.resume) {
           // torrent is not a WebTorrent object
           // make it one
-          this.startTorrent(key)
+          this.startTorrent(this.getIndexOfTorrent(torrent.infoHash))
         } else {
           torrent.resume()
         }
@@ -199,12 +203,19 @@ export default {
     },
 
     pauseTorrent () {
-      for (const key in this.tableCheckedRows) {
-        const torrent = this.torrents[key]
-        if (torrent.mine) continue
-        console.log(torrent)
+      for (const torrent of this.tableCheckedRows) {
+        if (!torrent.pause) continue
         torrent.pause()
       }
+    },
+
+    getIndexOfTorrent (infoHash) {
+      for (const index in this.torrents) {
+        if (this.torrents[index].infoHash === infoHash) {
+          return index
+        }
+      }
+      return null
     }
   },
 
