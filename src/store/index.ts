@@ -9,6 +9,8 @@ export default new Vuex.Store({
     selectedUsers: [] as any,
     torrents: {},
 
+    p2pt: null,
+
     internetShare: false,
     roomID: ''
   },
@@ -49,6 +51,10 @@ export default new Vuex.Store({
     activateInternetShare (state, roomID: string) {
       state.internetShare = true
       state.roomID = roomID
+    },
+
+    setP2PT (state, payload) {
+      state.p2pt = payload
     }
   },
   actions: {

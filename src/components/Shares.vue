@@ -5,9 +5,12 @@
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
+        <b-navbar-item tag="a" @click="showGrid">
+          Grid
+        </b-navbar-item>
         <div class="actions">
-          <b-navbar-item tag="div">
-            <b-button type="is-primary">Notify All</b-button>
+          <b-navbar-item tag="router-link" :to="{ path: '/about' }">
+            Help
           </b-navbar-item>
         </div>
       </template>
@@ -105,6 +108,10 @@ export default {
   },
 
   methods: {
+    showGrid () {
+      this.$emit('showScreen', 'grid')
+    },
+
     onFileChange (files) {
       for (const key in files) {
         this.makeTorrent(files[key])
@@ -153,26 +160,24 @@ export default {
   },
 
   mounted () {
-    if (this.$p2pt === null) {
-      this.$router.push('/')
-    }
-
     this.$store.subscribe((mutation) => {
       // new torrent is torrent received from peers
       if (mutation.type === 'newTorrent') {
+        console.log(mutation.payload)
         this.$set(this.torrents, this.torrents.length, {
           infoHash: mutation.payload.i,
           name: mutation.payload.n,
           length: mutation.payload.l
         })
       } else if (mutation.type === 'addTorrent') {
+        const p2pt = this.$store.state.p2pt
+        let data = mutation.payload
+        data = { ...data, ...{ type: 'newTorrent' } }
+
         // let peers know of this torrent
-        console.log(this.$p2pt)
         for (const key in this.$store.state.users) {
           const user = this.$store.state.users[key]
-          this.$p2pt.send(user.conn, mutation.payload, ...{
-            type: 'newTorrent'
-          })
+          p2pt.send(user.conn, data)
         }
       }
     })

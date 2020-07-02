@@ -1,18 +1,18 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Index from '../views/Index.vue'
+import Grid from '../views/Grid.vue'
 import Shares from '../components/Shares.vue'
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
-    path: '/',
-    name: 'Index',
-    component: Index
+    path: '/grid',
+    name: 'Grid',
+    component: Grid
   },
   {
-    path: '/shares',
+    path: '/',
     name: 'Shares',
     component: Shares
   },
