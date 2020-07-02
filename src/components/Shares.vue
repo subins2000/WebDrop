@@ -40,21 +40,18 @@
             <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
               <b-button @click="resumeTorrent">Start</b-button>
             </div>
-            <div class="control" v-else-if="tableCheckedRows[0].paused">
-              <b-button @click="resumeTorrent">Resume</b-button>
-            </div>
             <div class="control" v-else>
-              <b-button type="is-warning" @click="pauseTorrent">Pause</b-button>
+              <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
             </div>
           </b-field>
         </span>
         <span v-else>
           <b-field grouped group-multiline>
             <div class="control">
-              <b-button @click="resumeTorrent">Resume</b-button>
+              <b-button @click="resumeTorrent">Start</b-button>
             </div>
             <div class="control">
-              <b-button type="is-warning" @click="pauseTorrent">Pause</b-button>
+              <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
             </div>
           </b-field>
         </span>
@@ -62,10 +59,10 @@
       <div v-else>
         <b-field grouped group-multiline>
           <div class="control">
-            <b-button disabled>Resume</b-button>
+            <b-button disabled>Start</b-button>
           </div>
           <div class="control">
-            <b-button disabled>Pause</b-button>
+            <b-button disabled>Remove</b-button>
           </div>
         </b-field>
       </div>
@@ -202,10 +199,13 @@ export default {
       }
     },
 
-    pauseTorrent () {
+    removeTorrent () {
       for (const torrent of this.tableCheckedRows) {
-        if (!torrent.pause) continue
-        torrent.pause()
+        if (!torrent.destroy) continue
+        torrent.destroy()
+
+        this.$delete(this.torrents, this.getIndexOfTorrent(torrent.infoHash))
+        this.tableCheckedRows = []
       }
     },
 
