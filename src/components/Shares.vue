@@ -5,7 +5,7 @@
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
-        <b-navbar-item tag="a" @click="showGrid">
+        <b-navbar-item tag="router-link" :to="{ path: '/grid' }">
           Grid
         </b-navbar-item>
         <div class="actions">
@@ -25,6 +25,11 @@
         <b-button class="is-text">
           {{ usersCount }} users
         </b-button>
+        <b-tooltip label="Start downloading files on receive" position="is-bottom">
+          <b-switch v-model="autoStart" type="is-danger">
+            Auto Start
+          </b-switch>
+        </b-tooltip>
         <b-button class="is-text">
           {{ status }}
         </b-button>
@@ -32,7 +37,10 @@
       <div v-if="tableCheckedRows.length > 0">
         <span v-if="tableCheckedRows.length === 1">
           <b-field grouped group-multiline>
-            <div class="control" v-if="tableCheckedRows[0].paused">
+            <div class="control" v-if="tableCheckedRows[0].mine">
+              <b-button @click="resumeTorrent">Start</b-button>
+            </div>
+            <div class="control" v-else-if="tableCheckedRows[0].paused">
               <b-button @click="resumeTorrent">Resume</b-button>
             </div>
             <div class="control" v-else>
@@ -73,6 +81,9 @@
           <b-table-column field="size" label="Size" v-bind:class="{ 'is-warning' : props.row.paused }">
             {{ props.row.length | formatSize }}
           </b-table-column>
+          <b-table-column v-if="props.row.done" field="finish" label="" class="is-success">
+            <b-button >Download</b-button>
+          </b-table-column>
         </template>
         <template slot="empty">
           <b-upload v-model="files" @input="onFileChange"
@@ -92,6 +103,8 @@ export default {
 
   data () {
     return {
+      autoStart: true,
+
       files: [],
       torrents: [],
       selectedUsers: this.$store.state.selectedUsers,
@@ -108,10 +121,6 @@ export default {
   },
 
   methods: {
-    showGrid () {
-      this.$emit('showScreen', 'grid')
-    },
-
     onFileChange (files) {
       for (const key in files) {
         this.makeTorrent(files[key])
@@ -129,32 +138,61 @@ export default {
         this.status = ''
 
         this.onTorrent(torrent)
-
-        this.$store.commit('addTorrent', {
-          i: torrent.infoHash,
-          n: torrent.name,
-          l: torrent.length
-        })
       })
     },
 
     onTorrent (torrent) {
-      // torrent will have only one file
-      const file = torrent.files[0]
+      this.$store.commit('addTorrent', {
+        i: torrent.infoHash,
+        n: torrent.name,
+        l: torrent.length
+      })
 
-      torrent.remaining = ''
       this.$set(this.torrents, this.torrents.length, torrent)
+    },
+
+    // add new torrent obtained from a peer
+    addNewTorrent (torrentInfo) {
+      const index = this.torrents.length
+      this.$set(this.torrents, index, {
+        infoHash: torrentInfo.i,
+        name: torrentInfo.n,
+        length: torrentInfo.l,
+        mine: false
+      })
+
+      if (this.autoStart) {
+        this.startTorrent(index)
+      }
+    },
+
+    startTorrent (index) {
+      this.$wt.add(this.torrents[index].infoHash, {
+        announce: this.$ANNOUNCE_URLS
+      }, (torrent) => {
+        this.$set(this.torrents, index, torrent)
+      })
     },
 
     resumeTorrent () {
       for (const key in this.tableCheckedRows) {
-        this.torrents[key].resume()
+        const torrent = this.torrents[key]
+        if (torrent.mine) {
+          // torrent is not a WebTorrent object
+          // make it one
+          this.startTorrent(key)
+        } else {
+          torrent.resume()
+        }
       }
     },
 
     pauseTorrent () {
       for (const key in this.tableCheckedRows) {
-        this.torrents[key].pause()
+        const torrent = this.torrents[key]
+        if (torrent.mine) continue
+        console.log(torrent)
+        torrent.pause()
       }
     }
   },
@@ -163,21 +201,18 @@ export default {
     this.$store.subscribe((mutation) => {
       // new torrent is torrent received from peers
       if (mutation.type === 'newTorrent') {
-        console.log(mutation.payload)
-        this.$set(this.torrents, this.torrents.length, {
-          infoHash: mutation.payload.i,
-          name: mutation.payload.n,
-          length: mutation.payload.l
-        })
+        this.addNewTorrent(mutation.payload)
       } else if (mutation.type === 'addTorrent') {
         const p2pt = this.$store.state.p2pt
-        let data = mutation.payload
-        data = { ...data, ...{ type: 'newTorrent' } }
+        const data = {
+          ...mutation.payload,
+          ...{ type: 'newTorrent' }
+        }
 
         // let peers know of this torrent
         for (const key in this.$store.state.users) {
           const user = this.$store.state.users[key]
-          p2pt.send(user.conn, data)
+          p2pt.send(user.conn, JSON.stringify(data))
         }
       }
     })

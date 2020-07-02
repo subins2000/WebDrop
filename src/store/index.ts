@@ -40,8 +40,20 @@ export default new Vuex.Store({
       state.selectedUsers = []
     },
 
+    // torrent added by user
     addTorrent (state, payload) {
-      Vue.set(state.torrents, payload.i, payload.n)
+      Vue.set(state.torrents, payload.i, {
+        ...payload,
+        ...{ m: true } // m for mine
+      })
+    },
+
+    // torrent received from a peer
+    newTorrent (state, payload) {
+      Vue.set(state.torrents, payload.i, {
+        ...payload,
+        ...{ m: false } // m for mine
+      })
     },
 
     setRoom (state, roomID: string) {
