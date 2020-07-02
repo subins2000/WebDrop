@@ -82,7 +82,9 @@
             {{ props.row.length | formatSize }}
           </b-table-column>
           <b-table-column v-if="props.row.done" field="finish" label="" class="is-success">
-            <b-button >Download</b-button>
+            <a v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
+              <b-button>Download</b-button>
+            </a>
           </b-table-column>
         </template>
         <template slot="empty">
@@ -137,18 +139,27 @@ export default {
       }, (torrent) => {
         this.status = ''
 
+        this.$store.commit('addTorrent', {
+          i: torrent.infoHash,
+          n: torrent.name,
+          l: torrent.length
+        })
+
         this.onTorrent(torrent)
       })
     },
 
-    onTorrent (torrent) {
-      this.$store.commit('addTorrent', {
-        i: torrent.infoHash,
-        n: torrent.name,
-        l: torrent.length
+    onTorrent (torrent, index = this.torrents.length) {
+      torrent.on('done', () => {
+        // there will be only one file
+        const file = torrent.files[0]
+        file.getBlobURL((err, url) => {
+          if (err) throw err
+          this.$set(this.torrents[index], 'downloadURL', url)
+        })
       })
 
-      this.$set(this.torrents, this.torrents.length, torrent)
+      this.$set(this.torrents, index, torrent)
     },
 
     // add new torrent obtained from a peer
@@ -170,7 +181,7 @@ export default {
       this.$wt.add(this.torrents[index].infoHash, {
         announce: this.$ANNOUNCE_URLS
       }, (torrent) => {
-        this.$set(this.torrents, index, torrent)
+        this.onTorrent(torrent, index)
       })
     },
 
