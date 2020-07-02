@@ -40,7 +40,7 @@
             <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
               <b-button @click="resumeTorrent">Start</b-button>
             </div>
-            <div class="control" v-else>
+            <div class="control">
               <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
             </div>
           </b-field>
@@ -79,6 +79,10 @@
           <b-table-column field="size" label="Size" width="120" v-bind:class="{ 'is-warning' : props.row.paused }">
             {{ props.row.length | formatSize }}
           </b-table-column>
+          <b-table-column field="stats" label="Stats">
+            <span v-if="props.row.wdUpSpeed">Upload: {{ props.row.wdUpSpeed | formatSize }}/s <br/></span>
+            <span v-if="props.row.wdDownSpeed">Download: {{ props.row.wdDownSpeed | formatSize }}/s</span>
+          </b-table-column>
           <b-table-column v-if="!props.row.mine" field="finish" label="">
             <b-button v-if="!props.row.done" disabled>Download</b-button>
             <a v-else v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
@@ -99,6 +103,8 @@
 </template>
 
 <script>
+import * as throttle from 'throttleit'
+
 export default {
   name: 'Send',
 
@@ -160,6 +166,14 @@ export default {
           this.$set(this.torrents[index], 'downloadURL', url)
         })
       })
+
+      const updateSpeed = () => {
+        this.$set(this.torrents[index], 'wdUpSpeed', torrent.uploadSpeed * 8)
+        this.$set(this.torrents[index], 'wdDownSpeed', torrent.downloadSpeed * 8)
+      }
+      torrent.on('download', throttle(updateSpeed, 1000))
+      torrent.on('upload', throttle(updateSpeed, 1000))
+      updateSpeed()
 
       this.$set(this.torrents, index, torrent)
     },
