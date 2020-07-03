@@ -22,14 +22,20 @@ export default {
     },
 
     setUpP2PT () {
-      this.startP2PT('a')
       publicIP.v4().then((ip) => {
         const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
         this.$store.commit('setRoom', roomID)
-        // this.startP2PT(roomID)
+        this.startP2PT(roomID)
       }).catch(error => {
         console.log(error)
-        this.status = 'Could not find your IP address'
+        this.$buefy.snackbar.open({
+          message: 'Could not find your IP address',
+          type: 'is-danger',
+          queue: true,
+          indefinite: true,
+          actionText: 'Retry',
+          onAction: this.setUpP2PT
+        })
       })
     },
 
@@ -38,7 +44,6 @@ export default {
       p2pt.setIdentifier('webdrop' + identifier)
 
       p2pt.on('peerconnect', (peer) => {
-        this.status = ''
         p2pt.send(peer, JSON.stringify({
           type: 'init',
           name: this.$store.state.myName,
@@ -69,6 +74,7 @@ export default {
           })
         } else if (msg.type === 'newTorrent') {
           delete msg.type
+          msg.peer = peer
           this.$store.commit('newTorrent', msg)
         }
       })
@@ -82,15 +88,18 @@ export default {
         warningCount++
 
         if (warningCount >= stats.total && stats.connected === 0) {
-          this.status = 'Cannot connect to WebTorrent trackers'
-
           console.error(blah)
 
-          this.$buefy.toast.open({
+          this.$buefy.snackbar.open({
             message: 'We couldn\'t connect to any WebTorrent trackers. A page refresh might help.\nYour ISP might be blocking them 🤔',
-            position: 'is-top',
             type: 'is-danger',
-            duration: 6000
+            queue: true,
+            indefinite: true,
+            actionText: 'Retry',
+            onAction: () => {
+              p2pt.destroy()
+              this.startP2PT(identifier)
+            }
           })
         }
       })

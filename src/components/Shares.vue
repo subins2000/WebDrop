@@ -2,7 +2,7 @@
   <div>
     <b-navbar class="is-success" :mobile-burger="false">
       <template slot="brand">
-        <b-navbar-item tag="router-link" :to="{ path: '/' }" active>
+        <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
         <b-navbar-item tag="router-link" :to="{ path: '/grid' }">
@@ -81,9 +81,9 @@
           </b-table-column>
           <b-table-column field="stats" label="Stats" width="50vw">
             <div class="columns is-gapless is-multiline is-vcentered">
-              <div v-show="props.row.wdUpSpeed || props.row.wdDownSpeed" class="column is-5">
-                <span v-show="props.row.wdUpSpeed">Upload: {{ props.row.wdUpSpeed | formatSize }}/s <br/></span>
-                <span v-show="props.row.wdDownSpeed">Download: {{ props.row.wdDownSpeed | formatSize }}/s</span>
+              <div v-show="!props.row.paused" class="column is-5">
+                <span v-if="props.row.wdUpSpeed">Upload: {{ props.row.wdUpSpeed | formatSize }}/s <br/></span>
+                <span v-if="props.row.wdDownSpeed">Download: {{ props.row.wdDownSpeed | formatSize }}/s</span>
               </div>
               <div v-if="!props.row.mine" class="column">
                 <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
@@ -178,41 +178,54 @@ export default {
       this.$set(this.torrents, index, torrent)
 
       const updateSpeed = () => {
+        if (!this.torrents[index]) return
+
         // Vue will make rendering delay and slows down file transfer if progress value is directly given
         const progress = parseInt((100 * torrent.progress).toFixed(1))
 
         this.torrents[index].wdProgress = progress
 
         // bytes per second
-        this.$set(this.torrents[index], 'wdDownSpeed', torrent.uploadSpeed)
+        this.$set(this.torrents[index], 'wdUpSpeed', torrent.uploadSpeed)
         this.$set(this.torrents[index], 'wdDownSpeed', torrent.downloadSpeed)
       }
-      torrent.on('download', throttle(updateSpeed, 250))
-      torrent.on('upload', throttle(updateSpeed, 250))
+      torrent.on('download', throttle(updateSpeed, 500))
+      torrent.on('upload', throttle(updateSpeed, 500))
       updateSpeed()
     },
 
     // add new torrent obtained from a peer
     addNewTorrent (torrentInfo) {
-      const index = this.torrents.length
-      this.$set(this.torrents, index, {
-        infoHash: torrentInfo.i,
-        name: torrentInfo.n,
-        length: torrentInfo.l,
-        mine: false
-      })
+      let index = this.getIndexOfTorrent(torrentInfo.i)
 
-      if (this.autoStart) {
-        this.startTorrent(index)
+      if (index) {
+        // torrent with same hash exist
+        this.torrents[index].addPeer(torrentInfo.peer)
+      } else {
+        // add new item
+        index = this.torrents.length
+        this.$set(this.torrents, index, {
+          infoHash: torrentInfo.i,
+          name: torrentInfo.n,
+          length: torrentInfo.l,
+          mine: false
+        })
+
+        if (this.autoStart) {
+          this.startTorrent(index)
+        }
       }
     },
 
     startTorrent (index) {
-      this.$wt.add(this.torrents[index].infoHash, {
+      const infoHash = this.torrents[index].infoHash
+
+      this.$wt.add(infoHash, {
         announce: this.$ANNOUNCE_URLS
       }, (torrent) => {
         this.onTorrent(torrent, index)
       })
+      return null
     },
 
     resumeTorrent () {
