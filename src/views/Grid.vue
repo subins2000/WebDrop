@@ -1,13 +1,13 @@
 <template>
   <div>
     <div>
-      <b-navbar v-if="userSelectedCount === 0" class="navbar is-info main-navbar has-text-white">
+      <b-navbar v-if="userSelectedCount === 0" class="navbar is-success main-navbar has-text-white">
         <template slot="brand">
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
             <h1 class="is-size-4">WebDrop</h1>
           </b-navbar-item>
-          <b-navbar-item tag="router-link" :to="{ path: '/about' }">
-            How-To
+          <b-navbar-item active>
+            Grid
           </b-navbar-item>
         </template>
         <template slot="end">
@@ -19,17 +19,17 @@
           </b-navbar-item>
         </template>
       </b-navbar>
-      <b-navbar v-else class="navbar is-success has-text-white has-shadow" :mobile-burger="false">
+      <b-navbar v-else class="navbar is-info has-text-white has-shadow" :mobile-burger="false">
         <template slot="brand">
           <b-navbar-item>
             <b-button type="is-danger" size="is-medium" v-on:click="cancelAllUserSelection">X</b-button>
           </b-navbar-item>
           <b-navbar-item tag="div">
-            {{ userSelectedCount }} users selected
+            {{ userSelectedCount }} user{{ userSelectedCount > 1 ? 's' : '' }} selected
           </b-navbar-item>
           <div class="actions">
-            <b-navbar-item tag="router-link" :to="{ path: '/send' }">
-              <b-button type="is-primary" size="is-medium">Send</b-button>
+            <b-navbar-item tag="div" @click="ping">
+              <b-button type="is-warning" size="is-medium">Ping!</b-button>
             </b-navbar-item>
           </div>
         </template>
@@ -37,7 +37,6 @@
       <div id="earth-wrapper">
         <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet">
           <defs>
-            <linearGradient xlink:href="#4" id="3" x1="159.46" y1="668.03" x2="160.66" y2="596.97" gradientUnits="userSpaceOnUse"/><linearGradient id="4"><stop stop-color="#08f"/><stop offset="1" stop-color="#02c3ff"/></linearGradient><linearGradient xlink:href="#4" id="2" x1="159.46" y1="668.03" x2="160.66" y2="596.97" gradientUnits="userSpaceOnUse"/><linearGradient xlink:href="#4" id="0" x1="169.5" y1="624.72" x2="159.24" y2="63.27" gradientUnits="userSpaceOnUse" gradientTransform="matrix(.93022 0 0 .91891 14.815 32.587)"/><linearGradient id="1" x1="8.167" y1="1050.47" x2="8.115" y2="1038.35" gradientUnits="userSpaceOnUse"><stop stop-color="#141414"/><stop offset="1" stop-color="#2d2d2f"/></linearGradient><g id="phone-icon" transform="matrix(.07976 0 0 .06939 11.129.212)"><rect width="292.69" height="525.81" x="18.553" y="87.91" fill="url(#0)" fill-rule="evenodd" rx="9.302"/><path d="m11.404 1037.36h-6.807c-.31 0-.561.251-.561.561v12.877c0 .31.251.561.561.561h6.807c.31 0 .561-.251.561-.561v-12.877c0-.31-.251-.561-.561-.561m-.082 11.778h-6.644v-9.555h6.644z" transform="matrix(42.98335 0 0 49.4146-182.52-51263.92)" fill="url(#1)"/><ellipse cx="161.34" cy="637.98" rx="25.23" ry="29" fill="url(#2)" fill-rule="evenodd" stroke="url(#3)" stroke-linecap="round" stroke-width="7.411"/></g>
             <filter id="shadow" x="-20%" y="-20%" width="200%" height="200%">
               <feOffset result="offOut" in="SourceAlpha" dx="0" dy="0" />
               <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
@@ -78,22 +77,7 @@
 </template>
 
 <script>
-import * as P2PT from 'p2pt'
 import * as d3 from 'd3'
-import Bowser from 'bowser'
-import * as publicIP from 'public-ip'
-import * as hashSum from 'hash-sum'
-
-const getAColor = () => {
-  // l in 'hsla' stands for lightness
-  return `hsla(${~~(360 * Math.random())},70%,60%,1)`
-}
-
-const getName = () => {
-  const bowser = Bowser.getParser(window.navigator.userAgent)
-
-  return `${bowser.getOSName()} ${bowser.getBrowserName()}`
-}
 
 export default {
   name: 'Index',
@@ -108,8 +92,6 @@ export default {
   data () {
     return {
       status: 'Connecting...',
-      myName: getName(),
-      myColor: null,
 
       circleSlots: [],
 
@@ -143,119 +125,21 @@ export default {
 
   methods: {
     init () {
-      this.myColor = sessionStorage.getItem('myColor')
-      if (!this.myColor) {
-        this.myColor = getAColor()
-        sessionStorage.setItem('myColor', this.myColor)
-      }
-
-      this.setUpP2PT()
       this.setUpEarth()
 
       this.$store.subscribe((mutation) => {
         if (mutation.type === 'addUser') {
-          const slot = this.circleSlots.shift()
-          this.addUserCircle(
-            mutation.payload.id,
-            mutation.payload.name,
-            mutation.payload.color,
-            slot[0],
-            slot[1]
-          )
-
-          this.circleSlotIndex++
+          this.addUser(mutation.payload)
         } else if (mutation.type === 'removeUser') {
-          const userID = mutation.payload
-          const elem = this.earth.querySelector(`.user[id="${userID}"]`)
-
-          const item = [elem.getAttribute('cx'), elem.getAttribute('cy')]
-          this.circleSlots.push(item)
-
-          elem.remove()
+          this.removeUser(mutation.payload)
         }
       })
-    },
 
-    setUpP2PT () {
-      this.startP2PT('a')
-      publicIP.v4().then((ip) => {
-        const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
-        this.$store.commit('setRoom', roomID)
-        // this.startP2PT(roomID)
-      }).catch(error => {
-        console.log(error)
-        this.status = 'Could not find your IP address'
-      })
-    },
-
-    startP2PT (identifier) {
-      if (this.$p2pt) {
-        this.$p2pt.destroy()
+      for (const userID in this.$store.state.users) {
+        let user = this.$store.state.users[userID]
+        user = { ...user, ...{ id: userID } }
+        this.addUser(user)
       }
-      this.$p2pt = new P2PT(this.$ANNOUNCE_URLS)
-      this.$p2pt.setIdentifier('webdrop' + identifier)
-
-      this.$p2pt.on('peerconnect', (peer) => {
-        this.status = ''
-        this.$p2pt.send(peer, JSON.stringify({
-          type: 'init',
-          name: this.myName,
-          color: this.myColor
-        }))
-      })
-
-      this.$p2pt.on('msg', (peer, msg) => {
-        try {
-          msg = JSON.parse(msg)
-        } catch (_) {
-          return
-        }
-
-        if (msg.type === 'init') {
-          this.$store.commit('addUser', {
-            id: peer.id,
-            name: msg.name,
-            color: msg.color,
-            conn: peer
-          })
-        } else if (msg.type === 'send') {
-          this.$buefy.dialog.confirm({
-            message: `${this.$store.state.users[peer.id].name} wants to send you file <b class="is-bold">${msg.name}</b>`,
-            onConfirm: () => {
-              this.receiveFile(msg.name, msg.infoHash)
-            }
-          })
-        }
-      })
-
-      this.$p2pt.on('peerclose', (peer) => {
-        this.$store.commit('removeUser', peer.id)
-      })
-
-      let warningCount = 0
-      this.$p2pt.on('trackerwarning', (blah, stats) => {
-        warningCount++
-
-        if (warningCount >= stats.total && stats.connected === 0) {
-          this.status = 'Cannot connect to WebTorrent trackers'
-
-          console.error(blah)
-
-          this.$buefy.toast.open({
-            message: 'We couldn\'t connect to any WebTorrent trackers. A page refresh might help.\nYour ISP might be blocking them 🤔',
-            position: 'is-top',
-            type: 'is-danger',
-            duration: 6000
-          })
-        }
-      })
-
-      this.$p2pt.on('trackerconnect', () => {
-        this.status = 'Connected!'
-        warningCount--
-      })
-
-      this.$p2pt.start()
     },
 
     shareViaInternet () {
@@ -296,12 +180,14 @@ export default {
       this.internetShareModelActive = false
     },
 
-    receiveFile (name, infoHash) {
-      this.$store.commit('receiveFile', {
-        infoHash,
-        name
-      })
-      this.$router.push('/receive')
+    ping (name) {
+      const data = {
+        type: 'ping'
+      }
+      for (const userID of this.$store.state.selectedUsers) {
+        const user = this.$store.state.users[userID]
+        this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+      }
     },
 
     setUpEarth () {
@@ -347,7 +233,20 @@ export default {
         i++
       }
 
-      this.addUserCircle('me', this.myName, this.myColor, this.circleStartingX, this.circleStartingY)
+      this.addUserCircle('me', this.$store.state.myName, this.$store.state.myColor, this.circleStartingX, this.circleStartingY)
+    },
+
+    addUser (user) {
+      const slot = this.circleSlots.shift()
+      this.addUserCircle(
+        user.id,
+        user.name,
+        user.color,
+        slot[0],
+        slot[1]
+      )
+
+      this.circleSlotIndex++
     },
 
     addUserCircle (userID, userName, userColor, x, y) {
@@ -369,13 +268,6 @@ export default {
         .attr('stroke', '#CCC')
         .attr('fill', userColor)
         .attr('filter', 'url(#shadow)')
-
-      const mid = this.userCircleRadius / 2
-      group.append('use')
-        .attr('xlink:href', '#phone-icon')
-        .attr('height', this.userCircleRadius)
-        .attr('x', x - mid)
-        .attr('y', y - mid)
 
       group.append('text')
         .attr('class', 'user-text')
@@ -404,8 +296,19 @@ export default {
       }
     },
 
+    removeUser (userID) {
+      const elem = this.earth.querySelector(`.user[id="${userID}"]`)
+
+      if (elem) {
+        const item = [elem.getAttribute('cx'), elem.getAttribute('cy')]
+        this.circleSlots.push(item)
+
+        elem.remove()
+      }
+    },
+
     cancelAllUserSelection () {
-      this.userSelected = []
+      this.$store.commit('clearSelectedUsers')
 
       this.earth.querySelectorAll('.selected').forEach(elem => {
         elem.classList.remove('selected')
@@ -438,6 +341,9 @@ export default {
     justify-content: flex-end
     margin-left: auto
 
+    a
+      color: #fff
+
 .main-navbar .navbar-brand
   width: auto
 
@@ -461,6 +367,7 @@ export default {
     &.selected
       circle
         stroke-width: 3px
+        stroke: #000
 
   .user-text.selected
     font-weight: bold

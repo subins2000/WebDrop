@@ -6,7 +6,7 @@
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
         <b-navbar-item tag="div">
-          Receive Files
+          Shares
         </b-navbar-item>
       </template>
     </b-navbar>
@@ -44,9 +44,7 @@
 
 <script>
 export default {
-  name: 'Receive',
-
-  props: ['back'],
+  name: 'Shares',
 
   data () {
     return {

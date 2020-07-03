@@ -5,14 +5,24 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    myColor: '',
+    myName: '',
+
     users: {} as any,
     selectedUsers: [] as any,
-    receivedFiles: {},
+    torrents: {},
+
+    p2pt: null,
 
     internetShare: false,
     roomID: ''
   },
   mutations: {
+    initProfile (state, payload) {
+      state.myColor = payload.color
+      state.myName = payload.name
+    },
+
     addUser (state, payload) {
       Vue.set(state.users, payload.id, {
         name: payload.name,
@@ -38,8 +48,20 @@ export default new Vuex.Store({
       state.selectedUsers = []
     },
 
-    receiveFile (state, payload) {
-      Vue.set(state.receivedFiles, payload.infoHash, payload.name)
+    // torrent added by user
+    addTorrent (state, payload) {
+      Vue.set(state.torrents, payload.i, {
+        ...payload,
+        ...{ m: true } // m for mine
+      })
+    },
+
+    // torrent received from a peer
+    newTorrent (state, payload) {
+      Vue.set(state.torrents, payload.i, {
+        ...payload,
+        ...{ m: false } // m for mine
+      })
     },
 
     setRoom (state, roomID: string) {
@@ -49,6 +71,10 @@ export default new Vuex.Store({
     activateInternetShare (state, roomID: string) {
       state.internetShare = true
       state.roomID = roomID
+    },
+
+    setP2PT (state, payload) {
+      state.p2pt = payload
     }
   },
   actions: {

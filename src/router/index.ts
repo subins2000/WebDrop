@@ -1,26 +1,20 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
-import Index from '../views/Index.vue'
-import Send from '../components/Send.vue'
-import Receive from '../components/Receive.vue'
+import Grid from '../views/Grid.vue'
+import Shares from '../components/Shares.vue'
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
+    path: '/grid',
+    name: 'Grid',
+    component: Grid
+  },
+  {
     path: '/',
-    name: 'Index',
-    component: Index
-  },
-  {
-    path: '/send',
-    name: 'Send',
-    component: Send
-  },
-  {
-    path: '/receive',
-    name: 'Receive',
-    component: Receive
+    name: 'Shares',
+    component: Shares
   },
   {
     path: '/about',
