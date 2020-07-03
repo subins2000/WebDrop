@@ -2,7 +2,7 @@
   <div>
     <b-navbar class="is-success" :mobile-burger="false">
       <template slot="brand">
-        <b-navbar-item tag="router-link" :to="{ path: '/' }">
+        <b-navbar-item tag="router-link" :to="{ path: '/' }" active>
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
         <b-navbar-item tag="router-link" :to="{ path: '/grid' }">

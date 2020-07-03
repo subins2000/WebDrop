@@ -1,12 +1,12 @@
 <template>
   <div>
     <div>
-      <b-navbar v-if="userSelectedCount === 0" class="navbar is-info main-navbar has-text-white">
+      <b-navbar v-if="userSelectedCount === 0" class="navbar is-success main-navbar has-text-white">
         <template slot="brand">
           <b-navbar-item tag="router-link" :to="{ path: '/' }">
             <h1 class="is-size-4">WebDrop</h1>
           </b-navbar-item>
-          <b-navbar-item>
+          <b-navbar-item active>
             Grid
           </b-navbar-item>
         </template>
@@ -19,17 +19,17 @@
           </b-navbar-item>
         </template>
       </b-navbar>
-      <b-navbar v-else class="navbar is-success has-text-white has-shadow" :mobile-burger="false">
+      <b-navbar v-else class="navbar is-info has-text-white has-shadow" :mobile-burger="false">
         <template slot="brand">
           <b-navbar-item>
             <b-button type="is-danger" size="is-medium" v-on:click="cancelAllUserSelection">X</b-button>
           </b-navbar-item>
           <b-navbar-item tag="div">
-            {{ userSelectedCount }} users selected
+            {{ userSelectedCount }} user{{ userSelectedCount > 1 ? 's' : '' }} selected
           </b-navbar-item>
           <div class="actions">
-            <b-navbar-item tag="router-link" :to="{ path: '/send' }">
-              <b-button type="is-primary" size="is-medium">Send</b-button>
+            <b-navbar-item tag="div" @click="ping">
+              <b-button type="is-warning" size="is-medium">Ping!</b-button>
             </b-navbar-item>
           </div>
         </template>
@@ -180,12 +180,14 @@ export default {
       this.internetShareModelActive = false
     },
 
-    receiveFile (name, infoHash) {
-      this.$store.commit('receiveFile', {
-        infoHash,
-        name
-      })
-      this.$router.push('/receive')
+    ping (name) {
+      const data = {
+        type: 'ping'
+      }
+      for (const userID of this.$store.state.selectedUsers) {
+        const user = this.$store.state.users[userID]
+        this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+      }
     },
 
     setUpEarth () {
@@ -306,7 +308,7 @@ export default {
     },
 
     cancelAllUserSelection () {
-      this.userSelected = []
+      this.$store.commit('clearSelectedUsers')
 
       this.earth.querySelectorAll('.selected').forEach(elem => {
         elem.classList.remove('selected')
@@ -365,6 +367,7 @@ export default {
     &.selected
       circle
         stroke-width: 3px
+        stroke: #000
 
   .user-text.selected
     font-weight: bold

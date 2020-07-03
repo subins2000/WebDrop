@@ -60,6 +60,13 @@ export default {
             color: msg.color,
             conn: peer
           })
+        } else if (msg.type === 'ping') {
+          this.$buefy.snackbar.open({
+            duration: 3000,
+            message: `<b>${this.$store.state.users[peer.id].name}</b> pinged!`,
+            type: 'is-warning',
+            queue: false
+          })
         } else if (msg.type === 'newTorrent') {
           delete msg.type
           this.$store.commit('newTorrent', msg)

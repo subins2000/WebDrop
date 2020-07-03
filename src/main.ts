@@ -40,7 +40,7 @@ let myName = sessionStorage.getItem('myName')
 if (!myColor) {
   // random color
   myColor = `hsla(${~~(360 * Math.random())},70%,60%,1)`
-  sessionStorage.setItem('myName', myColor)
+  sessionStorage.setItem('myColor', myColor)
 }
 
 if (!myName) {
