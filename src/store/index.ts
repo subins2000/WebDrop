@@ -75,6 +75,11 @@ export default new Vuex.Store({
 
     setP2PT (state, payload) {
       state.p2pt = payload
+    },
+
+    destroyP2PT (state) {
+      state.p2pt.destroy()
+      state.users = {}
     }
   },
   actions: {

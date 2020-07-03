@@ -1,25 +1,7 @@
 <template>
   <div>
     <div>
-      <b-navbar v-if="userSelectedCount === 0" class="navbar is-success main-navbar has-text-white">
-        <template slot="brand">
-          <b-navbar-item tag="router-link" :to="{ path: '/' }">
-            <h1 class="is-size-4">WebDrop</h1>
-          </b-navbar-item>
-          <b-navbar-item active>
-            Grid
-          </b-navbar-item>
-        </template>
-        <template slot="end">
-          <b-navbar-item tag="div" @click="shareViaInternet">
-            <b-button type="is-primary">Share Via Internet 🌐</b-button>
-          </b-navbar-item>
-          <b-navbar-item tag="div">
-            {{ status }}
-          </b-navbar-item>
-        </template>
-      </b-navbar>
-      <b-navbar v-else class="navbar is-info has-text-white has-shadow" :mobile-burger="false">
+      <b-navbar v-if="userSelectedCount > 0" class="navbar is-info has-text-white has-shadow" :mobile-burger="false">
         <template slot="brand">
           <b-navbar-item>
             <b-button type="is-danger" size="is-medium" v-on:click="cancelAllUserSelection">X</b-button>
@@ -46,33 +28,6 @@
         </svg>
       </div>
     </div>
-    <b-modal :active.sync="internetShareModelActive" class="has-text-centered">
-      <div class="card">
-        <div class="card-content content">
-          <b-tabs v-model="internetShareModelActiveTab" type="is-info">
-            <b-tab-item label="Invite People">
-              <p>Share this room code with people you want to share files with :</p>
-              <pre class="is-size-4">{{ roomID }}</pre>
-              <h3 style="margin-top: 0">OR</h3>
-              <p>Share this link</p>
-              <div class="columns">
-                <div class="column is-four-fifths">
-                  <input class="input is-info is-medium is-flat" onclick="this.select()" v-bind:value='internetInviteLink' readonly />
-                </div>
-                <div class="column">
-                  <span class="button is-info is-primary is-medium" @click="copyInviteLink" v-clipboard="internetInviteLink" style="width: 100%">Copy</span>
-                </div>
-              </div>
-            </b-tab-item>
-            <b-tab-item label="Join Room">
-              <p>Paste the room code here :</p>
-              <input class="input is-info is-medium is-flat" v-model='internetRoomInput' /><br/><br/>
-              <div class="button is-info is-medium" @click="joinInternetRoom" style="width: 100%;">Join</div>
-            </b-tab-item>
-          </b-tabs>
-        </div>
-      </div>
-    </b-modal>
   </div>
 </template>
 
@@ -93,33 +48,13 @@ export default {
     return {
       status: 'Connecting...',
 
-      circleSlots: [],
-
-      internetShareModelActive: false,
-      internetShareModelActiveTab: 0,
-      internetRoomInput: ''
+      circleSlots: []
     }
   },
 
   computed: {
-    userSelected () {
-      return this.$store.state.selectedUsers
-    },
-
     userSelectedCount () {
-      return this.userSelected.length
-    },
-
-    internetShare () {
-      return this.$store.state.internetShare
-    },
-
-    roomID () {
-      return this.$store.state.roomID
-    },
-
-    internetInviteLink () {
-      return this.$INTERNET_ROOM_SHARE_LINK + this.roomID
+      return this.$store.state.selectedUsers.length
     }
   },
 
@@ -140,44 +75,6 @@ export default {
         user = { ...user, ...{ id: userID } }
         this.addUser(user)
       }
-    },
-
-    shareViaInternet () {
-      let roomID = this.roomID
-      if (!roomID) {
-        roomID = Math.random().toString(36).substr(2, this.$INTERNET_ROOM_CODE_LENGTH)
-        this.$store.commit('activateInternetShare', roomID)
-
-        this.startP2PT(roomID)
-      }
-
-      this.internetShareModelActive = true
-    },
-
-    copyInviteLink () {
-      this.$buefy.toast.open({
-        duration: 2000,
-        message: 'Invite Link Copied !',
-        position: 'is-top',
-        type: 'is-success'
-      })
-    },
-
-    joinInternetRoom () {
-      if (this.internetRoomInput.length !== this.$INTERNET_ROOM_CODE_LENGTH) {
-        return
-      }
-      this.$store.commit('activateInternetShare', this.internetRoomInput)
-
-      this.startP2PT(this.internetRoomInput)
-
-      this.$buefy.toast.open({
-        duration: 2000,
-        message: `Joined Room ${this.internetRoomInput}`,
-        position: 'is-top',
-        type: 'is-success'
-      })
-      this.internetShareModelActive = false
     },
 
     ping (name) {
@@ -323,30 +220,6 @@ export default {
 </script>
 
 <style lang="sass">
-.navbar
-  padding-top: 10px
-  padding-bottom: 10px
-  transition: 0.2s all
-
-  // disable start & end and only use brand
-  .navbar-brand
-    width: 100%
-
-  &.has-shadow
-    box-shadow: 0 5px 30px 0 #AAA !important
-
-  .actions
-    display: flex
-    align-items: stretch
-    justify-content: flex-end
-    margin-left: auto
-
-    a
-      color: #fff
-
-.main-navbar .navbar-brand
-  width: auto
-
 #earth-wrapper
   position: fixed
   top: 52px

@@ -11,8 +11,12 @@ import VueClipboard from 'vue-clipboard2'
 import Bowser from 'bowser'
 import WebTorrent from 'webtorrent'
 
+import Navbar from './components/Navbar.vue'
+
 Vue.use(Buefy)
 Vue.use(VueClipboard)
+
+Vue.component('Navbar', Navbar)
 
 Vue.config.productionTip = false
 
