@@ -9,39 +9,15 @@
 </template>
 
 <script>
-import Bowser from 'bowser'
 import * as hashSum from 'hash-sum'
 import * as P2PT from 'p2pt'
 import * as publicIP from 'public-ip'
 
-const getName = () => {
-  const bowser = Bowser.getParser(window.navigator.userAgent)
-
-  return `${bowser.getOSName()} ${bowser.getBrowserName()}`
-}
-
-const getAColor = () => {
-  // l in 'hsla' stands for lightness
-  return `hsla(${~~(360 * Math.random())},70%,60%,1)`
-}
-
 export default {
   name: 'App',
 
-  data () {
-    return {
-      myName: getName()
-    }
-  },
-
   methods: {
     init () {
-      this.myColor = sessionStorage.getItem('myColor')
-      if (!this.myColor) {
-        this.myColor = getAColor()
-        sessionStorage.setItem('myColor', this.myColor)
-      }
-
       this.setUpP2PT()
     },
 
@@ -65,8 +41,8 @@ export default {
         this.status = ''
         p2pt.send(peer, JSON.stringify({
           type: 'init',
-          name: this.myName,
-          color: this.myColor
+          name: this.$store.state.myName,
+          color: this.$store.state.myColor
         }))
       })
 

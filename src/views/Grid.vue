@@ -93,7 +93,6 @@ export default {
   data () {
     return {
       status: 'Connecting...',
-      myColor: null,
 
       circleSlots: [],
 
@@ -233,7 +232,7 @@ export default {
         i++
       }
 
-      this.addUserCircle('me', this.myName, this.myColor, this.circleStartingX, this.circleStartingY)
+      this.addUserCircle('me', this.$store.state.myName, this.$store.state.myColor, this.circleStartingX, this.circleStartingY)
     },
 
     addUser (user) {

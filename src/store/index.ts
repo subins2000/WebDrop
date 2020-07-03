@@ -5,6 +5,9 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    myColor: '',
+    myName: '',
+
     users: {} as any,
     selectedUsers: [] as any,
     torrents: {},
@@ -15,6 +18,11 @@ export default new Vuex.Store({
     roomID: ''
   },
   mutations: {
+    initProfile (state, payload) {
+      state.myColor = payload.color
+      state.myName = payload.name
+    },
+
     addUser (state, payload) {
       Vue.set(state.users, payload.id, {
         name: payload.name,
