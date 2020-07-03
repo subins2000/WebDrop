@@ -1,20 +1,5 @@
 <template>
   <div>
-    <b-navbar class="is-success" :mobile-burger="false">
-      <template slot="brand">
-        <b-navbar-item tag="router-link" :to="{ path: '/' }">
-          <h1 class="is-size-4">WebDrop</h1>
-        </b-navbar-item>
-        <b-navbar-item tag="router-link" :to="{ path: '/grid' }">
-          Grid
-        </b-navbar-item>
-        <div class="actions">
-          <b-navbar-item tag="router-link" :to="{ path: '/about' }">
-            Help
-          </b-navbar-item>
-        </div>
-      </template>
-    </b-navbar>
     <div class="container">
       <b-field class="actions content" grouped>
         <b-upload v-model="files" multiple @input="onFileChange">
@@ -22,9 +7,11 @@
             <span>Add File</span>
           </a>
         </b-upload>
-        <b-button class="is-text">
-          {{ usersCount }} users
-        </b-button>
+        <router-link to="/grid">
+          <b-button class="is-text">
+            {{ usersCount }} users
+          </b-button>
+        </router-link>
         <b-tooltip label="Start downloading files on receive" position="is-bottom">
           <b-switch v-model="autoStart" type="is-danger">
             Auto Start

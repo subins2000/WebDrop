@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <Navbar/>
     <transition name='slide'>
       <keep-alive>
         <router-view/>
@@ -19,6 +20,13 @@ export default {
   methods: {
     init () {
       this.setUpP2PT()
+
+      this.$store.subscribe((mutation) => {
+        if (mutation.type === 'activateInternetShare') {
+          this.$store.commit('destroyP2PT')
+          this.startP2PT(this.$store.state.roomID)
+        }
+      })
     },
 
     setUpP2PT () {
@@ -97,7 +105,7 @@ export default {
             indefinite: true,
             actionText: 'Retry',
             onAction: () => {
-              p2pt.destroy()
+              this.$store.commit('destroyP2PT')
               this.startP2PT(identifier)
             }
           })
@@ -120,12 +128,35 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="sass">
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400&display=swap');
 
-#app {
+#app
   font-family: 'Ubuntu', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
+
+.navbar
+  padding-top: 10px
+  padding-bottom: 10px
+  transition: 0.2s all
+
+  // disable start & end and only use brand
+  .navbar-brand
+    width: 100%
+
+  &.has-shadow
+    box-shadow: 0 5px 30px 0 #AAA !important
+
+  .actions
+    display: flex
+    align-items: stretch
+    justify-content: flex-end
+    margin-left: auto
+
+    a
+      color: #fff
+
+.main-navbar .navbar-brand
+  width: auto
 </style>
