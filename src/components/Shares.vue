@@ -70,24 +70,28 @@
         :data="torrents"
         :checked-rows.sync="tableCheckedRows"
         checkable
-        checkbox-position="left">
+        checkbox-position="left"
+        is-fullwidth>
         <template slot-scope="props">
-          <b-table-column field="name" label="Name" v-bind:class="{ 'is-warning' : props.row.paused }">
+          <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }">
             <span>{{ props.row.name }}</span>
-            <b-progress v-if="!props.row.mine" type="is-success" :value="parseInt((100 * props.row.progress).toFixed(1))" size="is-medium" show-value format="percent"></b-progress>
           </b-table-column>
-          <b-table-column field="size" label="Size" width="120" v-bind:class="{ 'is-warning' : props.row.paused }">
+          <b-table-column field="size" label="Size" width="10vw" v-bind:class="{ 'is-warning' : props.row.paused }">
             {{ props.row.length | formatSize }}
           </b-table-column>
-          <b-table-column field="stats" label="Stats">
-            <span v-if="props.row.wdUpSpeed">Upload: {{ props.row.wdUpSpeed | formatSize }}/s <br/></span>
-            <span v-if="props.row.wdDownSpeed">Download: {{ props.row.wdDownSpeed | formatSize }}/s</span>
-          </b-table-column>
-          <b-table-column v-if="!props.row.mine" field="finish" label="">
-            <b-button v-if="!props.row.done" disabled>Download</b-button>
-            <a v-else v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
-              <b-button type="is-success">Download</b-button>
-            </a>
+          <b-table-column field="stats" label="Stats" width="50vw">
+            <div class="columns is-gapless is-multiline is-vcentered">
+              <div v-show="props.row.wdUpSpeed || props.row.wdDownSpeed" class="column is-5">
+                <span v-show="props.row.wdUpSpeed">Upload: {{ props.row.wdUpSpeed | formatSize }}/s <br/></span>
+                <span v-show="props.row.wdDownSpeed">Download: {{ props.row.wdDownSpeed | formatSize }}/s</span>
+              </div>
+              <div v-if="!props.row.mine" class="column">
+                <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
+                  <b-button type="is-success">Download</b-button>
+                </a>
+                <b-progress v-show="!props.row.done" type="is-success" :value="props.row.wdProgress" size="is-medium" show-value format="percent"></b-progress>
+              </div>
+            </div>
           </b-table-column>
         </template>
         <template slot="empty">
@@ -167,15 +171,25 @@ export default {
         })
       })
 
-      const updateSpeed = () => {
-        this.$set(this.torrents[index], 'wdUpSpeed', torrent.uploadSpeed * 8)
-        this.$set(this.torrents[index], 'wdDownSpeed', torrent.downloadSpeed * 8)
-      }
-      torrent.on('download', throttle(updateSpeed, 1000))
-      torrent.on('upload', throttle(updateSpeed, 1000))
-      updateSpeed()
+      // custom properties added to Torrent object
+      torrent.wdUpSpeed = 0
+      torrent.wdDownSpeed = 0
 
       this.$set(this.torrents, index, torrent)
+
+      const updateSpeed = () => {
+        // Vue will make rendering delay and slows down file transfer if progress value is directly given
+        const progress = parseInt((100 * torrent.progress).toFixed(1))
+
+        this.torrents[index].wdProgress = progress
+
+        // bytes per second
+        this.$set(this.torrents[index], 'wdDownSpeed', torrent.uploadSpeed)
+        this.$set(this.torrents[index], 'wdDownSpeed', torrent.downloadSpeed)
+      }
+      torrent.on('download', throttle(updateSpeed, 250))
+      torrent.on('upload', throttle(updateSpeed, 250))
+      updateSpeed()
     },
 
     // add new torrent obtained from a peer
