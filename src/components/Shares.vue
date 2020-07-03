@@ -277,5 +277,6 @@ export default {
   margin-top: 20px
 
 .drop-area
-  padding: 40% 20px
+  padding: 20vh 20vw
+  width: 100%
 </style>

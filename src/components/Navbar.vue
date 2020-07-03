@@ -112,12 +112,20 @@ export default {
       this.$store.commit('activateInternetShare', this.internetRoomInput)
 
       this.$buefy.toast.open({
-        duration: 2000,
+        duration: 4000,
         message: `Joined Room <b>${this.internetRoomInput}</b>`,
         position: 'is-top',
         type: 'is-warning'
       })
       this.internetShareModelActive = false
+    }
+  },
+
+  mounted () {
+    const roomID = this.$route.query.room
+    if (roomID) {
+      this.internetRoomInput = roomID
+      this.joinInternetRoom()
     }
   }
 }
