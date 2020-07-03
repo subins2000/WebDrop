@@ -17,9 +17,6 @@
             Auto Start
           </b-switch>
         </b-tooltip>
-        <b-button class="is-text">
-          {{ status }}
-        </b-button>
       </b-field>
       <div v-if="tableCheckedRows.length > 0">
         <span v-if="tableCheckedRows.length === 1">
@@ -106,7 +103,6 @@ export default {
       files: [],
       torrents: [],
       selectedUsers: this.$store.state.selectedUsers,
-      status: '',
 
       tableCheckedRows: []
     }
@@ -127,13 +123,19 @@ export default {
     },
 
     makeTorrent (file) {
-      this.status = 'Preparing files'
+      const snack = this.$buefy.snackbar.open({
+        message: 'Preparing files. This might take a while depending on file size',
+        type: 'is-primary',
+        queue: true,
+        indefinite: true,
+        actionText: 'Ok'
+      })
 
       this.$wt.seed(file, {
         announceList: [this.$ANNOUNCE_URLS],
         name: file.name
       }, (torrent) => {
-        this.status = ''
+        snack.close()
 
         this.$store.commit('addTorrent', {
           i: torrent.infoHash,

@@ -41,13 +41,14 @@ Vue.prototype.$wt = new WebTorrent()
 let myColor = sessionStorage.getItem('myColor')
 let myName = sessionStorage.getItem('myName')
 
-if (!myColor) {
+// Length limit to prevent malicious inputs
+if (!myColor || myColor.length > 20) {
   // random color
   myColor = `hsla(${~~(360 * Math.random())},70%,60%,1)`
   sessionStorage.setItem('myColor', myColor)
 }
 
-if (!myName) {
+if (!myName || myName.length > 30) {
   const bowser = Bowser.getParser(window.navigator.userAgent)
 
   myName = `${bowser.getOSName()} ${bowser.getBrowserName()}`

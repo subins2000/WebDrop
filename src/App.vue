@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Navbar/>
+    <Navbar v-if="$route.name !== 'About'" />
     <transition name='slide'>
       <keep-alive>
         <router-view/>

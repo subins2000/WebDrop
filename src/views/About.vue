@@ -17,12 +17,12 @@
         <ol>
           <li>Connect your devices to the same WiFi or hotspot</li>
           <li>Make sure internet is available</li>
-          <li>Choose the device and send !</li>
+          <li>Choose files and share !</li>
         </ol>
         <h3 class="content is-size-4">FAQ</h3>
         <ul>
-          <li>Is file passed through internet ? Wouldn't it be slow ?</li>
-          <p><b>Ans:</b>&nbsp;Internet is only required for discovering devices. Your devices are connected <b>Peer To Peer</b>. This P2P connection can be made through LAN using the same WiFi hotspot, thus increasing transfer speed ! Files are not shared through internet, though that is also possible too.</p>
+          <li>Isn't file passed through internet ? Wouldn't it be slow ?</li>
+          <p><b>Ans:</b>&nbsp;Internet is only required for discovering devices. Your devices are connected <b>Peer To Peer</b>. This P2P connection can be made through LAN using the same WiFi hotspot, thus increasing transfer speed ! Files are not shared through internet unless you use "Share via Internet" feature.</p>
           <li>Will you know the files being sent ?</li>
           <p><b>Ans:</b>&nbsp;No ! Absolutely not ! P2P connection made ensures that you and only the other connected devices will know the data/files passed between each other.</p>
           <li>Is A Server Being Used ?</li>
