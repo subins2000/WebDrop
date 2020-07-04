@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <Navbar v-if="$route.name !== 'About'" />
-    <transition name='slide'>
+    <Header v-if="$route.name !== 'About'" />
+    <transition name='slide-fade'>
       <keep-alive>
         <router-view/>
       </keep-alive>
@@ -128,35 +128,73 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400&display=swap');
 
-#app
+#app {
   font-family: 'Ubuntu', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
 
-.navbar
-  padding-top: 10px
-  padding-bottom: 10px
-  transition: 0.2s all
+// Import Bulma's core
+@import "~bulma/sass/utilities/_all";
 
-  // disable start & end and only use brand
-  .navbar-brand
-    width: 100%
+// Set your colors
+$primary: #8c67ef;
+$primary-invert: findColorInvert($primary);
+$twitter: #4099FF;
+$twitter-invert: findColorInvert($twitter);
 
-  &.has-shadow
-    box-shadow: 0 5px 30px 0 #AAA !important
+// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+$colors: (
+    "white": ($white, $black),
+    "black": ($black, $white),
+    "light": ($light, $light-invert),
+    "dark": ($dark, $dark-invert),
+    "primary": ($primary, $primary-invert),
+    "info": ($info, $info-invert),
+    "success": ($success, $success-invert),
+    "warning": ($warning, $warning-invert),
+    "danger": ($danger, $danger-invert),
+    "twitter": ($twitter, $twitter-invert)
+);
 
-  .actions
-    display: flex
-    align-items: stretch
-    justify-content: flex-end
-    margin-left: auto
+// Links
+$link: $primary;
+$link-invert: $primary-invert;
+$link-focus-border: $primary;
 
-    a
-      color: #fff
+// For buefy
+$speed-slow: 150ms !default
+$speed-slower: 250ms !default
 
-.main-navbar .navbar-brand
-  width: auto
+// Import Bulma and Buefy styles
+@import "~bulma";
+@import "~buefy/src/scss/utils/_animations.scss";
+@import "~buefy/src/scss/components/_notices.scss";
+
+@import "~buefy/src/scss/components/_modal.scss";
+@import "~buefy/src/scss/components/_switch.scss";
+@import "~buefy/src/scss/components/_tabs.scss";
+
+@import "~buefy/src/scss/utils/_functions.scss";
+@import "~buefy/src/scss/components/_table.scss";
+
+@import "~buefy/src/scss/components/_tooltip.scss";
+@import "~buefy/src/scss/components/_upload.scss";
+
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .2s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
 </style>

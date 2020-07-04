@@ -1,7 +1,4 @@
 import Vue from 'vue'
-
-import Buefy from 'buefy'
-import 'buefy/dist/buefy.css'
 import VueClipboard from 'vue-clipboard2'
 
 import WebTorrent from 'webtorrent'
@@ -12,12 +9,42 @@ import store from './store'
 import './registerServiceWorker'
 
 import device from './device'
-import Navbar from './components/Navbar.vue'
+import Header from './components/Header.vue'
 
-Vue.use(Buefy)
+import Button from 'buefy/dist/components/button'
+import Field from 'buefy/dist/components/field'
+import Modal from 'buefy/dist/components/modal'
+import Navbar from 'buefy/dist/components/navbar'
+import Switch from 'buefy/dist/components/switch'
+import Tabs from 'buefy/dist/components/tabs'
+import Table from 'buefy/dist/components/table'
+import Tooltip from 'buefy/dist/components/tooltip'
+import Upload from 'buefy/dist/components/upload'
+import Toast from 'buefy/dist/components/toast'
+import Snackbar from 'buefy/dist/components/snackbar'
+
 Vue.use(VueClipboard)
 
-Vue.component('Navbar', Navbar)
+// load only needed buefy components
+const comps = [
+  Button,
+  Field,
+  Modal,
+  Navbar,
+  Tabs,
+  Table,
+  Tooltip,
+  Snackbar,
+  Switch,
+  Toast,
+  Upload
+]
+
+for (const comp of comps) {
+  Vue.use(comp)
+}
+
+Vue.component('Header', Header)
 
 Vue.config.productionTip = false
 

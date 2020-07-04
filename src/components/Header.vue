@@ -52,7 +52,7 @@
 
 <script>
 export default {
-  name: 'Navbar',
+  name: 'Header',
 
   data () {
     return {
@@ -130,3 +130,29 @@ export default {
   }
 }
 </script>
+
+<style lang="sass">
+.navbar
+  padding-top: 10px
+  padding-bottom: 10px
+  transition: 0.2s all
+
+  // disable start & end and only use brand
+  .navbar-brand
+    width: 100%
+
+  &.has-shadow
+    box-shadow: 0 5px 30px 0 #AAA !important
+
+  .actions
+    display: flex
+    align-items: stretch
+    justify-content: flex-end
+    margin-left: auto
+
+    a
+      color: #fff
+
+.main-navbar .navbar-brand
+  width: auto
+</style>
