@@ -54,7 +54,10 @@
         :data.sync="torrents"
         :checked-rows.sync="tableCheckedRows"
         checkable
-        checkbox-position="left">
+        checkbox-position="left"
+        focusable
+        :selected.sync="tableSelectedRow"
+        v-click-outside="onOutsideClick">
         <template slot-scope="props">
           <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }">
             <span style="word-break: break-word;max-width: 60vw;">{{ props.row.name }}</span>
@@ -111,7 +114,8 @@ export default {
       torrents: [],
       selectedUsers: this.$store.state.selectedUsers,
 
-      tableCheckedRows: []
+      tableCheckedRows: [],
+      tableSelectedRow: {}
     }
   },
 
@@ -227,7 +231,7 @@ export default {
     },
 
     resumeTorrent () {
-      for (const torrent of this.tableCheckedRows) {
+      for (const torrent of this.getSelectedRows()) {
         if (!torrent.resume) {
           // torrent is not a WebTorrent object
           // make it one
@@ -239,12 +243,14 @@ export default {
     },
 
     removeTorrent () {
-      for (const torrent of this.tableCheckedRows) {
+      const rows = this.getSelectedRows()
+      for (const key in rows) {
+        const torrent = rows[key]
         if (!torrent.destroy) continue
         torrent.destroy()
 
         this.$delete(this.torrents, this.getIndexOfTorrent(torrent.infoHash))
-        this.tableCheckedRows = []
+        delete this.tableCheckedRows[key]
       }
     },
 
@@ -255,6 +261,18 @@ export default {
         }
       }
       return null
+    },
+
+    getSelectedRows () {
+      if (this.tableCheckedRows.length === 0) {
+        return [this.tableSelectedRow]
+      } else {
+        return this.tableCheckedRows
+      }
+    },
+
+    onOutsideClick () {
+      this.tableSelectedRow = {}
     }
   },
 
