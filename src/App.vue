@@ -172,13 +172,14 @@ $speed-slower: 250ms !default
 // Import Bulma and Buefy styles
 @import "~bulma";
 @import "~buefy/src/scss/utils/_animations.scss";
-@import "~buefy/src/scss/components/_notices.scss";
+@import "~buefy/src/scss/utils/_functions.scss";
 
+@import "~buefy/src/scss/components/_checkbox.scss";
 @import "~buefy/src/scss/components/_modal.scss";
+@import "~buefy/src/scss/components/_notices.scss";
 @import "~buefy/src/scss/components/_switch.scss";
 @import "~buefy/src/scss/components/_tabs.scss";
 
-@import "~buefy/src/scss/utils/_functions.scss";
 @import "~buefy/src/scss/components/_table.scss";
 
 @import "~buefy/src/scss/components/_tooltip.scss";

@@ -18,6 +18,7 @@ import Navbar from 'buefy/dist/components/navbar'
 import Switch from 'buefy/dist/components/switch'
 import Tabs from 'buefy/dist/components/tabs'
 import Table from 'buefy/dist/components/table'
+import Tag from 'buefy/dist/components/tag'
 import Tooltip from 'buefy/dist/components/tooltip'
 import Upload from 'buefy/dist/components/upload'
 import Toast from 'buefy/dist/components/toast'
@@ -33,6 +34,7 @@ const comps = [
   Navbar,
   Tabs,
   Table,
+  Tag,
   Tooltip,
   Snackbar,
   Switch,
