@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar v-if="userSelectedCount > 0" class="navbar is-info has-text-white has-shadow" :mobile-burger="false">
+    <b-navbar v-if="userSelectedCount > 0" class="navbar is-info is-fixed-top has-text-white has-shadow" :mobile-burger="false">
       <template slot="brand">
         <b-navbar-item>
           <b-button type="is-danger" size="is-medium" v-on:click="cancelAllUserSelection">X</b-button>
@@ -133,13 +133,13 @@ export default {
           }
 
           this.circleSlots.push(
-            [this.circleStartingX, this.circleStartingY - curCircleRadius]
+            [this.circleStartingX, this.circleStartingY - curCircleRadius, false]
           )
           this.circleSlots.push(
-            [this.circleStartingX + curCircleRadius * Math.cos(deg), this.circleStartingY - curCircleRadius * Math.sin(deg)]
+            [this.circleStartingX + curCircleRadius * Math.cos(deg), this.circleStartingY - curCircleRadius * Math.sin(deg), false]
           )
           this.circleSlots.push(
-            [this.circleStartingX - curCircleRadius * Math.cos(deg), this.circleStartingY - curCircleRadius * Math.sin(deg)]
+            [this.circleStartingX - curCircleRadius * Math.cos(deg), this.circleStartingY - curCircleRadius * Math.sin(deg), false]
           )
         }
 
@@ -151,19 +151,27 @@ export default {
     },
 
     addUser (user) {
-      const slot = this.circleSlots.shift()
+      let slot, slotIndex
+
+      // find free slot
+      for (slotIndex in this.circleSlots) {
+        slot = this.circleSlots[slotIndex]
+        // not occupied
+        if (slot[2] === false) break
+      }
+
+      slot[2] = true
       this.addUserCircle(
         user.id,
         user.name,
         user.color,
         slot[0],
-        slot[1]
+        slot[1],
+        slotIndex
       )
-
-      this.circleSlotIndex++
     },
 
-    addUserCircle (userID, userName, userColor, x, y) {
+    addUserCircle (userID, userName, userColor, x, y, slotIndex) {
       const elem = this.earth.querySelector(`.user[id="${userID}"]`)
 
       if (elem) return
@@ -173,6 +181,7 @@ export default {
       group
         .attr('class', 'user')
         .attr('id', userID)
+        .attr('slotindex', slotIndex)
         .on('click', this.onUserClick)
 
       group.append('circle')
@@ -214,8 +223,10 @@ export default {
       const elem = this.earth.querySelector(`.user[id="${userID}"]`)
 
       if (elem) {
-        const item = [elem.getAttribute('cx'), elem.getAttribute('cy')]
-        this.circleSlots.push(item)
+        const slot = this.circleSlots[elem.getAttribute('slotindex')]
+
+        // make it not occupied
+        slot[2] = false
 
         elem.remove()
       }
