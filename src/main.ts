@@ -1,16 +1,17 @@
 import Vue from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
-import './registerServiceWorker'
 
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 import VueClipboard from 'vue-clipboard2'
 
-import Bowser from 'bowser'
 import WebTorrent from 'webtorrent'
 
+import App from './App.vue'
+import router from './router'
+import store from './store'
+import './registerServiceWorker'
+
+import device from './device'
 import Navbar from './components/Navbar.vue'
 
 Vue.use(Buefy)
@@ -49,9 +50,7 @@ if (!myColor || myColor.length > 20) {
 }
 
 if (!myName || myName.length > 30) {
-  const bowser = Bowser.getParser(window.navigator.userAgent)
-
-  myName = `${bowser.getOSName()} ${bowser.getBrowserName()}`
+  myName = `${device.os} ${device.browser}`
   sessionStorage.setItem('myName', myName)
 }
 
