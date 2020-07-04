@@ -89,7 +89,7 @@
           </b-table-column>
         </template>
         <template slot="empty">
-          <b-upload v-model="files" @input="onFileChange"
+          <b-upload id="upload-area" v-model="files" @input="onFileChange"
             multiple
             drag-drop>
             <p class="drop-area">Drop your files here or click to upload</p>
@@ -303,7 +303,9 @@ export default {
 .table
   margin-top: 20px
 
+#upload-area
+  display: block
+
 .drop-area
-  padding: 20vh 20vw
-  width: 100%
+  padding: 10% 30%
 </style>

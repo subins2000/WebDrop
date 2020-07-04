@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import P2PT from 'p2pt'
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -12,7 +14,7 @@ export default new Vuex.Store({
     selectedUsers: [] as any,
     torrents: {},
 
-    p2pt: {} as any,
+    p2pt: P2PT,
 
     internetShare: false,
     roomID: ''
