@@ -44,7 +44,7 @@ let myName = sessionStorage.getItem('myName')
 // Length limit to prevent malicious inputs
 if (!myColor || myColor.length > 20) {
   // random color
-  myColor = `hsla(${~~(360 * Math.random())},70%,60%,1)`
+  myColor = `hsla(${~~(360 * Math.random())},60%,60%,1)`
   sessionStorage.setItem('myColor', myColor)
 }
 

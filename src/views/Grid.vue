@@ -1,32 +1,30 @@
 <template>
   <div>
-    <div>
-      <b-navbar v-if="userSelectedCount > 0" class="navbar is-info has-text-white has-shadow" :mobile-burger="false">
-        <template slot="brand">
-          <b-navbar-item>
-            <b-button type="is-danger" size="is-medium" v-on:click="cancelAllUserSelection">X</b-button>
+    <b-navbar v-if="userSelectedCount > 0" class="navbar is-info has-text-white has-shadow" :mobile-burger="false">
+      <template slot="brand">
+        <b-navbar-item>
+          <b-button type="is-danger" size="is-medium" v-on:click="cancelAllUserSelection">X</b-button>
+        </b-navbar-item>
+        <b-navbar-item tag="div">
+          {{ userSelectedCount }} user{{ userSelectedCount > 1 ? 's' : '' }} selected
+        </b-navbar-item>
+        <div class="actions">
+          <b-navbar-item tag="div" @click="ping">
+            <b-button type="is-warning" size="is-medium">Ping!</b-button>
           </b-navbar-item>
-          <b-navbar-item tag="div">
-            {{ userSelectedCount }} user{{ userSelectedCount > 1 ? 's' : '' }} selected
-          </b-navbar-item>
-          <div class="actions">
-            <b-navbar-item tag="div" @click="ping">
-              <b-button type="is-warning" size="is-medium">Ping!</b-button>
-            </b-navbar-item>
-          </div>
-        </template>
-      </b-navbar>
-      <div id="earth-wrapper">
-        <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet">
-          <defs>
-            <filter id="shadow" x="-20%" y="-20%" width="200%" height="200%">
-              <feOffset result="offOut" in="SourceAlpha" dx="0" dy="0" />
-              <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
-              <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
-            </filter>
-          </defs>
-        </svg>
-      </div>
+        </div>
+      </template>
+    </b-navbar>
+    <div id="earth-wrapper">
+      <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <filter id="shadow" x="-20%" y="-20%" width="200%" height="200%">
+            <feOffset result="offOut" in="SourceAlpha" dx="0" dy="0" />
+            <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
+            <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
+          </filter>
+        </defs>
+      </svg>
     </div>
   </div>
 </template>
@@ -42,7 +40,7 @@ export default {
 
   circleStartingX: 0,
   circleStartingY: 0,
-  userCircleRadius: 50,
+  userCircleRadius: 0,
 
   data () {
     return {
@@ -75,9 +73,18 @@ export default {
         user = { ...user, ...{ id: userID } }
         this.addUser(user)
       }
+
+      // for testing many users on grid
+      // for (let i = 0; i < 18; i++) {
+      //  this.addUser({
+      //    id: '1a' + i,
+      //    name: 'Linux Firefox',
+      //    color: `hsla(${~~(360 * Math.random())},60%,60%,1)`
+      //   })
+      // }
     },
 
-    ping (name) {
+    ping () {
       const data = {
         type: 'ping'
       }
@@ -101,7 +108,7 @@ export default {
       const biggestCircleRadius = Math.max(canvasSize[0] / 2, canvasSize[1])
 
       // 5% of width
-      this.userCircleRadius = canvasSize[1] * 0.05
+      this.userCircleRadius = canvasSize[1] * 0.03
 
       let curCircleRadius = this.userCircleRadius
 
@@ -115,18 +122,28 @@ export default {
           .attr('fill', 'transparent')
 
         if (i > 1) {
+          let deg = (Math.PI / 4)
+
+          if (i > 2) {
+            deg += (deg / 3)
+          }
+
+          if (i > 3) {
+            deg += deg / (2 ^ i)
+          }
+
           this.circleSlots.push(
             [this.circleStartingX, this.circleStartingY - curCircleRadius]
           )
           this.circleSlots.push(
-            [this.circleStartingX + curCircleRadius * Math.cos(10), this.circleStartingY + curCircleRadius * Math.sin(10)]
+            [this.circleStartingX + curCircleRadius * Math.cos(deg), this.circleStartingY - curCircleRadius * Math.sin(deg)]
           )
           this.circleSlots.push(
-            [this.circleStartingX - curCircleRadius * Math.cos(10), this.circleStartingY + curCircleRadius * Math.sin(10)]
+            [this.circleStartingX - curCircleRadius * Math.cos(deg), this.circleStartingY - curCircleRadius * Math.sin(deg)]
           )
         }
 
-        curCircleRadius += biggestCircleRadius * 0.15
+        curCircleRadius += biggestCircleRadius * 0.10
         i++
       }
 

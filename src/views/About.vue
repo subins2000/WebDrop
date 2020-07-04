@@ -16,7 +16,7 @@
         <p>3 steps to share files !</p>
         <ol>
           <li>Connect your devices to the same WiFi or hotspot</li>
-          <li>Make sure internet is available</li>
+          <li>Open this website on your devices</li>
           <li>Choose files and share !</li>
         </ol>
         <h3 class="content is-size-4">FAQ</h3>

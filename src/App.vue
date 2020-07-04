@@ -99,7 +99,7 @@ export default {
           console.error(blah)
 
           this.$buefy.snackbar.open({
-            message: 'We couldn\'t connect to any WebTorrent trackers. A page refresh might help.\nYour ISP might be blocking them 🤔',
+            message: 'We couldn\'t connect to any WebTorrent trackers. Your ISP might be blocking them 🤔',
             type: 'is-danger',
             queue: true,
             indefinite: true,
