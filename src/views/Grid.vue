@@ -16,7 +16,7 @@
       </template>
     </b-navbar>
     <div id="earth-wrapper">
-      <svg id="earth" ref="earth" preserveAspectRatio="xMidYMid meet">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" id="earth" ref="earth" preserveAspectRatio="xMidYMid meet">
         <defs>
           <filter id="shadow" x="-20%" y="-20%" width="200%" height="200%">
             <feOffset result="offOut" in="SourceAlpha" dx="0" dy="0" />
@@ -30,8 +30,6 @@
 </template>
 
 <script>
-import * as d3 from 'd3'
-
 export default {
   name: 'Index',
 
@@ -94,13 +92,21 @@ export default {
       }
     },
 
+    makeSVGNode (node, attr) {
+      node = document.createElementNS('http://www.w3.org/2000/svg', node)
+      for (const [name, value] of Object.entries(attr)) {
+        node.setAttributeNS(null, name, value)
+      }
+      return node
+    },
+
     setUpEarth () {
       this.earth = this.$refs.earth
-      this.svg = d3.select(this.earth)
+      this.svg = this.earth
 
       const canvasSize = [window.innerWidth, window.innerHeight]
 
-      this.svg.attr('viewBox', `0 0 ${canvasSize[0]} ${canvasSize[1]}`)
+      this.svg.setAttribute('viewBox', `0 0 ${canvasSize[0]} ${canvasSize[1]}`)
 
       this.circleStartingX = canvasSize[0] / 2
       this.circleStartingY = canvasSize[1] - canvasSize[1] * 0.1
@@ -114,12 +120,13 @@ export default {
 
       let i = 0
       while (curCircleRadius < biggestCircleRadius) {
-        this.svg.append('circle')
-          .attr('r', curCircleRadius)
-          .attr('cx', this.circleStartingX)
-          .attr('cy', this.circleStartingY)
-          .attr('stroke', '#CCC')
-          .attr('fill', 'transparent')
+        this.svg.appendChild(this.makeSVGNode('circle', {
+          r: curCircleRadius,
+          cx: this.circleStartingX,
+          cy: this.circleStartingY,
+          stroke: '#CCC',
+          fill: 'transparent'
+        }))
 
         if (i > 1) {
           let deg = (Math.PI / 4)
@@ -176,34 +183,39 @@ export default {
 
       if (elem) return
 
-      const group = this.svg.append('g')
+      const group = this.makeSVGNode('g', {
+        class: 'user',
+        id: userID,
+        slotindex: slotIndex
+      })
+      group.addEventListener('click', this.onUserClick)
 
-      group
-        .attr('class', 'user')
-        .attr('id', userID)
-        .attr('slotindex', slotIndex)
-        .on('click', this.onUserClick)
+      const c = this.makeSVGNode('circle', {
+        r: this.userCircleRadius,
+        cx: x,
+        cy: y,
+        stroke: '#CCC',
+        fill: userColor,
+        filter: 'url(#shadow)'
+      })
+      group.appendChild(c)
 
-      group.append('circle')
-        .attr('r', this.userCircleRadius)
-        .attr('cx', x)
-        .attr('cy', y)
-        .attr('stroke', '#CCC')
-        .attr('fill', userColor)
-        .attr('filter', 'url(#shadow)')
+      const t = this.makeSVGNode('text', {
+        class: 'user-text',
+        id: userID,
+        'dominant-baseline': 'middle',
+        'text-anchor': 'middle',
+        x,
+        y: y - this.userCircleRadius - 10
+      })
+      t.textContent = userName
 
-      group.append('text')
-        .attr('class', 'user-text')
-        .attr('id', userID)
-        .attr('dominant-baseline', 'middle')
-        .attr('text-anchor', 'middle')
-        .attr('x', x)
-        .attr('y', y - this.userCircleRadius - 10)
-        .text(userName)
+      group.appendChild(t)
+      this.svg.appendChild(group)
     },
 
-    onUserClick () {
-      const user = d3.event.target.parentElement
+    onUserClick (e) {
+      const user = e.target.parentElement
       const userID = user.id
 
       if (userID === 'me') return
