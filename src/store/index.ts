@@ -12,7 +12,7 @@ export default new Vuex.Store({
     selectedUsers: [] as any,
     torrents: {},
 
-    p2pt: null,
+    p2pt: {} as any,
 
     internetShare: false,
     roomID: ''
@@ -78,8 +78,10 @@ export default new Vuex.Store({
     },
 
     destroyP2PT (state) {
-      state.p2pt.destroy()
-      state.users = {}
+      if (state.p2pt !== null) {
+        state.p2pt.destroy()
+        state.users = {}
+      }
     }
   },
   actions: {

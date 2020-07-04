@@ -92,10 +92,11 @@ export default {
       })
 
       let warningCount = 0
+      let trackerConnected = false
       p2pt.on('trackerwarning', (blah, stats) => {
         warningCount++
 
-        if (warningCount >= stats.total && stats.connected === 0) {
+        if (warningCount >= stats.total && !trackerConnected) {
           console.error(blah)
 
           this.$buefy.snackbar.open({
@@ -113,8 +114,7 @@ export default {
       })
 
       p2pt.on('trackerconnect', () => {
-        this.status = 'Connected!'
-        warningCount--
+        trackerConnected = true
       })
 
       this.$store.commit('setP2PT', p2pt)

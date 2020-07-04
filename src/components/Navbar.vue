@@ -11,7 +11,7 @@
         <div class="actions">
           <b-tooltip :label="internetShare ? 'Joined An Internet Share Room' : 'Share via Internet'" position="is-bottom" :type="internetShare ? 'is-warning' : 'is-primary'">
             <b-navbar-item tag="div" @click="shareViaInternet">
-              <b-button :type="internetShare ? 'is-warning' : 'is-text'"><img src="img/web.png" /></b-button>
+              <b-button :type="internetShare ? 'is-warning' : 'is-text'"><img src="img/web.png" height="100%" /></b-button>
             </b-navbar-item>
           </b-tooltip>
           <b-navbar-item tag="router-link" :to="{ path: '/about' }">
