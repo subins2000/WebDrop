@@ -51,10 +51,14 @@
         </b-field>
       </div>
       <b-table
+        id="torrents"
         :data.sync="torrents"
         :checked-rows.sync="tableCheckedRows"
         checkable
-        checkbox-position="left">
+        checkbox-position="left"
+        focusable
+        :selected.sync="tableSelectedRow"
+        v-click-outside="onOutsideClick">
         <template slot-scope="props">
           <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }">
             <span style="word-break: break-word;max-width: 60vw;">{{ props.row.name }}</span>
@@ -89,7 +93,7 @@
           <b-upload v-model="files" @input="onFileChange"
             multiple
             drag-drop>
-            <p class="drop-area">Drop your files here or click to upload</p>
+            <p id="drop-area">Drop your files here or click to upload</p>
           </b-upload>
         </template>
       </b-table>
@@ -111,7 +115,8 @@ export default {
       torrents: [],
       selectedUsers: this.$store.state.selectedUsers,
 
-      tableCheckedRows: []
+      tableCheckedRows: [],
+      tableSelectedRow: {}
     }
   },
 
@@ -227,7 +232,7 @@ export default {
     },
 
     resumeTorrent () {
-      for (const torrent of this.tableCheckedRows) {
+      for (const torrent of this.getSelectedRows()) {
         if (!torrent.resume) {
           // torrent is not a WebTorrent object
           // make it one
@@ -239,12 +244,14 @@ export default {
     },
 
     removeTorrent () {
-      for (const torrent of this.tableCheckedRows) {
+      const rows = this.getSelectedRows()
+      for (const key in rows) {
+        const torrent = rows[key]
         if (!torrent.destroy) continue
         torrent.destroy()
 
         this.$delete(this.torrents, this.getIndexOfTorrent(torrent.infoHash))
-        this.tableCheckedRows = []
+        delete this.tableCheckedRows[key]
       }
     },
 
@@ -255,6 +262,18 @@ export default {
         }
       }
       return null
+    },
+
+    getSelectedRows () {
+      if (this.tableCheckedRows.length === 0) {
+        return [this.tableSelectedRow]
+      } else {
+        return this.tableCheckedRows
+      }
+    },
+
+    onOutsideClick () {
+      this.tableSelectedRow = {}
     }
   },
 
@@ -277,15 +296,65 @@ export default {
         }
       }
     })
+
+    // handle file drop on page
+    const target = document.documentElement
+    const body = document.body
+    let timeout, showDrag
+
+    target.addEventListener('dragover', (e) => {
+      e.preventDefault()
+      body.classList.add('dragging')
+      showDrag = true
+    })
+
+    target.addEventListener('dragleave', () => {
+      showDrag = false
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        if (!showDrag) {
+          body.classList.remove('dragging')
+        }
+      }, 200)
+    })
+
+    target.addEventListener('drop', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      body.classList.remove('dragging')
+
+      const files = Array.from(e.dataTransfer.files) // Array of all files
+
+      if (files) {
+        this.onFileChange(files)
+      }
+    })
   }
 }
 </script>
 
-<style scoped lang="sass">
-.table
+<style lang="sass">
+#torrents
   margin-top: 20px
 
-.drop-area
-  padding: 20vh 20vw
+  .upload
+    display: block
+
+#drop-area
+  padding: 10% 30%
+
+body.dragging:after
+  display: flex
+  content: "Drop the file(s) anywhere on this page"
+  position: fixed
+  left: 0
   width: 100%
+  top: 0
+  height: 100%
+  justify-content: center
+  align-items: center
+  font-size: 1.5em
+  background-color: rgba(255, 255, 0, .3)
+  pointer-events: none
+  transition: 0.5s all
 </style>
