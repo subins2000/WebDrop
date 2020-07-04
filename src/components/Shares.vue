@@ -51,6 +51,7 @@
         </b-field>
       </div>
       <b-table
+        id="torrents"
         :data.sync="torrents"
         :checked-rows.sync="tableCheckedRows"
         checkable
@@ -89,10 +90,10 @@
           </b-table-column>
         </template>
         <template slot="empty">
-          <b-upload id="upload-area" v-model="files" @input="onFileChange"
+          <b-upload v-model="files" @input="onFileChange"
             multiple
             drag-drop>
-            <p class="drop-area">Drop your files here or click to upload</p>
+            <p id="drop-area">Drop your files here or click to upload</p>
           </b-upload>
         </template>
       </b-table>
@@ -295,17 +296,65 @@ export default {
         }
       }
     })
+
+    // handle file drop on page
+    const target = document.documentElement
+    const body = document.body
+    let timeout, showDrag
+
+    target.addEventListener('dragover', (e) => {
+      e.preventDefault()
+      body.classList.add('dragging')
+      showDrag = true
+    })
+
+    target.addEventListener('dragleave', () => {
+      showDrag = false
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        if (!showDrag) {
+          body.classList.remove('dragging')
+        }
+      }, 200)
+    })
+
+    target.addEventListener('drop', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      body.classList.remove('dragging')
+
+      const files = Array.from(e.dataTransfer.files) // Array of all files
+
+      if (files) {
+        this.onFileChange(files)
+      }
+    })
   }
 }
 </script>
 
-<style scoped lang="sass">
-.table
+<style lang="sass">
+#torrents
   margin-top: 20px
 
-#upload-area
-  display: block
+  .upload
+    display: block
 
-.drop-area
+#drop-area
   padding: 10% 30%
+
+body.dragging:after
+  display: flex
+  content: "Drop the file(s) anywhere on this page"
+  position: fixed
+  left: 0
+  width: 100%
+  top: 0
+  height: 100%
+  justify-content: center
+  align-items: center
+  font-size: 1.5em
+  background-color: rgba(255, 255, 0, .3)
+  pointer-events: none
+  transition: 0.5s all
 </style>
