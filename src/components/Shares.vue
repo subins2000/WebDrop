@@ -67,9 +67,9 @@
             {{ props.row.length | formatSize }}
           </b-table-column>
           <b-table-column field="stats" label="Stats" width="50vw">
-            <div class="columns is-gapless is-multiline is-vcentered">
+            <div class="columns is-gapless is-vcentered">
               <div v-show="!props.row.paused" class="column is-5">
-                <b-field grouped group-multiline>
+                <b-field grouped>
                   <b-taglist class="control" attached>
                     <b-tag type="is-dark">🔼</b-tag>
                     <b-tag type="is-info">{{ props.row.wdUpSpeed | formatSize }}/s</b-tag>
@@ -339,6 +339,9 @@ export default {
 
   .upload
     display: block
+
+  .tags:last-child
+    margin-bottom: 0
 
 #drop-area
   padding: 10% 30%
