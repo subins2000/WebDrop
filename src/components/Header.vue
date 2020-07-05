@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar class="is-success" :mobile-burger="false">
+    <b-navbar v-if="$route.name !== 'About'" class="is-success" :mobile-burger="false">
       <template slot="brand">
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <h1 class="is-size-4">WebDrop</h1>
@@ -15,9 +15,19 @@
             </b-navbar-item>
           </b-tooltip>
           <b-navbar-item tag="router-link" :to="{ path: '/about' }">
-            <b-button type="is-text">Help</b-button>
+            <b-button type="is-warning">Help</b-button>
           </b-navbar-item>
         </div>
+      </template>
+    </b-navbar>
+    <b-navbar v-else class="navbar is-warning has-text-white" :mobile-burger="false">
+      <template slot="brand">
+        <b-navbar-item tag="router-link" :to="{ path: '/' }">
+          <h1 class="is-size-4">WebDrop</h1>
+        </b-navbar-item>
+        <b-navbar-item tag="div">
+          Share Files Easily Across Devices !
+        </b-navbar-item>
       </template>
     </b-navbar>
     <b-modal :active.sync="internetShareModelActive" class="has-text-centered">

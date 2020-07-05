@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Header v-if="$route.name !== 'About'" />
+    <Header />
     <transition name='slide-fade'>
       <keep-alive>
         <router-view/>
