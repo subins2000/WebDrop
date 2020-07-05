@@ -48,8 +48,6 @@ for (const comp of comps) {
 
 Vue.component('Header', Header)
 
-Vue.config.productionTip = false
-
 let announceURLs = [
   'wss://tracker.openwebtorrent.com',
   'wss://tracker.sloppyta.co:443/announce',

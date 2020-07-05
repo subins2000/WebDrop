@@ -18,6 +18,7 @@ module.exports = {
         /has-text-/,
         /is-grouped/,
         /navbar/,
+        /notices/,
         /tab/
       ],
       whitelistPatternsChildren: [

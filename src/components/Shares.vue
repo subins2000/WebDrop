@@ -20,7 +20,7 @@
       </b-field>
       <div v-if="tableCheckedRows.length > 0">
         <span v-if="tableCheckedRows.length === 1">
-          <b-field grouped group-multiline>
+          <b-field grouped>
             <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
               <b-button @click="resumeTorrent">Start</b-button>
             </div>
