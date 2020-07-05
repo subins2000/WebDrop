@@ -30,6 +30,8 @@ export default {
     },
 
     setUpP2PT () {
+      // for testing purposes
+      // this.startP2PT('a')
       publicIP.v4().then((ip) => {
         const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
         this.$store.commit('setRoom', roomID)
@@ -38,6 +40,7 @@ export default {
         console.log(error)
         this.$buefy.snackbar.open({
           message: 'Could not find your IP address',
+          position: 'is-top',
           type: 'is-danger',
           queue: true,
           indefinite: true,
@@ -101,13 +104,16 @@ export default {
 
           this.$buefy.snackbar.open({
             message: 'We couldn\'t connect to any WebTorrent trackers. Your ISP might be blocking them 🤔',
+            position: 'is-top',
             type: 'is-danger',
             queue: true,
             indefinite: true,
             actionText: 'Retry',
             onAction: () => {
-              this.$store.commit('destroyP2PT')
-              this.startP2PT(identifier)
+              if (!trackerConnected) {
+                this.$store.commit('destroyP2PT')
+                this.startP2PT(identifier)
+              }
             }
           })
         }
