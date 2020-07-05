@@ -290,7 +290,10 @@ export default {
 
 @media screen and (max-width: 960px)
   .container
-    padding: 20px 5%
+    padding: 20px 2%
+
+  .b-tabs .tab-content
+    padding: 1rem 0 1rem 0
 
 @media screen and (min-width: 900px)
   .container

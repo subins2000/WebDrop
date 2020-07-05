@@ -25,8 +25,8 @@
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
-        <b-navbar-item tag="div">
-          Share Files Easily Across Devices !
+        <b-navbar-item tag="router-link" :to="{ path: '/grid' }">
+          Grid
         </b-navbar-item>
       </template>
     </b-navbar>
