@@ -13,8 +13,8 @@
           </b-switch>
         </b-tooltip>
         <router-link to="/grid">
-          <b-button class="is-text">
-            {{ usersCount }} users
+          <b-button class="is-text" id="usersCount" v-bind:class="{ 'is-danger': glowUsersBtn }">
+            {{ usersCount }} device{{ usersCount === 1 ? '' : 's' }}
           </b-button>
         </router-link>
       </b-field>
@@ -110,6 +110,8 @@ export default {
   data () {
     return {
       autoStart: true,
+
+      glowUsersBtn: false,
 
       files: [],
       torrents: [],
@@ -294,6 +296,11 @@ export default {
           const user = this.$store.state.users[key]
           p2pt.send(user.conn, JSON.stringify(data))
         }
+      } else if (mutation.type === 'addUser') {
+        this.glowUsersBtn = true
+        setTimeout(() => {
+          this.glowUsersBtn = false
+        }, 500)
       }
     })
 
@@ -334,6 +341,9 @@ export default {
 </script>
 
 <style lang="sass">
+#usersCount
+  transition: 0.25s all
+
 #torrents
   margin-top: 20px
 
