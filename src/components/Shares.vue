@@ -18,10 +18,10 @@
           </b-button>
         </router-link>
       </b-field>
-      <div v-if="tableCheckedRows.length > 0">
-        <span v-if="tableCheckedRows.length === 1">
+      <div v-if="selectedRows.length > 0">
+        <span v-if="selectedRows.length === 1">
           <b-field grouped>
-            <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
+            <div class="control" v-if="!selectedRows[0].mine && selectedRows[0].paused">
               <b-button @click="resumeTorrent">Start</b-button>
             </div>
             <div class="control">
@@ -69,7 +69,7 @@
           <b-table-column field="stats" label="Stats" width="50vw">
             <div class="columns is-gapless is-vcentered">
               <div v-show="!props.row.paused" class="column is-5">
-                <b-field grouped>
+                <b-field grouped group-multiline>
                   <b-taglist class="control" attached>
                     <b-tag type="is-dark">🔼</b-tag>
                     <b-tag type="is-info">{{ props.row.wdUpSpeed | formatSize }}/s</b-tag>
@@ -125,6 +125,14 @@ export default {
   computed: {
     usersCount () {
       return Object.keys(this.$store.state.users).length
+    },
+
+    selectedRows () {
+      if (this.tableCheckedRows.length === 0) {
+        return Object.keys(this.tableSelectedRow).length === 0 ? [] : [this.tableSelectedRow]
+      } else {
+        return this.tableCheckedRows
+      }
     }
   },
 
@@ -139,7 +147,7 @@ export default {
     makeTorrent (file) {
       const snack = this.$buefy.snackbar.open({
         message: 'Preparing file. This might take a while depending on file size',
-        type: 'is-primary',
+        type: 'is-warning',
         queue: true,
         indefinite: true,
         actionText: 'Ok'
@@ -228,13 +236,14 @@ export default {
       this.$wt.add(infoHash, {
         announce: this.$ANNOUNCE_URLS
       }, (torrent) => {
+        torrent.mine = false
         this.onTorrent(torrent, index)
       })
       return null
     },
 
     resumeTorrent () {
-      for (const torrent of this.getSelectedRows()) {
+      for (const torrent of this.selectedRows) {
         if (!torrent.resume) {
           // torrent is not a WebTorrent object
           // make it one
@@ -246,7 +255,7 @@ export default {
     },
 
     removeTorrent () {
-      const rows = this.getSelectedRows()
+      const rows = this.selectedRows
       for (const key in rows) {
         const torrent = rows[key]
         if (!torrent.destroy) continue
@@ -264,14 +273,6 @@ export default {
         }
       }
       return null
-    },
-
-    getSelectedRows () {
-      if (this.tableCheckedRows.length === 0) {
-        return [this.tableSelectedRow]
-      } else {
-        return this.tableCheckedRows
-      }
     },
 
     onOutsideClick () {
@@ -350,8 +351,11 @@ export default {
   .upload
     display: block
 
-  .tags:last-child
+  .field.is-grouped.is-grouped-multiline
     margin-bottom: 0
+
+    .control, .tags:last-child
+      margin-bottom: 0
 
 #drop-area
   padding: 10% 30%

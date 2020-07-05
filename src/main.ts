@@ -15,6 +15,7 @@ import Button from 'buefy/dist/components/button'
 import Field from 'buefy/dist/components/field'
 import Modal from 'buefy/dist/components/modal'
 import Navbar from 'buefy/dist/components/navbar'
+import Progress from 'buefy/dist/components/progress'
 import Switch from 'buefy/dist/components/switch'
 import Tabs from 'buefy/dist/components/tabs'
 import Table from 'buefy/dist/components/table'
@@ -32,6 +33,7 @@ const comps = [
   Field,
   Modal,
   Navbar,
+  Progress,
   Tabs,
   Table,
   Tag,

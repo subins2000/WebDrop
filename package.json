@@ -7,8 +7,12 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
+  "dependenciesComments": {
+    "end-of-stream": "Downgraded end-of-stream because of https://github.com/webtorrent/instant.io/issues/210#issuecomment-609687048"
+  },
   "dependencies": {
     "buefy": "^0.8.19",
+    "end-of-stream": "1.4.1",
     "hash-sum": "^1.0.2",
     "p2pt": "https://github.com/subins2000/p2pt#master",
     "public-ip": "^4.0.1",

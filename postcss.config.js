@@ -25,6 +25,7 @@ module.exports = {
         /tabs/,
         /modal/,
         /switch/,
+        /progress/,
         /upload/
       ]
     })
