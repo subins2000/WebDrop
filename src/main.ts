@@ -6,7 +6,7 @@ import WebTorrent from 'webtorrent'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import './registerServiceWorker'
+import registerWorker from './registerServiceWorker'
 
 import device from './device'
 import Header from './components/Header.vue'
@@ -137,8 +137,10 @@ Vue.directive('click-outside', {
   }
 })
 
-new Vue({
+const vue = new Vue({
   router,
   store,
   render: h => h(App)
 }).$mount('#app')
+
+registerWorker(vue)
