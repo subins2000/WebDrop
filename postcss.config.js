@@ -29,6 +29,7 @@ module.exports = {
         /modal/,
         /notices$/,
         /switch$/,
+        /b-table/,
         /tabs$/
       ]
     })
