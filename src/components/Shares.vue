@@ -106,9 +106,14 @@
             <span>Devices <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag> </span>
           </template>
           <center class="content">
-            <router-link to="/grid">
-              <b-button type="is-success" size="is-medium">Show Grid</b-button>
-            </router-link>
+            <p>
+              <router-link to="/grid">
+                <b-button type="is-success" size="is-medium">Show Grid</b-button>
+              </router-link>
+            </p>
+            <p v-show="Object.keys($store.state.users).length === 0">
+              Make sure your devices are connected to the same WiFi.
+            </p>
           </center>
           <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
             <b-taglist attached class="control">
@@ -368,6 +373,23 @@ export default {
 </script>
 
 <style lang="sass">
+.container
+  padding: 20px 0
+
+@media screen and (max-width: 960px)
+  .container
+    padding: 20px 2%
+
+  .b-tabs .tab-content
+    padding: 1rem 0 1rem 0
+
+  .modal .card-content
+    padding: 0 1rem
+
+@media screen and (min-width: 900px)
+  .container
+    max-width: 900px
+
 .countTag
   transition: 0.25s all
 

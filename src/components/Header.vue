@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-navbar v-if="$route.name !== 'About'" class="is-success has-shadow" :mobile-burger="false">
+    <b-navbar v-if="$route.name !== 'About'" class="is-success has-shadow" :mobile-burger="false" :transparent="true">
       <template slot="brand">
         <b-navbar-item tag="router-link" :to="{ path: '/' }">
           <h1 class="is-size-4">WebDrop</h1>
