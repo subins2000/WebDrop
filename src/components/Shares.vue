@@ -1,104 +1,122 @@
 <template>
   <div>
     <div class="container">
-      <b-field class="actions content" grouped>
-        <b-upload v-model="files" multiple @input="onFileChange">
-          <a class="button is-info">
-            <span>Add File</span>
-          </a>
-        </b-upload>
-        <b-tooltip label="Start downloading files on receive" position="is-bottom">
-          <b-switch v-model="autoStart" type="is-danger">
-            Auto Start
-          </b-switch>
-        </b-tooltip>
-        <router-link to="/grid">
-          <b-button class="is-text" id="usersCount" v-bind:class="{ 'is-danger': glowUsersBtn }">
-            {{ usersCount }} device{{ usersCount === 1 ? '' : 's' }}
-          </b-button>
-        </router-link>
-      </b-field>
-      <div v-click-outside="onOutsideClick">
-        <div v-if="selectedRows.length > 0">
-          <span v-if="selectedRows.length === 1">
-            <b-field grouped>
-              <div class="control" v-if="!selectedRows[0].mine && selectedRows[0].paused">
-                <b-button @click="resumeTorrent">Start</b-button>
-              </div>
-              <div class="control">
-                <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
-              </div>
-            </b-field>
-          </span>
-          <span v-else>
+      <b-tabs type="is-boxed" expanded>
+        <b-tab-item label="Files" v-click-outside="onOutsideClick">
+          <b-field class="actions content" grouped>
+            <b-upload v-model="files" multiple @input="onFileChange">
+              <a class="button is-info">
+                <span>Add File</span>
+              </a>
+            </b-upload>
+            <b-tooltip label="Start downloading files on receive" position="is-bottom">
+              <b-switch v-model="autoStart" type="is-danger">
+                Auto Start
+              </b-switch>
+            </b-tooltip>
+          </b-field>
+          <div v-if="selectedRows.length > 0">
+            <span v-if="selectedRows.length === 1">
+              <b-field grouped>
+                <div class="control" v-if="!selectedRows[0].mine && selectedRows[0].paused">
+                  <b-button @click="resumeTorrent">Start</b-button>
+                </div>
+                <div class="control">
+                  <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
+                </div>
+              </b-field>
+            </span>
+            <span v-else>
+              <b-field grouped group-multiline>
+                <div class="control">
+                  <b-button @click="resumeTorrent">Start</b-button>
+                </div>
+                <div class="control">
+                  <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
+                </div>
+              </b-field>
+            </span>
+          </div>
+          <div v-else>
             <b-field grouped group-multiline>
               <div class="control">
-                <b-button @click="resumeTorrent">Start</b-button>
+                <b-button disabled>Start</b-button>
               </div>
               <div class="control">
-                <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
+                <b-button disabled>Remove</b-button>
               </div>
             </b-field>
-          </span>
-        </div>
-        <div v-else>
-          <b-field grouped group-multiline>
-            <div class="control">
-              <b-button disabled>Start</b-button>
-            </div>
-            <div class="control">
-              <b-button disabled>Remove</b-button>
-            </div>
+          </div>
+          <b-table
+            class="content"
+            id="torrents"
+            :data.sync="torrents"
+            :checked-rows.sync="tableCheckedRows"
+            checkable
+            checkbox-position="left"
+            focusable
+            :selected.sync="tableSelectedRow">
+            <template slot-scope="props">
+              <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }">
+                <span style="word-break: break-word;max-width: 60vw;">{{ props.row.name }}</span>
+              </b-table-column>
+              <b-table-column field="size" label="Size" width="10vw" v-bind:class="{ 'is-warning' : props.row.paused }">
+                {{ props.row.length | formatSize }}
+              </b-table-column>
+              <b-table-column field="stats" label="Stats" width="50vw">
+                <div class="columns is-gapless is-vcentered">
+                  <div v-show="!props.row.paused" class="column is-5">
+                    <b-field grouped group-multiline>
+                      <b-taglist class="control" attached>
+                        <b-tag type="is-dark">🔼</b-tag>
+                        <b-tag type="is-info">{{ props.row.wdUpSpeed | formatSize }}/s</b-tag>
+                      </b-taglist>
+                      <b-taglist class="control" attached>
+                        <b-tag type="is-dark">🔽</b-tag>
+                        <b-tag type="is-success">{{ props.row.wdDownSpeed | formatSize }}/s</b-tag>
+                      </b-taglist>
+                    </b-field>
+                  </div>
+                  <div v-if="!props.row.mine" class="column">
+                    <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
+                      <b-button type="is-success">Download</b-button>
+                    </a>
+                    <b-progress v-show="!props.row.done" type="is-success" :value="props.row.wdProgress" size="is-medium" show-value format="percent"></b-progress>
+                  </div>
+                </div>
+              </b-table-column>
+            </template>
+            <template slot="empty">
+              <b-upload v-model="files" @input="onFileChange"
+                multiple
+                drag-drop>
+                <p id="drop-area">Drop your files here or click to upload</p>
+              </b-upload>
+            </template>
+          </b-table>
+        </b-tab-item>
+        <b-tab-item label="Messages">
+
+        </b-tab-item>
+        <b-tab-item label="Devices">
+          <template slot="header">
+            <span> Devices <b-tag id="usersCount" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag> </span>
+          </template>
+          <center>
+            <router-link to="/grid">
+              <b-button type="is-success">Show Grid</b-button>
+            </router-link>
+          </center>
+          <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
+            <b-taglist attached class="control">
+              <b-tag size="is-medium" type="is-info">{{ user.name }}</b-tag>
+              <b-tag size="is-medium" type="is-warning">
+                <b-button type="is-warning" size="is-small">Ping!</b-button>
+              </b-tag>
+            </b-taglist>
           </b-field>
-        </div>
-        <b-table
-          class="content"
-          id="torrents"
-          :data.sync="torrents"
-          :checked-rows.sync="tableCheckedRows"
-          checkable
-          checkbox-position="left"
-          focusable
-          :selected.sync="tableSelectedRow">
-          <template slot-scope="props">
-            <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }">
-              <span style="word-break: break-word;max-width: 60vw;">{{ props.row.name }}</span>
-            </b-table-column>
-            <b-table-column field="size" label="Size" width="10vw" v-bind:class="{ 'is-warning' : props.row.paused }">
-              {{ props.row.length | formatSize }}
-            </b-table-column>
-            <b-table-column field="stats" label="Stats" width="50vw">
-              <div class="columns is-gapless is-vcentered">
-                <div v-show="!props.row.paused" class="column is-5">
-                  <b-field grouped group-multiline>
-                    <b-taglist class="control" attached>
-                      <b-tag type="is-dark">🔼</b-tag>
-                      <b-tag type="is-info">{{ props.row.wdUpSpeed | formatSize }}/s</b-tag>
-                    </b-taglist>
-                    <b-taglist class="control" attached>
-                      <b-tag type="is-dark">🔽</b-tag>
-                      <b-tag type="is-success">{{ props.row.wdDownSpeed | formatSize }}/s</b-tag>
-                    </b-taglist>
-                  </b-field>
-                </div>
-                <div v-if="!props.row.mine" class="column">
-                  <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
-                    <b-button type="is-success">Download</b-button>
-                  </a>
-                  <b-progress v-show="!props.row.done" type="is-success" :value="props.row.wdProgress" size="is-medium" show-value format="percent"></b-progress>
-                </div>
-              </div>
-            </b-table-column>
-          </template>
-          <template slot="empty">
-            <b-upload v-model="files" @input="onFileChange"
-              multiple
-              drag-drop>
-              <p id="drop-area">Drop your files here or click to upload</p>
-            </b-upload>
-          </template>
-        </b-table>
-      </div>
+        </b-tab-item>
+      </b-tabs>
     </div>
   </div>
 </template>
@@ -117,7 +135,6 @@ export default {
 
       files: [],
       torrents: [],
-      selectedUsers: this.$store.state.selectedUsers,
 
       tableCheckedRows: [],
       tableSelectedRow: {}
