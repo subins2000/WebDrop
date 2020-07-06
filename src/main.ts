@@ -104,42 +104,6 @@ Vue.filter('formatSize', function (size: number) {
   return size.toString() + ' B'
 })
 
-// Thanks benrwb https://stackoverflow.com/a/50465546
-let eventSetDrag, eventClearDrag, eventOnClick
-Vue.directive('click-outside', {
-  bind: function (el, binding, vnode) {
-    eventSetDrag = function () {
-      el.setAttribute('data-dragging', 'yes')
-    }
-    eventClearDrag = function () {
-      el.removeAttribute('data-dragging')
-    }
-    eventOnClick = function (event) {
-      const dragging = el.getAttribute('data-dragging')
-      // Check that the click was outside the el and its children, and wasn't a drag
-      if (!(el === event.target || el.contains(event.target)) && !dragging) {
-        // call method provided in attribute value
-
-        // Why ? https://github.com/Microsoft/TypeScript/issues/10642
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore: Object may be undefined
-        if (vnode) vnode.context[binding.expression](event)
-      }
-    }
-    document.addEventListener('touchstart', eventClearDrag)
-    document.addEventListener('touchmove', eventSetDrag)
-    document.addEventListener('click', eventOnClick)
-    document.addEventListener('touchend', eventOnClick)
-  },
-  unbind: function (el) {
-    document.removeEventListener('touchstart', eventClearDrag)
-    document.removeEventListener('touchmove', eventSetDrag)
-    document.removeEventListener('click', eventOnClick)
-    document.removeEventListener('touchend', eventOnClick)
-    el.removeAttribute('data-dragging')
-  }
-})
-
 const vue = new Vue({
   router,
   store,

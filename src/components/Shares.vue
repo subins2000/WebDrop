@@ -2,7 +2,7 @@
   <div>
     <div class="container">
       <b-tabs type="is-boxed" expanded>
-        <b-tab-item label="Files" v-click-outside="onOutsideClick">
+        <b-tab-item label="Files">
           <template slot="header">
             <span>Files <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
           </template>
@@ -21,10 +21,10 @@
                 </b-checkbox>
               </b-tooltip>
             </div>
-            <div class="control" v-if="selectedRows.length > 0">
-              <div class="control" v-if="selectedRows.length === 1">
+            <div class="control" v-if="tableCheckedRows.length > 0">
+              <div class="control" v-if="tableCheckedRows.length === 1">
                 <b-field grouped>
-                  <div class="control" v-if="!selectedRows[0].mine && selectedRows[0].paused">
+                  <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
                     <b-button @click="resumeTorrent">Start</b-button>
                   </div>
                   <div class="control">
@@ -60,9 +60,7 @@
             :data.sync="torrents"
             :checked-rows.sync="tableCheckedRows"
             checkable
-            checkbox-position="left"
-            focusable
-            :selected.sync="tableSelectedRow">
+            checkbox-position="left">
             <template slot-scope="props">
               <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }">
                 <span style="word-break: break-word;max-width: 60vw;">{{ props.row.name }}</span>
@@ -182,22 +180,13 @@ export default {
       msg: '', // input field
       torrents: [],
 
-      tableCheckedRows: [],
-      tableSelectedRow: {}
+      tableCheckedRows: []
     }
   },
 
   computed: {
     usersCount () {
       return Object.keys(this.$store.state.users).length
-    },
-
-    selectedRows () {
-      if (this.tableCheckedRows.length === 0) {
-        return Object.keys(this.tableSelectedRow).length === 0 ? [] : [this.tableSelectedRow]
-      } else {
-        return this.tableCheckedRows
-      }
     },
 
     msgs () {
@@ -318,7 +307,7 @@ export default {
     },
 
     resumeTorrent () {
-      for (const torrent of this.selectedRows) {
+      for (const torrent of this.tableCheckedRows) {
         if (!torrent.resume) {
           // torrent is not a WebTorrent object
           // make it one
@@ -330,18 +319,15 @@ export default {
     },
 
     removeTorrent () {
-      const rows = this.selectedRows
+      const rows = this.tableCheckedRows
       for (const key in rows) {
         const torrent = rows[key]
         if (!torrent.destroy) continue
 
+        this.$delete(this.tableCheckedRows, key)
         this.$delete(this.torrents, this.getIndexOfTorrent(torrent.infoHash))
-        torrent.destroy()
 
-        this.tableSelectedRow = {}
-        if (this.tableCheckedRows[key]) {
-          delete this.tableCheckedRows[key]
-        }
+        torrent.destroy()
       }
     },
 
@@ -352,10 +338,6 @@ export default {
         }
       }
       return null
-    },
-
-    onOutsideClick () {
-      this.tableSelectedRow = {}
     },
 
     ping (user) {
