@@ -6,50 +6,54 @@
           <template slot="header">
             <span>Files <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
           </template>
-          <b-field class="actions content" grouped>
-            <b-upload v-model="files" multiple @input="onFileChange">
-              <a class="button is-info">
-                <span>Add File</span>
-              </a>
-            </b-upload>
-            <b-tooltip label="Start downloading files on receive" position="is-bottom">
-              <b-switch v-model="autoStart" type="is-danger">
-                Auto Start
-              </b-switch>
-            </b-tooltip>
-          </b-field>
-          <div v-if="selectedRows.length > 0">
-            <span v-if="selectedRows.length === 1">
+          <b-field class="actions content" grouped group-multiline>
+            <div class="control">
+              <b-upload v-model="files" multiple @input="onFileChange">
+                <a class="button is-info">
+                  <span>Add File</span>
+                </a>
+              </b-upload>
+            </div>
+            <div class="control" id="autoStart">
+              <b-tooltip label="Start downloading files on receive" position="is-bottom">
+                <b-checkbox v-model="autoStart" type="is-danger">
+                  Auto Start
+                </b-checkbox>
+              </b-tooltip>
+            </div>
+            <div class="control" v-if="selectedRows.length > 0">
+              <div class="control" v-if="selectedRows.length === 1">
+                <b-field grouped>
+                  <div class="control" v-if="!selectedRows[0].mine && selectedRows[0].paused">
+                    <b-button @click="resumeTorrent">Start</b-button>
+                  </div>
+                  <div class="control">
+                    <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
+                  </div>
+                </b-field>
+              </div>
+              <div class="control" v-else>
+                <b-field grouped>
+                  <div class="control">
+                    <b-button @click="resumeTorrent">Start</b-button>
+                  </div>
+                  <div class="control">
+                    <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
+                  </div>
+                </b-field>
+              </div>
+            </div>
+            <div class="control" v-else>
               <b-field grouped>
-                <div class="control" v-if="!selectedRows[0].mine && selectedRows[0].paused">
-                  <b-button @click="resumeTorrent">Start</b-button>
+                <div class="control">
+                  <b-button disabled>Start</b-button>
                 </div>
                 <div class="control">
-                  <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
+                  <b-button disabled>Remove</b-button>
                 </div>
               </b-field>
-            </span>
-            <span v-else>
-              <b-field grouped group-multiline>
-                <div class="control">
-                  <b-button @click="resumeTorrent">Start</b-button>
-                </div>
-                <div class="control">
-                  <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
-                </div>
-              </b-field>
-            </span>
-          </div>
-          <div v-else>
-            <b-field grouped group-multiline>
-              <div class="control">
-                <b-button disabled>Start</b-button>
-              </div>
-              <div class="control">
-                <b-button disabled>Remove</b-button>
-              </div>
-            </b-field>
-          </div>
+            </div>
+          </b-field>
           <b-table
             class="content"
             id="torrents"
@@ -115,7 +119,8 @@
             <div class="card" v-for="(msg, index) in msgs" :key="index">
               <header class="card-header">
                 <p class="card-header-title">
-                  {{ msg.name }}
+                  <b-tag class="has-text-white" v-bind:style="{ 'background-color': msg.color }">{{ msg.time }}</b-tag>
+                  <b-tag>{{ msg.name }}</b-tag>
                 </p>
                 <a class="card-header-icon" title="Copy message" @click="copyMsg" v-clipboard="msg.msg">
                   Copy
@@ -131,11 +136,17 @@
           <template slot="header">
             <span>Devices <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
           </template>
-          <center class="content">
+          <center class="content" style="border-bottom: 2px dashed #aaa;">
             <p>
               <router-link to="/grid">
-                <b-button type="is-success" size="is-medium">Show Grid</b-button>
+                <b-button type="is-primary" style="float: right;">Show Grid</b-button>
               </router-link>
+              <b-taglist attached>
+                <b-tag type="is-success" size="is-medium" v-bind:style="{ 'background-color': $store.state.myColor }" class="has-text-white">
+                  {{ $store.state.myName }}
+                </b-tag>
+                <b-tag type="is-warning" size="is-medium">Me</b-tag>
+              </b-taglist>
             </p>
             <p v-show="Object.keys($store.state.users).length === 0">
               Make sure your devices are connected to the same WiFi.
@@ -143,9 +154,9 @@
           </center>
           <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
             <b-taglist attached class="control">
-              <b-tag size="is-medium" type="is-info">{{ user.name }}</b-tag>
+              <b-tag size="is-medium" v-bind:style="{ 'background-color': user.color }" class="has-text-white">{{ user.name }}</b-tag>
               <b-tag size="is-medium" type="is-warning">
-                <b-button type="is-warning" size="is-small" @click="ping(user)">Ping!</b-button>
+                <a @click="ping(user)">Ping!</a>
               </b-tag>
             </b-taglist>
           </b-field>
@@ -366,12 +377,16 @@ export default {
     sendMsg () {
       const data = {
         type: 'msg',
-        msg: this.msg
+        msg: this.msg,
+        time: new Date().toLocaleTimeString()
       }
 
       this.$store.commit('addMessage', {
         ...data,
-        ...{ name: this.$store.state.myName }
+        ...{
+          name: this.$store.state.myName,
+          color: this.$store.state.myColor
+        }
       })
 
       for (const key in this.$store.state.users) {
@@ -481,8 +496,11 @@ export default {
 .countTag
   transition: 0.25s all
 
+#autoStart
+  padding: 0.5em 0 0
+
 #torrents
-  margin-top: 20px
+  // margin-top: 20px
 
   .upload
     display: block

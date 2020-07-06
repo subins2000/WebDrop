@@ -12,12 +12,12 @@ import device from './device'
 import Header from './components/Header.vue'
 
 import Button from 'buefy/dist/components/button'
+import Checkbox from 'buefy/dist/components/checkbox'
 import Field from 'buefy/dist/components/field'
 import Input from 'buefy/dist/components/input'
 import Modal from 'buefy/dist/components/modal'
 import Navbar from 'buefy/dist/components/navbar'
 import Progress from 'buefy/dist/components/progress'
-import Switch from 'buefy/dist/components/switch'
 import Tabs from 'buefy/dist/components/tabs'
 import Table from 'buefy/dist/components/table'
 import Tag from 'buefy/dist/components/tag'
@@ -31,6 +31,7 @@ Vue.use(VueClipboard)
 // load only needed buefy components
 const comps = [
   Button,
+  Checkbox,
   Field,
   Input,
   Modal,
@@ -41,7 +42,6 @@ const comps = [
   Tag,
   Tooltip,
   Snackbar,
-  Switch,
   Toast,
   Upload
 ]

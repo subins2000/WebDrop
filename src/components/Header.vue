@@ -6,7 +6,7 @@
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
         <b-navbar-item tag="router-link" :to="{ path: '/grid' }">
-          Grid
+          <span class="is-size-6">Grid</span>
         </b-navbar-item>
         <div class="actions">
           <b-tooltip :label="internetShare ? 'Joined An Internet Share Room' : 'Share via Internet'" position="is-bottom" :type="internetShare ? 'is-warning' : 'is-primary'">

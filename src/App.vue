@@ -98,7 +98,10 @@ export default {
           this.$store.commit('newTorrent', msg)
         } else if (msg.type === 'msg') {
           delete msg.type
+
           msg.name = this.$store.state.users[peer.id].name
+          msg.color = this.$store.state.users[peer.id].color
+
           this.$store.commit('addMessage', msg)
         }
       })
