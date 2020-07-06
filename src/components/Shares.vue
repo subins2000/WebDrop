@@ -99,12 +99,11 @@
           </b-table>
         </b-tab-item>
         <b-tab-item label="Messages">
-          <b-field label="Message"
-            label-position="on-border">
-            <b-input type="textarea"></b-input>
+          <b-field label="Message" label-position="on-border">
+            <b-input type="textarea" v-model="msg"></b-input>
           </b-field>
           <b-field>
-            <b-button type="button is-primary">Send</b-button>
+            <b-button type="button is-primary" @click="sendMsg">Send</b-button>
           </b-field>
           <div id="messages">
             <p v-show="msgs.length === 0">
@@ -143,7 +142,7 @@
             <b-taglist attached class="control">
               <b-tag size="is-medium" type="is-info">{{ user.name }}</b-tag>
               <b-tag size="is-medium" type="is-warning">
-                <b-button type="is-warning" size="is-small">Ping!</b-button>
+                <b-button type="is-warning" size="is-small" @click="ping(user)">Ping!</b-button>
               </b-tag>
             </b-taglist>
           </b-field>
@@ -166,12 +165,7 @@ export default {
       glowUsersBtn: false,
 
       files: [],
-      msgs: [
-        // {
-        //   name: 'Linux Firefox',
-        //   msg: 'something something'
-        // }
-      ],
+      msg: '', // input field
       torrents: [],
 
       tableCheckedRows: [],
@@ -190,6 +184,16 @@ export default {
       } else {
         return this.tableCheckedRows
       }
+    },
+
+    msgs () {
+      // return [
+      //   {
+      //     name: 'Linux Firefox',
+      //     msg: 'something something'
+      //   }
+      // ]
+      return this.$store.state.msgs.slice().reverse()
     }
   },
 
@@ -340,6 +344,11 @@ export default {
       this.tableSelectedRow = {}
     },
 
+    ping (user) {
+      const users = [user]
+      this.$root.$emit('ping', users)
+    },
+
     copyMsg () {
       this.$buefy.toast.open({
         duration: 2000,
@@ -347,6 +356,17 @@ export default {
         position: 'is-top',
         type: 'is-primary'
       })
+    },
+
+    sendMsg () {
+      const data = {
+        type: 'msg',
+        msg: this.msg
+      }
+      for (const key in this.$store.state.users) {
+        const user = this.$store.state.users[key]
+        this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+      }
     }
   },
 

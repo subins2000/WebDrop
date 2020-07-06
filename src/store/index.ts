@@ -12,6 +12,8 @@ export default new Vuex.Store({
 
     users: {} as any,
     selectedUsers: [] as any,
+
+    msgs: [],
     torrents: {},
 
     p2pt: P2PT,
@@ -84,6 +86,10 @@ export default new Vuex.Store({
         state.p2pt.destroy()
         state.users = {}
       }
+    },
+
+    addMessage (state, payload) {
+      Vue.set(state.msgs, state.msgs.length, payload)
     }
   },
   actions: {
