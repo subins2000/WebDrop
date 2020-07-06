@@ -27,6 +27,15 @@ export default {
           this.startP2PT(this.$store.state.roomID)
         }
       })
+
+      this.$root.$on('ping', (users) => {
+        const data = {
+          type: 'ping'
+        }
+        for (const user of users) {
+          this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+        }
+      })
     },
 
     setUpP2PT () {

@@ -83,13 +83,11 @@ export default {
     },
 
     ping () {
-      const data = {
-        type: 'ping'
-      }
+      const users = []
       for (const userID of this.$store.state.selectedUsers) {
-        const user = this.$store.state.users[userID]
-        this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+        users.push(this.$store.state.users[userID])
       }
+      this.$root.$emit('ping', users)
     },
 
     makeSVGNode (node, attr) {

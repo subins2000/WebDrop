@@ -100,11 +100,11 @@
         </b-tab-item>
         <b-tab-item label="Devices">
           <template slot="header">
-            <span> Devices <b-tag id="usersCount" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag> </span>
+            <span>Devices <b-tag id="usersCount" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag> </span>
           </template>
-          <center>
+          <center class="content">
             <router-link to="/grid">
-              <b-button type="is-success">Show Grid</b-button>
+              <b-button type="is-success" size="is-medium">Show Grid</b-button>
             </router-link>
           </center>
           <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
