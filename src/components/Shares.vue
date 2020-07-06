@@ -99,11 +99,35 @@
           </b-table>
         </b-tab-item>
         <b-tab-item label="Messages">
-
+          <b-field label="Message"
+            label-position="on-border">
+            <b-input type="textarea"></b-input>
+          </b-field>
+          <b-field>
+            <b-button type="button is-primary">Send</b-button>
+          </b-field>
+          <div id="messages">
+            <p v-show="msgs.length === 0">
+              No messages
+            </p>
+            <div class="card" v-for="(msg, index) in msgs" :key="index">
+              <header class="card-header">
+                <p class="card-header-title">
+                  {{ msg.name }}
+                </p>
+                <a class="card-header-icon" @click="copyMsg" v-clipboard="msg.msg">
+                  Copy
+                </a>
+              </header>
+              <div class="card-content">
+                <div class="content">{{ msg.msg }}</div>
+              </div>
+            </div>
+          </div>
         </b-tab-item>
         <b-tab-item label="Devices">
           <template slot="header">
-            <span>Devices <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag> </span>
+            <span>Devices <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
           </template>
           <center class="content">
             <p>
@@ -142,6 +166,12 @@ export default {
       glowUsersBtn: false,
 
       files: [],
+      msgs: [
+        // {
+        //   name: 'Linux Firefox',
+        //   msg: 'something something'
+        // }
+      ],
       torrents: [],
 
       tableCheckedRows: [],
@@ -308,6 +338,15 @@ export default {
 
     onOutsideClick () {
       this.tableSelectedRow = {}
+    },
+
+    copyMsg () {
+      this.$buefy.toast.open({
+        duration: 2000,
+        message: 'Message Copied !',
+        position: 'is-top',
+        type: 'is-primary'
+      })
     }
   },
 
@@ -404,6 +443,9 @@ export default {
 
     .control, .tags:last-child
       margin-bottom: 0
+
+#messages
+  margin-bottom: 20px
 
 #drop-area
   padding: 10% 30%

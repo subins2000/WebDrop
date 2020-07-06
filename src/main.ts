@@ -13,6 +13,7 @@ import Header from './components/Header.vue'
 
 import Button from 'buefy/dist/components/button'
 import Field from 'buefy/dist/components/field'
+import Input from 'buefy/dist/components/input'
 import Modal from 'buefy/dist/components/modal'
 import Navbar from 'buefy/dist/components/navbar'
 import Progress from 'buefy/dist/components/progress'
@@ -31,6 +32,7 @@ Vue.use(VueClipboard)
 const comps = [
   Button,
   Field,
+  Input,
   Modal,
   Navbar,
   Progress,
