@@ -144,10 +144,12 @@
                 <b-tag type="is-warning" size="is-medium">Me</b-tag>
               </b-taglist>
             </p>
-            <p v-show="Object.keys($store.state.users).length === 0">
-              Make sure your devices are connected to the same WiFi.
-            </p>
+            <!-- empty <p> necessary -->
+            <p></p>
           </div>
+          <p v-show="Object.keys($store.state.users).length === 0">
+            <center>Make sure your devices are connected to the same WiFi.</center>
+          </p>
           <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
             <b-taglist attached class="control">
               <b-tag size="is-medium" v-bind:style="{ 'background-color': user.color }" class="has-text-white">{{ user.name }}</b-tag>

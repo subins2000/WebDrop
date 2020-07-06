@@ -15,24 +15,21 @@ module.exports = {
           ) || []
         );
       },
-      keyframes: true,
-      whitelist: [],
       whitelistPatterns: [
-        /card/,
-        /field/,
-        /modal/,
-        /has-text-/,
-        /is-grouped/,
+        /card$/,
+        /field$/,
+        /has-text-white$/,
+        /is-grouped$/,
         /navbar/,
-        /tab/
+        /progress$/,
+        /tab$/
       ],
       whitelistPatternsChildren: [
-        /checkbox/,
-        /notices/,
-        /switch/,
-        /progress/,
-        /tabs/,
-        /upload/
+        /checkbox$/,
+        /modal/,
+        /notices$/,
+        /switch$/,
+        /tabs$/,
       ]
     })
   ]
