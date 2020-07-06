@@ -4,7 +4,7 @@
       <b-tabs type="is-boxed" expanded>
         <b-tab-item label="Files" v-click-outside="onOutsideClick">
           <template slot="header">
-            <span>Files <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ torrents.length }}</b-tag> </span>
+            <span>Files <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
           </template>
           <b-field class="actions content" grouped>
             <b-upload v-model="files" multiple @input="onFileChange">
@@ -99,6 +99,9 @@
           </b-table>
         </b-tab-item>
         <b-tab-item label="Messages">
+          <template slot="header">
+            <span>Messages <b-tag class="countTag" v-bind:class="{ 'is-danger': glowMsgsBtn }" rounded>{{ msgs.length }}</b-tag></span>
+          </template>
           <b-field label="Message" label-position="on-border">
             <b-input type="textarea" v-model="msg"></b-input>
           </b-field>
@@ -162,6 +165,8 @@ export default {
     return {
       autoStart: true,
 
+      glowFilesBtn: false,
+      glowMsgsBtn: false,
       glowUsersBtn: false,
 
       files: [],
@@ -389,6 +394,11 @@ export default {
       // new torrent is torrent received from peers
       if (mutation.type === 'newTorrent') {
         this.addNewTorrent(mutation.payload)
+
+        this.glowFilesBtn = true
+        setTimeout(() => {
+          this.glowFilesBtn = false
+        }, 500)
       } else if (mutation.type === 'addTorrent') {
         const p2pt = this.$store.state.p2pt
         const data = {
@@ -405,6 +415,11 @@ export default {
         this.glowUsersBtn = true
         setTimeout(() => {
           this.glowUsersBtn = false
+        }, 500)
+      } else if (mutation.type === 'addMessage') {
+        this.glowMsgsBtn = true
+        setTimeout(() => {
+          this.glowMsgsBtn = false
         }, 500)
       }
     })
@@ -498,4 +513,19 @@ body.dragging:after
   background-color: rgba(255, 255, 0, .3)
   pointer-events: none
   transition: 0.5s all
+
+// To make field label on-border of input
+// obtained from node_modules/buefy/src/scss/components/_form.scss
+
+.field.is-floating-label
+  position: relative
+
+  .label
+    position: absolute
+    left: 1em
+    z-index: 5
+    top: -0.775em
+    padding-left: 0.125em
+    padding-right: 0.125em
+    font-size: calc(1rem * 3 / 4);
 </style>
