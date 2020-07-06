@@ -136,7 +136,7 @@
           <template slot="header">
             <span>Devices <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
           </template>
-          <center class="content" style="border-bottom: 2px dashed #aaa;">
+          <div class="content" style="border-bottom: 2px dashed #aaa;">
             <p>
               <router-link to="/grid">
                 <b-button type="is-primary" style="float: right;">Show Grid</b-button>
@@ -151,7 +151,7 @@
             <p v-show="Object.keys($store.state.users).length === 0">
               Make sure your devices are connected to the same WiFi.
             </p>
-          </center>
+          </div>
           <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
             <b-taglist attached class="control">
               <b-tag size="is-medium" v-bind:style="{ 'background-color': user.color }" class="has-text-white">{{ user.name }}</b-tag>

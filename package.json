@@ -11,6 +11,7 @@
     "end-of-stream": "Downgraded end-of-stream because of https://github.com/webtorrent/instant.io/issues/210#issuecomment-609687048"
   },
   "dependencies": {
+    "@beyonk/google-fonts-webpack-plugin": "^1.2.3",
     "buefy": "^0.8.19",
     "end-of-stream": "1.4.1",
     "hash-sum": "^1.0.2",

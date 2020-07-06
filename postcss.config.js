@@ -3,29 +3,35 @@ const IN_PRODUCTION = process.env.NODE_ENV === 'production'
 module.exports = {
   plugins: [
     IN_PRODUCTION && require('@fullhuman/postcss-purgecss')({
-      content: [ `./public/**/*.html`, `./src/**/*.vue` ],
+      content: ['./public/**/*.html', './src/**/*.vue'],
       defaultExtractor (content) {
-        const contentWithoutStyleBlocks = content.replace(/<style[^]+?<\/style>/gi, '')
-        return contentWithoutStyleBlocks.match(/[A-Za-z0-9-_/:]*[A-Za-z0-9-_/]+/g) || []
+        const contentWithoutStyleBlocks = content.replace(
+          /<style[^]+?<\/style>/gi,
+          ''
+        );
+        return (
+          contentWithoutStyleBlocks.match(
+            /[A-Za-z0-9-_/:]*[A-Za-z0-9-_/]+/g
+          ) || []
+        );
       },
+      keyframes: true,
       whitelist: [],
       whitelistPatterns: [
-        /-(leave|enter|appear)(|-(to|from|active))$/,
-        /^(?!(|.*?:)cursor-move).+-move$/,
-        /^router-link(|-exact)-active$/,
         /card/,
         /field/,
+        /modal/,
         /has-text-/,
         /is-grouped/,
         /navbar/,
-        /notices/,
         /tab/
       ],
       whitelistPatternsChildren: [
-        /tabs/,
-        /modal/,
+        /checkbox/,
+        /notices/,
         /switch/,
         /progress/,
+        /tabs/,
         /upload/
       ]
     })

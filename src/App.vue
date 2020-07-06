@@ -116,7 +116,7 @@ export default {
         warningCount++
 
         if (warningCount >= stats.total && !trackerConnected) {
-          console.error(blah)
+          console.log(blah)
 
           this.$buefy.snackbar.open({
             message: 'We couldn\'t connect to any WebTorrent trackers. Your ISP might be blocking them 🤔',
@@ -151,7 +151,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400&display=swap');
+// @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400&display=swap');
 
 #app {
   font-family: 'Ubuntu', sans-serif;
@@ -200,7 +200,6 @@ $speed-slower: 250ms !default
 @import "~buefy/src/scss/components/_modal.scss";
 @import "~buefy/src/scss/components/_notices.scss";
 @import "~buefy/src/scss/components/_progress.scss";
-@import "~buefy/src/scss/components/_switch.scss";
 @import "~buefy/src/scss/components/_tabs.scss";
 
 @import "~buefy/src/scss/components/_table.scss";
