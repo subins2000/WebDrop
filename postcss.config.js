@@ -16,20 +16,20 @@ module.exports = {
         );
       },
       whitelistPatterns: [
+        /-(leave|enter|appear)(|-(to|from|active))$/,
         /card$/,
         /field$/,
         /has-text-white$/,
         /is-grouped$/,
         /navbar/,
-        /progress$/,
-        /tab$/
+        /progress$/
       ],
       whitelistPatternsChildren: [
         /checkbox$/,
         /modal/,
         /notices$/,
         /switch$/,
-        /tabs$/,
+        /tabs$/
       ]
     })
   ]

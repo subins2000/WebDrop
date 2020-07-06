@@ -30,7 +30,7 @@
           <center class="content">
             <p>Made by <a href="https://twitter.com/SubinSiby" target="_blank">Subin Siby</a></p>
             <p>WebDrop is <a href="https://en.wikipedia.org/wiki/Free_Software" target="_blank">സ്വതന്ത്ര/free/libre</a> software [AGPL-3]</p>
-            <b-field grouped position="is-centered">
+            <b-field class="is-grouped is-grouped-centered">
               <div class="control">
                 <a href="https://subinsb.com/donate" target="_blank">
                   <b-button type="is-warning" size="is-medium">Donate</b-button>
