@@ -114,7 +114,7 @@
                 <p class="card-header-title">
                   {{ msg.name }}
                 </p>
-                <a class="card-header-icon" @click="copyMsg" v-clipboard="msg.msg">
+                <a class="card-header-icon" title="Copy message" @click="copyMsg" v-clipboard="msg.msg">
                   Copy
                 </a>
               </header>
@@ -363,10 +363,24 @@ export default {
         type: 'msg',
         msg: this.msg
       }
+
+      this.$store.commit('addMessage', {
+        ...data,
+        ...{ name: this.$store.state.myName }
+      })
+
       for (const key in this.$store.state.users) {
         const user = this.$store.state.users[key]
         this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
       }
+
+      this.$buefy.toast.open({
+        duration: 2000,
+        message: 'Sent !',
+        position: 'is-top',
+        type: 'is-primary'
+      })
+      this.msg = ''
     }
   },
 
