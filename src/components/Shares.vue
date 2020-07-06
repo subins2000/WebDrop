@@ -3,6 +3,9 @@
     <div class="container">
       <b-tabs type="is-boxed" expanded>
         <b-tab-item label="Files" v-click-outside="onOutsideClick">
+          <template slot="header">
+            <span>Files <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ torrents.length }}</b-tag> </span>
+          </template>
           <b-field class="actions content" grouped>
             <b-upload v-model="files" multiple @input="onFileChange">
               <a class="button is-info">
@@ -100,7 +103,7 @@
         </b-tab-item>
         <b-tab-item label="Devices">
           <template slot="header">
-            <span>Devices <b-tag id="usersCount" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag> </span>
+            <span>Devices <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag> </span>
           </template>
           <center class="content">
             <router-link to="/grid">
@@ -365,7 +368,7 @@ export default {
 </script>
 
 <style lang="sass">
-#usersCount
+.countTag
   transition: 0.25s all
 
 #torrents
