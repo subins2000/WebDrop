@@ -39,14 +39,14 @@
               <pre class="is-size-4">{{ roomID }}</pre>
               <h3 style="margin-top: 0">OR</h3>
               <p>Share this link</p>
-              <div class="columns">
-                <div class="column is-four-fifths">
+              <b-field grouped group-multiline>
+                <div class="control is-expanded">
                   <input class="input is-info is-medium is-flat" onclick="this.select()" v-bind:value='internetInviteLink' readonly />
                 </div>
-                <div class="column">
+                <div class="control">
                   <span class="button is-info is-primary is-medium" @click="copyInviteLink" v-clipboard="internetInviteLink" style="width: 100%">Copy</span>
                 </div>
-              </div>
+              </b-field>
             </b-tab-item>
             <b-tab-item label="Join Room">
               <p>Paste the room code here :</p>

@@ -191,15 +191,34 @@ $link-focus-border: $primary;
 $speed-slow: 150ms !default
 $speed-slower: 250ms !default
 
-// Import Bulma and Buefy styles
-@import "~bulma";
+// Import Bulma
+@import "~bulma/sass/base/_all.sass";
+@import "~bulma/sass/form/_all.sass";
+
+@import "~bulma/sass/elements/box.sass";
+@import "~bulma/sass/elements/button.sass";
+@import "~bulma/sass/elements/container.sass";
+@import "~bulma/sass/elements/content.sass";
+@import "~bulma/sass/elements/progress.sass";
+@import "~bulma/sass/elements/table.sass";
+@import "~bulma/sass/elements/tag.sass";
+
+@import "~bulma/sass/components/card.sass";
+@import "~bulma/sass/components/navbar.sass";
+
+// Import Buefy
 @import "~buefy/src/scss/utils/_animations.scss";
 @import "~buefy/src/scss/utils/_functions.scss";
 
 @import "~buefy/src/scss/components/_checkbox.scss";
+
+@import "~bulma/sass/components/modal.sass";
 @import "~buefy/src/scss/components/_modal.scss";
+
 @import "~buefy/src/scss/components/_notices.scss";
 @import "~buefy/src/scss/components/_progress.scss";
+
+@import "~bulma/sass/components/tabs.sass";
 @import "~buefy/src/scss/components/_tabs.scss";
 
 @import "~buefy/src/scss/components/_table.scss";

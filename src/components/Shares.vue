@@ -71,32 +71,28 @@
                 {{ props.row.length | formatSize }}
               </b-table-column>
               <b-table-column field="stats" label="Stats" width="50vw">
-                <div class="columns is-gapless is-vcentered">
-                  <div v-show="!props.row.paused" class="column is-5">
-                    <b-field grouped group-multiline>
-                      <b-taglist class="control" attached>
-                        <b-tag type="is-dark">🔼</b-tag>
-                        <b-tag type="is-info">{{ props.row.wdUpSpeed | formatSize }}/s</b-tag>
-                      </b-taglist>
-                      <b-taglist class="control" attached>
-                        <b-tag type="is-dark">🔽</b-tag>
-                        <b-tag type="is-success">{{ props.row.wdDownSpeed | formatSize }}/s</b-tag>
-                      </b-taglist>
-                    </b-field>
-                  </div>
-                  <div v-if="!props.row.mine" class="column">
-                    <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
-                      <b-button type="is-success">Download</b-button>
-                    </a>
-                    <b-progress v-show="!props.row.done" type="is-success" :value="props.row.wdProgress" size="is-medium" show-value format="percent"></b-progress>
-                  </div>
+                <div v-show="!props.row.paused" class="column is-5">
+                  <b-field grouped group-multiline>
+                    <b-taglist class="control" attached>
+                      <b-tag type="is-dark">🔼</b-tag>
+                      <b-tag type="is-info">{{ props.row.wdUpSpeed | formatSize }}/s</b-tag>
+                    </b-taglist>
+                    <b-taglist class="control" attached>
+                      <b-tag type="is-dark">🔽</b-tag>
+                      <b-tag type="is-success">{{ props.row.wdDownSpeed | formatSize }}/s</b-tag>
+                    </b-taglist>
+                    <div v-if="!props.row.mine" class="control">
+                      <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
+                        <b-button type="is-success">Download</b-button>
+                      </a>
+                      <b-progress v-show="!props.row.done" type="is-success" :value="props.row.wdProgress" size="is-medium" show-value format="percent"></b-progress>
+                    </div>
+                  </b-field>
                 </div>
               </b-table-column>
             </template>
             <template slot="empty">
-              <b-upload v-model="files" @input="onFileChange"
-                multiple
-                drag-drop>
+              <b-upload v-model="files" @input="onFileChange" multiple>
                 <p id="drop-area">Drop your files here or click to upload</p>
               </b-upload>
             </template>
@@ -511,11 +507,19 @@ export default {
     .control, .tags:last-child
       margin-bottom: 0
 
+  .tags .tag
+    margin-bottom: 0
+
 #messages
   margin-bottom: 20px
 
 #drop-area
   padding: 10% 30%
+  border: 2px dashed #DDD
+  border-radius: 20px
+
+  &:hover
+    border-color: #8c67ef
 
 body.dragging:after
   display: flex
