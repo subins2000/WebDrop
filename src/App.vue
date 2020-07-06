@@ -193,7 +193,11 @@ $speed-slower: 250ms !default
 
 // Import Bulma
 @import "~bulma/sass/base/_all.sass";
-@import "~bulma/sass/form/_all.sass";
+
+@import "~bulma/sass/form/shared.sass";
+@import "~bulma/sass/form/input-textarea.sass";
+@import "~bulma/sass/form/checkbox-radio.sass";
+@import "~bulma/sass/form/tools.sass";
 
 @import "~bulma/sass/elements/box.sass";
 @import "~bulma/sass/elements/button.sass";

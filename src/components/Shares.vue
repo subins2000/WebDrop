@@ -71,7 +71,7 @@
                 {{ props.row.length | formatSize }}
               </b-table-column>
               <b-table-column field="stats" label="Stats" width="50vw">
-                <div v-show="!props.row.paused" class="column is-5">
+                <div v-show="!props.row.paused">
                   <b-field grouped group-multiline>
                     <b-taglist class="control" attached>
                       <b-tag type="is-dark">🔼</b-tag>
@@ -81,7 +81,7 @@
                       <b-tag type="is-dark">🔽</b-tag>
                       <b-tag type="is-success">{{ props.row.wdDownSpeed | formatSize }}/s</b-tag>
                     </b-taglist>
-                    <div v-if="!props.row.mine" class="control">
+                    <div v-show="!props.row.mine" class="control is-expanded">
                       <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
                         <b-button type="is-success">Download</b-button>
                       </a>
@@ -267,7 +267,7 @@ export default {
         // Vue will make rendering delay and slows down file transfer if progress value is directly given
         const progress = parseInt((100 * torrent.progress).toFixed(1))
 
-        this.torrents[index].wdProgress = progress
+        this.$set(this.torrents[index], 'wdProgress', progress)
 
         // bytes per second
         this.$set(this.torrents[index], 'wdUpSpeed', torrent.uploadSpeed)
