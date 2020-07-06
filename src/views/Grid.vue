@@ -83,13 +83,11 @@ export default {
     },
 
     ping () {
-      const data = {
-        type: 'ping'
-      }
+      const users = []
       for (const userID of this.$store.state.selectedUsers) {
-        const user = this.$store.state.users[userID]
-        this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+        users.push(this.$store.state.users[userID])
       }
+      this.$root.$emit('ping', users)
     },
 
     makeSVGNode (node, attr) {
@@ -284,18 +282,4 @@ export default {
 
   .user-text.selected
     font-weight: bold
-
-.container
-  padding: 20px 0
-
-@media screen and (max-width: 960px)
-  .container
-    padding: 20px 2%
-
-  .b-tabs .tab-content
-    padding: 1rem 0 1rem 0
-
-@media screen and (min-width: 900px)
-  .container
-    max-width: 900px
 </style>

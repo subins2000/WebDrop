@@ -27,6 +27,15 @@ export default {
           this.startP2PT(this.$store.state.roomID)
         }
       })
+
+      this.$root.$on('ping', (users) => {
+        const data = {
+          type: 'ping'
+        }
+        for (const user of users) {
+          this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+        }
+      })
     },
 
     setUpP2PT () {
@@ -87,6 +96,13 @@ export default {
           delete msg.type
           msg.peer = peer
           this.$store.commit('newTorrent', msg)
+        } else if (msg.type === 'msg') {
+          delete msg.type
+
+          msg.name = this.$store.state.users[peer.id].name
+          msg.color = this.$store.state.users[peer.id].color
+
+          this.$store.commit('addMessage', msg)
         }
       })
 
