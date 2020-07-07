@@ -8,7 +8,7 @@
           </template>
           <b-field class="actions content" grouped group-multiline>
             <div class="control">
-              <b-upload v-model="files" multiple @input="onFileChange">
+              <b-upload v-model="files" multiple allowdirs @input="onFileChange">
                 <a class="button is-info">
                   <span>Add File</span>
                 </a>
@@ -474,15 +474,56 @@ export default {
     })
 
     target.addEventListener('drop', (e) => {
-      e.preventDefault()
       e.stopPropagation()
+      e.preventDefault()
       body.classList.remove('dragging')
 
-      const files = Array.from(e.dataTransfer.files) // Array of all files
+      function getFilesDataTransferItems (dataTransferItems) {
+        const files = []
 
-      if (files) {
-        this.onFileChange(files)
+        function traverseFileTreePromise (item, path = '') {
+          return new Promise(resolve => {
+            if (item.isFile) {
+              item.file(file => {
+                file.filepath = path + file.name // save full path
+                files.push(file)
+                resolve(file)
+              })
+            } else if (item.isDirectory) {
+              const dirReader = item.createReader()
+              dirReader.readEntries(entries => {
+                const entriesPromises = []
+                for (const entr of entries) { entriesPromises.push(traverseFileTreePromise(entr, path + item.name + '/')) }
+                resolve(Promise.all(entriesPromises))
+              })
+            }
+          })
+        }
+
+        return new Promise((resolve, reject) => {
+          const entriesPromises = []
+          for (const it of dataTransferItems) {
+            entriesPromises.push(traverseFileTreePromise(it.webkitGetAsEntry()))
+          }
+          Promise.all(entriesPromises)
+            .then(entries => {
+              // console.log(entries)
+              resolve(files)
+            }).catch(reject)
+        })
       }
+
+      getFilesDataTransferItems(e.dataTransfer.items).then(files => {
+        if (files) {
+          this.onFileChange(files)
+        }
+      }).catch(blah => {
+        const files = Array.from(e.dataTransfer.files) // Array of all files
+
+        if (files) {
+          this.onFileChange(files)
+        }
+      })
     })
   }
 }
