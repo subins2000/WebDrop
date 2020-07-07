@@ -16,7 +16,7 @@
             </div>
             <div class="control" id="autoStart">
               <b-tooltip label="Start downloading files on receive" position="is-bottom">
-                <b-checkbox v-model="autoStart" type="is-danger">
+                <b-checkbox v-model="autoStart" type="is-warning">
                   Auto Start
                 </b-checkbox>
               </b-tooltip>
@@ -354,13 +354,14 @@ export default {
       const rows = this.tableCheckedRows
 
       for (const key in rows) {
-        const torrent = torrentsWT[rows[key].infoHash]
+        const infoHash = rows[key].infoHash
+        const torrent = torrentsWT[infoHash]
 
-        this.$delete(this.tableCheckedRows, key)
-        this.$delete(this.torrents, this.getIndexOfTorrent(torrent.infoHash))
+        this.$delete(this.torrents, this.getIndexOfTorrent(infoHash))
 
-        torrent.destroy()
+        if (torrent) torrent.destroy()
       }
+      this.tableCheckedRows = []
     },
 
     getIndexOfTorrent (infoHash) {
