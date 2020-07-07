@@ -330,6 +330,8 @@ export default {
     },
 
     startTorrent (infoHash) {
+      if (torrentsWT[infoHash]) return
+
       this.$wt.add(infoHash, {
         announce: this.$ANNOUNCE_URLS
       }, (torrent) => {
@@ -340,21 +342,19 @@ export default {
 
     resumeTorrent () {
       for (const torrent of this.tableCheckedRows) {
-        if (!torrent.resume) {
-          // torrent is not a WebTorrent object
-          // make it one
-          this.startTorrent(torrent.infoHash)
+        if (torrentsWT[torrent.infoHash]) {
+          torrentsWT[torrent.infoHash].resume()
         } else {
-          torrent.resume()
+          this.startTorrent(torrent.infoHash)
         }
       }
     },
 
     removeTorrent () {
       const rows = this.tableCheckedRows
+
       for (const key in rows) {
-        const torrent = rows[key]
-        if (!torrent.destroy) continue
+        const torrent = torrentsWT[rows[key].infoHash]
 
         this.$delete(this.tableCheckedRows, key)
         this.$delete(this.torrents, this.getIndexOfTorrent(torrent.infoHash))
@@ -566,4 +566,18 @@ body.dragging:after
     padding-left: 0.125em
     padding-right: 0.125em
     font-size: calc(1rem * 3 / 4);
+
+@media screen and (max-width: 768px)
+  // Show check all row box on mobile
+  // Merge this to buefy :https://github.com/buefy/buefy/issues/2479
+  .b-table .table-wrapper.has-mobile-cards
+    thead
+      display: block
+      th
+        display: none
+
+      .checkbox-cell
+        display: block
+        width: 100%
+        text-align: right
 </style>
