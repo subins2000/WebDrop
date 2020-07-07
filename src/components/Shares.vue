@@ -79,7 +79,7 @@
                       <b-tag type="is-dark">🔽</b-tag>
                       <b-tag type="is-success">{{ props.row.downloadSpeed }}/s</b-tag>
                     </b-taglist>
-                    <div v-show="!props.row.mine" class="control is-expanded">
+                    <div v-show="!props.row.mine" class="control is-expanded downloadSection">
                       <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
                         <b-button type="is-success">Download</b-button>
                       </a>
@@ -610,6 +610,10 @@ body.dragging:after
     font-size: calc(1rem * 3 / 4);
 
 @media screen and (max-width: 768px)
+  .downloadSection
+    width: 60vw
+    margin-top: 5px
+
   // Show check all row box on mobile
   // Merge this to buefy :https://github.com/buefy/buefy/issues/2479
   .b-table .table-wrapper.has-mobile-cards
