@@ -66,24 +66,24 @@
                 <span style="word-break: break-word;max-width: 60vw;">{{ props.row.name }}</span>
               </b-table-column>
               <b-table-column field="size" label="Size" width="10vw" v-bind:class="{ 'is-warning' : props.row.paused }">
-                {{ props.row.length | formatSize }}
+                {{ props.row.size }}
               </b-table-column>
               <b-table-column field="stats" label="Stats" width="50vw">
                 <div v-show="!props.row.paused">
                   <b-field grouped group-multiline>
                     <b-taglist class="control" attached>
                       <b-tag type="is-dark">🔼</b-tag>
-                      <b-tag type="is-info">{{ props.row.wdUpSpeed | formatSize }}/s</b-tag>
+                      <b-tag type="is-info">{{ props.row.uploadSpeed }}/s</b-tag>
                     </b-taglist>
                     <b-taglist class="control" attached>
                       <b-tag type="is-dark">🔽</b-tag>
-                      <b-tag type="is-success">{{ props.row.wdDownSpeed | formatSize }}/s</b-tag>
+                      <b-tag type="is-success">{{ props.row.downloadSpeed }}/s</b-tag>
                     </b-taglist>
                     <div v-show="!props.row.mine" class="control is-expanded">
                       <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
                         <b-button type="is-success">Download</b-button>
                       </a>
-                      <b-progress v-show="!props.row.done" type="is-success" :value="props.row.wdProgress" size="is-medium" show-value format="percent"></b-progress>
+                      <b-progress v-show="!props.row.done" type="is-success" :value="props.row.progress" size="is-medium" show-value format="percent"></b-progress>
                     </div>
                   </b-field>
                 </div>
@@ -165,6 +165,20 @@
 <script>
 import * as throttle from 'throttleit'
 
+const torrentsWT = {} // WebTorrent objects
+
+function formatBytes (bytes, decimals = 2) {
+  if (bytes === 0) return '0 Bytes'
+
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
+
 export default {
   name: 'Send',
 
@@ -178,7 +192,7 @@ export default {
 
       files: [],
       msg: '', // input field
-      torrents: [],
+      torrents: [], // torrents
 
       tableCheckedRows: []
     }
@@ -208,6 +222,22 @@ export default {
       this.files = []
     },
 
+    addTorrentToList (torrent, mine = false) {
+      const torrentInfo = {
+        infoHash: torrent.infoHash,
+        name: torrent.name,
+        size: formatBytes(torrent.length),
+        paused: torrent.paused,
+        done: false,
+        mine,
+        progress: 0,
+        uploadSpeed: 0,
+        downloadSpeed: 0
+      }
+
+      this.$set(this.torrents, this.torrents.length, torrentInfo)
+    },
+
     makeTorrent (file) {
       const snack = this.$buefy.snackbar.open({
         message: 'Preparing file. This might take a while depending on file size',
@@ -230,27 +260,26 @@ export default {
         })
 
         // this torrent was added by user
-        torrent.mine = true
+        this.addTorrentToList(torrent, true)
 
         this.onTorrent(torrent)
       })
     },
 
-    onTorrent (torrent, index = this.torrents.length) {
+    // torrent is WebTorrent's Torrent object
+    onTorrent (torrent) {
+      const index = this.getIndexOfTorrent(torrent.infoHash)
+
       torrent.on('done', () => {
         // there will be only one file
         const file = torrent.files[0]
         file.getBlobURL((err, url) => {
           if (err) throw err
+
+          this.$set(this.torrents[index], 'done', true)
           this.$set(this.torrents[index], 'downloadURL', url)
         })
       })
-
-      // custom properties added to Torrent object
-      torrent.wdUpSpeed = 0
-      torrent.wdDownSpeed = 0
-
-      this.$set(this.torrents, index, torrent)
 
       const updateSpeed = () => {
         if (!this.torrents[index]) return
@@ -258,50 +287,53 @@ export default {
         // Vue will make rendering delay and slows down file transfer if progress value is directly given
         const progress = parseInt((100 * torrent.progress).toFixed(1))
 
-        this.$set(this.torrents[index], 'wdProgress', progress)
-
-        // bytes per second
-        this.$set(this.torrents[index], 'wdUpSpeed', torrent.uploadSpeed)
-        this.$set(this.torrents[index], 'wdDownSpeed', torrent.downloadSpeed)
+        const newObject = Object.assign({}, this.torrents[index], {
+          progress,
+          uploadSpeed: formatBytes(torrent.uploadSpeed),
+          downloadSpeed: formatBytes(torrent.downloadSpeed)
+        })
+        this.$set(this.torrents, index, newObject)
       }
+
       torrent.on('download', throttle(updateSpeed, 500))
       torrent.on('upload', throttle(updateSpeed, 500))
+
+      if (!torrentsWT[torrent.infoHash]) {
+        torrentsWT[torrent.infoHash] = torrent
+      }
+
+      this.$set(this.torrents[index], 'paused', false)
+
       updateSpeed()
     },
 
     // add new torrent obtained from a peer
     addNewTorrent (torrentInfo) {
-      let index = this.getIndexOfTorrent(torrentInfo.i)
+      const infoHash = torrentInfo.infoHash
 
-      if (index) {
+      if (torrentsWT[infoHash]) {
         // torrent with same hash exist
-        this.torrents[index].addPeer(torrentInfo.peer)
+        torrentsWT[infoHash].addPeer(torrentInfo.peer)
       } else {
         // add new item
-        index = this.torrents.length
-        this.$set(this.torrents, index, {
+        this.addTorrentToList({
           infoHash: torrentInfo.i,
           name: torrentInfo.n,
           length: torrentInfo.l,
-          mine: false,
-          wdUpSpeed: 0,
-          wdDownSpeed: 0
-        })
+          paused: !this.autoStart
+        }, false)
 
         if (this.autoStart) {
-          this.startTorrent(index)
+          this.startTorrent(torrentInfo.i)
         }
       }
     },
 
-    startTorrent (index) {
-      const infoHash = this.torrents[index].infoHash
-
+    startTorrent (infoHash) {
       this.$wt.add(infoHash, {
         announce: this.$ANNOUNCE_URLS
       }, (torrent) => {
-        torrent.mine = false
-        this.onTorrent(torrent, index)
+        this.onTorrent(torrent)
       })
       return null
     },
@@ -311,7 +343,7 @@ export default {
         if (!torrent.resume) {
           // torrent is not a WebTorrent object
           // make it one
-          this.startTorrent(this.getIndexOfTorrent(torrent.infoHash))
+          this.startTorrent(torrent.infoHash)
         } else {
           torrent.resume()
         }
