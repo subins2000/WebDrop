@@ -21,7 +21,7 @@
                 </b-checkbox>
               </b-tooltip>
             </div>
-            <div class="control" v-if="tableCheckedRows.length > 0">
+            <div class="control" id="torrentButtons" v-if="tableCheckedRows.length > 0">
               <div class="control" v-if="tableCheckedRows.length === 1">
                 <b-field grouped>
                   <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
@@ -43,16 +43,16 @@
                 </b-field>
               </div>
             </div>
-            <div class="control" v-else>
-              <b-field grouped>
-                <div class="control">
-                  <b-button disabled>Start</b-button>
-                </div>
-                <div class="control">
-                  <b-button disabled>Remove</b-button>
-                </div>
-              </b-field>
-            </div>
+            <b-field class="control" id="speedParams" grouped group-multiline>
+              <b-taglist class="control" attached>
+                <b-tag type="is-dark">🔼</b-tag>
+                <b-tag type="is-info">{{ uploadSpeed }}/s</b-tag>
+              </b-taglist>
+              <b-taglist class="control" attached>
+                <b-tag type="is-dark">🔽</b-tag>
+                <b-tag type="is-success">{{ downloadSpeed }}/s</b-tag>
+              </b-taglist>
+            </b-field>
           </b-field>
           <b-table
             class="content"
@@ -69,23 +69,14 @@
                 {{ props.row.size }}
               </b-table-column>
               <b-table-column field="stats" label="Stats" width="50vw">
-                <div v-show="!props.row.paused">
-                  <b-field grouped group-multiline>
-                    <b-taglist class="control" attached>
-                      <b-tag type="is-dark">🔼</b-tag>
-                      <b-tag type="is-info">{{ props.row.uploadSpeed }}/s</b-tag>
-                    </b-taglist>
-                    <b-taglist class="control" attached>
-                      <b-tag type="is-dark">🔽</b-tag>
-                      <b-tag type="is-success">{{ props.row.downloadSpeed }}/s</b-tag>
-                    </b-taglist>
-                    <div v-show="!props.row.mine" class="control is-expanded downloadSection">
-                      <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
-                        <b-button type="is-success">Download</b-button>
-                      </a>
-                      <b-progress v-show="!props.row.done" type="is-success" :value="props.row.progress" size="is-medium" show-value format="percent"></b-progress>
-                    </div>
-                  </b-field>
+                <div v-show="!props.row.mine" class="control is-expanded downloadSection">
+                  <a v-show="props.row.done" v-bind:href="props.row.downloadURL" v-bind:download="props.row.name">
+                    <b-button type="is-success">Download</b-button>
+                  </a>
+                  <b-progress v-show="!props.row.done" type="is-success" size="is-medium" :value="props.row.progress" show-value>
+                    <span>{{ props.row.progress }}%</span>
+                    <span v-show="props.row.paused">&nbsp;(Paused)</span>
+                  </b-progress>
                 </div>
               </b-table-column>
             </template>
@@ -163,9 +154,8 @@
 </template>
 
 <script>
-import * as throttle from 'throttleit'
-
 const torrentsWT = {} // WebTorrent objects
+let speedCheck = null
 
 function formatBytes (bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes'
@@ -193,6 +183,9 @@ export default {
       files: [],
       msg: '', // input field
       torrents: [], // torrents
+
+      uploadSpeed: 0,
+      downloadSpeed: 0,
 
       tableCheckedRows: []
     }
@@ -281,30 +274,13 @@ export default {
         })
       })
 
-      const updateSpeed = () => {
-        if (!this.torrents[index]) return
-
-        // Vue will make rendering delay and slows down file transfer if progress value is directly given
-        const progress = parseInt((100 * torrent.progress).toFixed(1))
-
-        const newObject = Object.assign({}, this.torrents[index], {
-          progress,
-          uploadSpeed: formatBytes(torrent.uploadSpeed),
-          downloadSpeed: formatBytes(torrent.downloadSpeed)
-        })
-        // this.$set(this.torrents, index, newObject)
-      }
-
-      torrent.on('download', throttle(updateSpeed, 500))
-      torrent.on('upload', throttle(updateSpeed, 500))
-
       if (!torrentsWT[torrent.infoHash]) {
         torrentsWT[torrent.infoHash] = torrent
       }
 
       this.$set(this.torrents[index], 'paused', false)
 
-      updateSpeed()
+      this.startSpeedCheck()
     },
 
     // add new torrent obtained from a peer
@@ -414,6 +390,28 @@ export default {
         type: 'is-primary'
       })
       this.msg = ''
+    },
+
+    startSpeedCheck () {
+      if (!speedCheck) {
+        speedCheck = setInterval(() => {
+          this.uploadSpeed = formatBytes(this.$wt.uploadSpeed)
+          this.downloadSpeed = formatBytes(this.$wt.downloadSpeed)
+
+          for (const index in this.torrents) {
+            const torrent = this.torrents[index]
+
+            if (torrent.done) continue
+
+            // Vue will make rendering delay and slows down file transfer if progress value is directly given
+            const progress = parseInt((100 * torrentsWT[torrent.infoHash].progress).toFixed(1))
+
+            if (torrent.progress !== progress) {
+              this.$set(this.torrents[index], 'progress', progress)
+            }
+          }
+        }, 1000)
+      }
     }
   },
 
@@ -506,8 +504,7 @@ export default {
             entriesPromises.push(traverseFileTreePromise(it.webkitGetAsEntry ? it.webkitGetAsEntry() : it.getAsEntry()))
           }
           Promise.all(entriesPromises)
-            .then(entries => {
-              // console.log(entries)
+            .then(() => {
               resolve(files)
             }).catch(reject)
         })
@@ -517,7 +514,7 @@ export default {
         if (files) {
           this.onFileChange(files)
         }
-      }).catch(blah => {
+      }).catch(() => {
         const files = Array.from(e.dataTransfer.files) // Array of all files
 
         if (files) {
@@ -547,6 +544,29 @@ export default {
   .container
     max-width: 900px
 
+@media screen and (max-width: 768px)
+  .downloadSection
+    width: 60vw
+    margin-top: 5px
+
+  #torrentButtons
+    position: absolute
+    top: calc(3em + 1.25rem)
+    left: 0.75em
+
+  // Show check all row box on mobile
+  // Merge this to buefy :https://github.com/buefy/buefy/issues/2479
+  .b-table .table-wrapper.has-mobile-cards
+    thead
+      display: block
+      th
+        display: none
+
+      .checkbox-cell
+        display: block
+        width: 100%
+        text-align: right
+
 .countTag
   transition: 0.25s all
 
@@ -559,14 +579,12 @@ export default {
   .upload
     display: block
 
-  .field.is-grouped.is-grouped-multiline
+#speedParams
+  .control, .tags:last-child
     margin-bottom: 0
 
-    .control, .tags:last-child
-      margin-bottom: 0
-
-  .tags .tag
-    margin-bottom: 0
+.tags .tag
+  margin-bottom: 0
 
 #messages
   margin-bottom: 20px
@@ -610,22 +628,4 @@ body.dragging:after
     padding-left: 0.125em
     padding-right: 0.125em
     font-size: calc(1rem * 3 / 4);
-
-@media screen and (max-width: 768px)
-  .downloadSection
-    width: 60vw
-    margin-top: 5px
-
-  // Show check all row box on mobile
-  // Merge this to buefy :https://github.com/buefy/buefy/issues/2479
-  .b-table .table-wrapper.has-mobile-cards
-    thead
-      display: block
-      th
-        display: none
-
-      .checkbox-cell
-        display: block
-        width: 100%
-        text-align: right
 </style>
