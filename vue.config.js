@@ -18,7 +18,7 @@ module.exports = {
       ],
       useRenderEvent: true,
       headless: true,
-      onlyProduction: true
+      onlyProduction: false
     }
   },
   configureWebpack: {
