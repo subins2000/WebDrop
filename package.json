@@ -7,9 +7,6 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
-  "dependenciesComments": {
-    "end-of-stream": "Downgraded end-of-stream because of https://github.com/webtorrent/instant.io/issues/210#issuecomment-609687048"
-  },
   "dependencies": {
     "@beyonk/google-fonts-webpack-plugin": "^1.2.3",
     "buefy": "^0.8.19",
@@ -45,11 +42,16 @@
     "eslint-plugin-vue": "^6.2.2",
     "glob-all": "^3.2.1",
     "node-sass": "^4.12.0",
+    "prerender-spa-plugin": "^3.2.1",
     "purgecss-webpack-plugin": "^2.3.0",
     "sass-loader": "^8.0.2",
     "typescript": "~3.8.3",
+    "vue-cli-plugin-prerender-spa": "^1.1.6",
     "vue-cli-plugin-webpack-bundle-analyzer": "^2.0.0",
     "vue-property-decorator": "^8.4.1",
     "vue-template-compiler": "^2.6.11"
+  },
+  "dependenciesComments": {
+    "end-of-stream": "Downgraded end-of-stream because of https://github.com/webtorrent/instant.io/issues/210#issuecomment-609687048"
   }
 }

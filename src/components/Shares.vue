@@ -21,7 +21,7 @@
                 </b-checkbox>
               </b-tooltip>
             </div>
-            <div class="control" id="torrentButtons" v-if="tableCheckedRows.length > 0">
+            <div class="control" id="torrentButtons" v-show="tableCheckedRows.length > 0">
               <div class="control" v-if="tableCheckedRows.length === 1">
                 <b-field grouped>
                   <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
@@ -580,6 +580,8 @@ export default {
     display: block
 
 #speedParams
+  align-items: center
+
   .control, .tags:last-child
     margin-bottom: 0
 
