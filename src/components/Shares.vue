@@ -286,7 +286,7 @@ export default {
 
     // add new torrent obtained from a peer
     addNewTorrent (torrentInfo) {
-      const infoHash = torrentInfo.infoHash
+      const infoHash = torrentInfo.i
 
       if (torrentsWT[infoHash]) {
         // torrent with same hash exist
@@ -402,7 +402,7 @@ export default {
           for (const index in this.torrents) {
             const torrent = this.torrents[index]
 
-            if (torrent.done) continue
+            if (torrent.done || !torrentsWT[torrent.infoHash]) continue
 
             // Vue will make rendering delay and slows down file transfer if progress value is directly given
             const progress = parseInt((100 * torrentsWT[torrent.infoHash].progress).toFixed(1))
