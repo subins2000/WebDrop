@@ -9,6 +9,16 @@ module.exports = {
   pluginOptions: {
     webpackBundleAnalyzer: {
       openAnalyzer: false
+    },
+    prerenderSpa: {
+      registry: undefined,
+      renderRoutes: [
+        '/',
+        '/grid'
+      ],
+      useRenderEvent: true,
+      headless: true,
+      onlyProduction: false
     }
   },
   configureWebpack: {

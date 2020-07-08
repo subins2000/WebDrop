@@ -6,7 +6,8 @@
           <template slot="header">
             <span>Files <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
           </template>
-          <b-field class="actions content" grouped group-multiline>
+          <!-- using class for purgecss to detect -->
+          <b-field class="content is-grouped is-grouped-multiline">
             <div class="control">
               <b-upload v-model="files" multiple allowdirs @input="onFileChange">
                 <a class="button is-info">
@@ -14,14 +15,14 @@
                 </a>
               </b-upload>
             </div>
-            <div class="control" id="autoStart">
+            <div class="control" id="autoStart" v-show="tableCheckedRows.length === 0">
               <b-tooltip label="Start downloading files on receive" position="is-bottom">
                 <b-checkbox v-model="autoStart" type="is-warning">
                   Auto Start
                 </b-checkbox>
               </b-tooltip>
             </div>
-            <div class="control" id="torrentButtons" v-if="tableCheckedRows.length > 0">
+            <div class="control" id="torrentButtons" v-show="tableCheckedRows.length > 0">
               <div class="control" v-if="tableCheckedRows.length === 1">
                 <b-field grouped>
                   <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
@@ -43,12 +44,12 @@
                 </b-field>
               </div>
             </div>
-            <b-field class="control" id="speedParams" grouped group-multiline>
-              <b-taglist class="control" attached>
+            <b-field class="control" id="speedParams" grouped>
+              <b-taglist attached>
                 <b-tag type="is-dark">🔼</b-tag>
                 <b-tag type="is-info">{{ uploadSpeed }}/s</b-tag>
               </b-taglist>
-              <b-taglist class="control" attached>
+              <b-taglist attached>
                 <b-tag type="is-dark">🔽</b-tag>
                 <b-tag type="is-success">{{ downloadSpeed }}/s</b-tag>
               </b-taglist>
@@ -158,11 +159,11 @@ const torrentsWT = {} // WebTorrent objects
 let speedCheck = null
 
 function formatBytes (bytes, decimals = 2) {
-  if (bytes === 0) return '0 Bytes'
+  if (bytes === 0) return '0 B'
 
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+  const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
 
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
@@ -184,8 +185,8 @@ export default {
       msg: '', // input field
       torrents: [], // torrents
 
-      uploadSpeed: 0,
-      downloadSpeed: 0,
+      uploadSpeed: '0B',
+      downloadSpeed: '0B',
 
       tableCheckedRows: []
     }
@@ -549,11 +550,6 @@ export default {
     width: 60vw
     margin-top: 5px
 
-  #torrentButtons
-    position: absolute
-    top: calc(3em + 1.25rem)
-    left: 0.75em
-
   // Show check all row box on mobile
   // Merge this to buefy :https://github.com/buefy/buefy/issues/2479
   .b-table .table-wrapper.has-mobile-cards
@@ -580,11 +576,10 @@ export default {
     display: block
 
 #speedParams
-  .control, .tags:last-child
-    margin-bottom: 0
+  align-items: center
 
-.tags .tag
-  margin-bottom: 0
+  .tags
+    margin-bottom: 0
 
 #messages
   margin-bottom: 20px
