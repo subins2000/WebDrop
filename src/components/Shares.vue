@@ -578,7 +578,7 @@ export default {
 #speedParams
   align-items: center
 
-  .tags
+  .tags, .tags .tag
     margin-bottom: 0
 
 #messages
