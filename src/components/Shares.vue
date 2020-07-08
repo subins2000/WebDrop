@@ -151,7 +151,7 @@
           <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
             <b-taglist attached class="control">
               <b-tag size="is-medium" v-bind:style="{ 'background-color': user.color }" class="has-text-white">{{ user.name }}</b-tag>
-              <b-tag size="is-medium" type="is-warning">
+              <b-tag size="is-medium" type="is-warning" class="noselect">
                 <a @click="ping(user)">Ping!</a>
               </b-tag>
             </b-taglist>
@@ -292,7 +292,7 @@ export default {
           uploadSpeed: formatBytes(torrent.uploadSpeed),
           downloadSpeed: formatBytes(torrent.downloadSpeed)
         })
-        this.$set(this.torrents, index, newObject)
+        // this.$set(this.torrents, index, newObject)
       }
 
       torrent.on('download', throttle(updateSpeed, 500))
@@ -503,7 +503,7 @@ export default {
         return new Promise((resolve, reject) => {
           const entriesPromises = []
           for (const it of dataTransferItems) {
-            entriesPromises.push(traverseFileTreePromise(it.webkitGetAsEntry()))
+            entriesPromises.push(traverseFileTreePromise(it.webkitGetAsEntry ? it.webkitGetAsEntry() : it.getAsEntry()))
           }
           Promise.all(entriesPromises)
             .then(entries => {
@@ -579,6 +579,9 @@ export default {
   &:hover
     border-color: #8c67ef
 
+.noselect
+  user-select: none
+
 body.dragging:after
   display: flex
   content: "Drop the file(s) anywhere on this page"
@@ -596,7 +599,6 @@ body.dragging:after
 
 // To make field label on-border of input
 // obtained from node_modules/buefy/src/scss/components/_form.scss
-
 .field.is-floating-label
   position: relative
 

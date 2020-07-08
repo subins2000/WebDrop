@@ -21,8 +21,7 @@ module.exports = {
         /field$/,
         /has-text-white$/,
         /is-grouped$/,
-        /navbar/,
-        /progress$/
+        /navbar/
       ],
       whitelistPatternsChildren: [
         /checkbox$/,
@@ -30,6 +29,7 @@ module.exports = {
         /notices$/,
         /switch$/,
         /b-table/,
+        /progress/,
         /tabs$/
       ]
     })
