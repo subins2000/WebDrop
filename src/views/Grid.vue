@@ -24,6 +24,11 @@
             <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
           </filter>
           <animate id="searchCircleAnim" xlink:href="#search-circle" attributeName="r" from="0" to="400" dur="6s" begin="2s;searchCircleAnim.end+2s"  restart="whenNotActive" />
+          <radialGradient id="searchCircleGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="70%" style="stop-color:rgb(255,255,255);
+            stop-opacity:0" />
+            <stop offset="100%" style="stop-color: #209cee;stop-opacity: 1" />
+          </radialGradient>
         </defs>
       </svg>
     </div>
@@ -116,7 +121,7 @@ export default {
         cx: this.circleStartingX,
         cy: this.circleStartingY,
         stroke: '#209cee',
-        fill: 'transparent',
+        fill: 'url(#searchCircleGradient)',
         id: 'search-circle'
       })
       this.svg.appendChild(c)
