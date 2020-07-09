@@ -291,6 +291,9 @@ export default {
     stroke: #000
     stroke-width: 0
 
+    animation-duration: 0.5s
+    animation-name: popUp
+
     &.selected
       circle
         stroke-width: 3px
@@ -298,4 +301,11 @@ export default {
 
   .user-text.selected
     font-weight: bold
+
+@keyframes popUp
+  from
+    opacity: 0
+
+  to
+    opacity: 1
 </style>
