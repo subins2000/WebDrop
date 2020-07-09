@@ -23,6 +23,7 @@
             <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
             <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
           </filter>
+          <animate id="searchCircleAnim" xlink:href="#search-circle" attributeName="r" from="0" to="400" dur="6s" begin="2s;searchCircleAnim.end+2s"  restart="whenNotActive" />
         </defs>
       </svg>
     </div>
@@ -109,10 +110,25 @@ export default {
       this.circleStartingX = canvasSize[0] / 2
       this.circleStartingY = canvasSize[1] - canvasSize[1] * 0.1
 
+      // animating circle
+      const c = this.makeSVGNode('circle', {
+        r: '0',
+        cx: this.circleStartingX,
+        cy: this.circleStartingY,
+        stroke: '#209cee',
+        fill: 'transparent',
+        id: 'search-circle'
+      })
+      this.svg.appendChild(c)
+
       const biggestCircleRadius = Math.max(canvasSize[0] / 2, canvasSize[1])
 
       // 5% of width
       this.userCircleRadius = canvasSize[1] * 0.03
+
+      const anim = document.getElementById('searchCircleAnim')
+      anim.setAttribute('from', this.userCircleRadius)
+      anim.setAttribute('to', biggestCircleRadius + biggestCircleRadius * 0.5)
 
       let curCircleRadius = this.userCircleRadius
 
