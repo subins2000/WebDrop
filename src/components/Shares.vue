@@ -4,7 +4,8 @@
       <b-tabs type="is-boxed" expanded>
         <b-tab-item label="Files">
           <template slot="header">
-            <span>Files <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
+            <file-multiple-icon class="icon is-small"></file-multiple-icon>
+            <span><span class="tab-header">Files</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
           </template>
           <!-- using class for purgecss to detect -->
           <b-field class="content is-grouped is-grouped-multiline">
@@ -92,7 +93,8 @@
         </b-tab-item>
         <b-tab-item label="Messages">
           <template slot="header">
-            <span>Messages <b-tag class="countTag" v-bind:class="{ 'is-danger': glowMsgsBtn }" rounded>{{ msgs.length }}</b-tag></span>
+            <android-messages-icon class="icon is-small"></android-messages-icon>
+            <span><span class="tab-header">Messages</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowMsgsBtn }" rounded>{{ msgs.length }}</b-tag></span>
           </template>
           <b-field label="Message" class="is-floating-label">
             <b-input type="textarea" v-model="msg" placeholder="Type message here..."></b-input>
@@ -122,7 +124,8 @@
         </b-tab-item>
         <b-tab-item label="Devices">
           <template slot="header">
-            <span>Devices <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
+            <devices-icon class="icon is-small"></devices-icon>
+            <span><span class="tab-header">Devices</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
           </template>
           <div class="content" style="border-bottom: 2px dashed #aaa;">
             <p>
@@ -157,7 +160,10 @@
 </template>
 
 <script>
+import AndroidMessagesIcon from 'vue-material-design-icons/AndroidMessages.vue'
+import DevicesIcon from 'vue-material-design-icons/Devices.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
+import FileMultipleIcon from 'vue-material-design-icons/FileMultiple.vue'
 import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
 import UploadIcon from 'vue-material-design-icons/Upload.vue'
 
@@ -180,9 +186,12 @@ export default {
   name: 'Send',
 
   components: {
-    UploadIcon,
+    AndroidMessagesIcon,
+    DevicesIcon,
+    DownloadIcon,
+    FileMultipleIcon,
     FileUploadIcon,
-    DownloadIcon
+    UploadIcon
   },
 
   data () {
@@ -585,6 +594,10 @@ export default {
         display: block
         width: 100%
         text-align: right
+
+@media screen and (max-width: 460px)
+  .tabs .tab-header
+    display: none
 
 .countTag
   transition: 0.25s all
