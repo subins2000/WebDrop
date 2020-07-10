@@ -18,10 +18,21 @@ export default new Vuex.Store({
 
     p2pt: P2PT,
 
+    settings: {
+      autoStart: true
+    },
+
     internetShare: false,
     roomID: ''
   },
   mutations: {
+    initSettings (state) {
+      const settings = window.localStorage.getItem('settings')
+      if (settings) {
+        state.settings = JSON.parse(settings)
+      }
+    },
+
     initProfile (state, payload) {
       state.myColor = payload.color
       state.myName = payload.name
@@ -90,6 +101,13 @@ export default new Vuex.Store({
 
     addMessage (state, payload) {
       Vue.set(state.msgs, state.msgs.length, payload)
+    },
+
+    // change a setting
+    setting (state, payload) {
+      Vue.set(state.settings, payload.name, payload.value)
+
+      window.localStorage.setItem('settings', JSON.stringify(state.settings))
     }
   },
   actions: {

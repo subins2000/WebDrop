@@ -76,9 +76,10 @@
                   </a>
                   <b-progress v-show="!props.row.done" type="is-success" size="is-medium" :value="props.row.progress" show-value>
                     <span>{{ props.row.progress }}%</span>
-                    <span v-show="props.row.paused">&nbsp;(Paused)</span>
+                    <span v-show="props.row.paused" class="has-text-black">&nbsp;(Paused)</span>
                   </b-progress>
                 </div>
+                <b-tag v-show="props.row.mine" type="is-info" title="Ready for other devices to download">🔼</b-tag>
               </b-table-column>
             </template>
             <template slot="empty">
@@ -138,7 +139,7 @@
             <p></p>
           </div>
           <p v-show="Object.keys($store.state.users).length === 0">
-            <center>Make sure your devices are connected to the same WiFi.</center>
+            <center>Open WebDrop on your devices and make sure the devices are connected to the same WiFi.</center>
           </p>
           <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
             <b-taglist attached class="control">
@@ -175,7 +176,7 @@ export default {
 
   data () {
     return {
-      autoStart: true,
+      autoStart: this.$store.state.settings.autoStart,
 
       glowFilesBtn: false,
       glowMsgsBtn: false,
@@ -189,6 +190,15 @@ export default {
       downloadSpeed: '0B',
 
       tableCheckedRows: []
+    }
+  },
+
+  watch: {
+    autoStart (value) {
+      this.$store.commit('setting', {
+        name: 'autoStart',
+        value
+      })
     }
   },
 

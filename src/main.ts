@@ -90,6 +90,7 @@ store.commit('initProfile', {
   name: myName,
   color: myColor
 })
+store.commit('initSettings')
 
 const vue = new Vue({
   router,
