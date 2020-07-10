@@ -4,13 +4,15 @@
       <b-tabs type="is-boxed" expanded>
         <b-tab-item label="Files">
           <template slot="header">
-            <span>Files <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
+            <file-multiple-icon class="icon is-small"></file-multiple-icon>
+            <span><span class="tab-header">Files</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
           </template>
           <!-- using class for purgecss to detect -->
           <b-field class="content is-grouped is-grouped-multiline">
             <div class="control">
               <b-upload v-model="files" multiple allowdirs @input="onFileChange">
-                <a class="button is-info">
+                <a class="button is-info" aria-label="Add File/Folder" title="Add File/Folder">
+                  <file-upload-icon class="icon is-small"></file-upload-icon>
                   <span>Add File</span>
                 </a>
               </b-upload>
@@ -46,11 +48,11 @@
             </div>
             <b-field class="control" id="speedParams" grouped>
               <b-taglist attached>
-                <b-tag type="is-dark">🔼</b-tag>
+                <a class="tag is-dark"><upload-icon class="icon is-small"></upload-icon></a>
                 <b-tag type="is-info">{{ uploadSpeed }}/s</b-tag>
               </b-taglist>
               <b-taglist attached>
-                <b-tag type="is-dark">🔽</b-tag>
+                <a class="tag is-dark"><download-icon class="icon is-small"></download-icon></a>
                 <b-tag type="is-success">{{ downloadSpeed }}/s</b-tag>
               </b-taglist>
             </b-field>
@@ -79,7 +81,7 @@
                     <span v-show="props.row.paused" class="has-text-black">&nbsp;(Paused)</span>
                   </b-progress>
                 </div>
-                <b-tag v-show="props.row.mine" type="is-info" title="Ready for other devices to download">🔼</b-tag>
+                <a class="tag is-info" v-show="props.row.mine"><upload-icon class="icon is-small" title="Ready for other devices to download"></upload-icon></a>
               </b-table-column>
             </template>
             <template slot="empty">
@@ -91,7 +93,8 @@
         </b-tab-item>
         <b-tab-item label="Messages">
           <template slot="header">
-            <span>Messages <b-tag class="countTag" v-bind:class="{ 'is-danger': glowMsgsBtn }" rounded>{{ msgs.length }}</b-tag></span>
+            <android-messages-icon class="icon is-small"></android-messages-icon>
+            <span><span class="tab-header">Messages</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowMsgsBtn }" rounded>{{ msgs.length }}</b-tag></span>
           </template>
           <b-field label="Message" class="is-floating-label">
             <b-input type="textarea" v-model="msg" placeholder="Type message here..."></b-input>
@@ -121,7 +124,8 @@
         </b-tab-item>
         <b-tab-item label="Devices">
           <template slot="header">
-            <span>Devices <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
+            <devices-icon class="icon is-small"></devices-icon>
+            <span><span class="tab-header">Devices</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
           </template>
           <div class="content" style="border-bottom: 2px dashed #aaa;">
             <p>
@@ -156,6 +160,13 @@
 </template>
 
 <script>
+import AndroidMessagesIcon from 'vue-material-design-icons/AndroidMessages.vue'
+import DevicesIcon from 'vue-material-design-icons/Devices.vue'
+import DownloadIcon from 'vue-material-design-icons/Download.vue'
+import FileMultipleIcon from 'vue-material-design-icons/FileMultiple.vue'
+import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
+import UploadIcon from 'vue-material-design-icons/Upload.vue'
+
 const torrentsWT = {} // WebTorrent objects
 let speedCheck = null
 
@@ -173,6 +184,15 @@ function formatBytes (bytes, decimals = 2) {
 
 export default {
   name: 'Send',
+
+  components: {
+    AndroidMessagesIcon,
+    DevicesIcon,
+    DownloadIcon,
+    FileMultipleIcon,
+    FileUploadIcon,
+    UploadIcon
+  },
 
   data () {
     return {
@@ -574,6 +594,10 @@ export default {
         display: block
         width: 100%
         text-align: right
+
+@media screen and (max-width: 460px)
+  .tabs .tab-header
+    display: none
 
 .countTag
   transition: 0.25s all

@@ -14,6 +14,8 @@ import * as hashSum from 'hash-sum'
 import * as P2PT from 'p2pt'
 import * as publicIP from 'public-ip'
 
+// import 'vue-material-design-icons/styles.css'
+
 export default {
   name: 'App',
 
@@ -263,6 +265,7 @@ $speed-slower: 250ms !default
 @import "~bulma/sass/elements/button.sass";
 @import "~bulma/sass/elements/container.sass";
 @import "~bulma/sass/elements/content.sass";
+@import "~bulma/sass/elements/icon.sass";
 @import "~bulma/sass/elements/progress.sass";
 @import "~bulma/sass/elements/table.sass";
 @import "~bulma/sass/elements/tag.sass";
