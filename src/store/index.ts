@@ -48,7 +48,7 @@ export default new Vuex.Store({
 
     removeUser (state, userID: string) {
       // userID == peerID
-      delete state.users[userID]
+      Vue.delete(state.users, userID)
     },
 
     selectUser (state, userID: string) {
