@@ -127,7 +127,7 @@
             <devices-icon class="icon is-small"></devices-icon>
             <span><span class="tab-header">Devices</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
           </template>
-          <div class="content" style="border-bottom: 2px dashed #aaa;">
+          <div class="content" style="position: relative;border-bottom: 2px dashed #dbdbdb;">
             <p>
               <router-link to="/grid">
                 <b-button type="is-primary" style="float: right;">Show Grid</b-button>
@@ -139,6 +139,7 @@
                 <b-tag type="is-warning" size="is-medium">Me</b-tag>
               </b-taglist>
             </p>
+            <span style="position: absolute;bottom: -11px">Devices</span>
             <!-- empty <p> necessary -->
             <p></p>
           </div>
@@ -146,9 +147,9 @@
             <center>Open WebDrop on your devices and make sure the devices are connected to the same WiFi.</center>
           </p>
           <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
-            <b-taglist attached class="control">
+            <b-taglist attached class="control noselect">
               <b-tag size="is-medium" v-bind:style="{ 'background-color': user.color }" class="has-text-white">{{ user.name }}</b-tag>
-              <b-tag size="is-medium" type="is-warning" class="noselect">
+              <b-tag size="is-medium" type="is-warning">
                 <a @click="ping(user)">Ping!</a>
               </b-tag>
             </b-taglist>
