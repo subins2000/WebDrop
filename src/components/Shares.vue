@@ -175,7 +175,7 @@ export default {
 
   data () {
     return {
-      autoStart: true,
+      autoStart: this.$store.state.settings.autoStart,
 
       glowFilesBtn: false,
       glowMsgsBtn: false,
@@ -189,6 +189,15 @@ export default {
       downloadSpeed: '0B',
 
       tableCheckedRows: []
+    }
+  },
+
+  watch: {
+    autoStart (value) {
+      this.$store.commit('setting', {
+        name: 'autoStart',
+        value
+      })
     }
   },
 
