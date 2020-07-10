@@ -133,7 +133,7 @@
                 <b-button type="is-primary" style="float: right;">Show Grid</b-button>
               </router-link>
               <b-taglist attached>
-                <b-tag type="is-success" size="is-medium" v-bind:style="{ 'background-color': $store.state.myColor }" class="has-text-white">
+                <b-tag type="is-success" size="is-medium" v-bind:style="{ 'background-color': $store.state.myColor }" class="has-text-white" style="text-overflow: ellipsis;max-width: 50vw;">
                   {{ $store.state.myName }}
                 </b-tag>
                 <b-tag type="is-warning" size="is-medium">Me</b-tag>
@@ -143,10 +143,10 @@
             <!-- empty <p> necessary -->
             <p></p>
           </div>
-          <p v-show="Object.keys($store.state.users).length === 0">
+          <p v-show="usersCount === 0">
             <center>Open WebDrop on your devices and make sure the devices are connected to the same WiFi.</center>
           </p>
-          <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
+          <b-field v-for="(user, userID) in users" :key="userID" grouped group-multiline>
             <b-taglist attached class="control noselect">
               <b-tag size="is-medium" v-bind:style="{ 'background-color': user.color }" class="has-text-white">{{ user.name }}</b-tag>
               <b-tag size="is-medium" type="is-warning">
@@ -224,8 +224,12 @@ export default {
   },
 
   computed: {
+    users () {
+      return this.$store.state.users
+    },
+
     usersCount () {
-      return Object.keys(this.$store.state.users).length
+      return Object.keys(this.users).length
     },
 
     msgs () {

@@ -21,6 +21,8 @@ if (os.match('Linux')) {
   } else {
     os = 'Linux'
   }
+} else if (os.match(/mac/i)) {
+  os = 'Mac'
 }
 
 const info = {
