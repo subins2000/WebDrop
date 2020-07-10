@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container">
-      <b-tabs type="is-boxed" expanded>
+      <b-tabs v-model="activeTab" type="is-boxed" expanded>
         <b-tab-item label="Files">
           <template slot="header">
             <file-multiple-icon class="icon is-small"></file-multiple-icon>
@@ -197,6 +197,7 @@ export default {
 
   data () {
     return {
+      activeTab: 0,
       autoStart: this.$store.state.settings.autoStart,
 
       glowFilesBtn: false,
@@ -338,6 +339,29 @@ export default {
         if (this.autoStart) {
           this.startTorrent(torrentInfo.i)
         }
+      }
+
+      // Notify new files if user is not currently seeing Files tab
+      if (!this.incomingNotify && (this.$route.name !== 'Shares' || (this.$route.name === 'Shares' && this.activeTab !== 0))) {
+        // only allow one notify
+        this.incomingNotify = this.$buefy.snackbar.open({
+          message: 'New Incoming File!',
+          type: 'is-warning',
+          position: 'is-bottom',
+          queue: true,
+          actionText: 'See',
+          onAction: () => {
+            this.activeTab = 0
+
+            if (this.$route.name !== 'Shares') {
+              this.$router.push('/')
+            }
+            this.incomingNotify = null
+          }
+        })
+        setTimeout(() => {
+          this.incomingNotify = null
+        }, 3000)
       }
     },
 
