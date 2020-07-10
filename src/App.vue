@@ -174,8 +174,13 @@ export default {
 
     sendTorrentsState (p2pt, peer) {
       for (const infoHash in this.$store.state.torrents) {
-        const torrent = {
-          ...this.$store.state.torrents[infoHash],
+        let torrent = this.$store.state.torrents[infoHash]
+
+        // only send torrents created by me (m = mine)
+        if (!torrent.m) continue
+
+        torrent = {
+          ...torrent,
           ...{
             type: 'newTorrent',
             i: infoHash

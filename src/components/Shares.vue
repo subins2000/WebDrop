@@ -93,8 +93,8 @@
           <template slot="header">
             <span>Messages <b-tag class="countTag" v-bind:class="{ 'is-danger': glowMsgsBtn }" rounded>{{ msgs.length }}</b-tag></span>
           </template>
-          <b-field label="Message" label-position="on-border">
-            <b-input type="textarea" v-model="msg"></b-input>
+          <b-field label="Message" class="is-floating-label">
+            <b-input type="textarea" v-model="msg" placeholder="Type message here..."></b-input>
           </b-field>
           <b-field>
             <b-button type="button is-primary" @click="sendMsg">Send</b-button>
