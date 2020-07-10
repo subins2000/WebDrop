@@ -35,25 +35,28 @@
     <b-modal :active.sync="internetShareModelActive" class="has-text-centered">
       <div class="card">
         <div class="card-content content">
-          <b-tabs v-model="internetShareModelActiveTab" type="is-info">
+          <b-tabs v-model="internetShareModelActiveTab" type="is-boxed" expanded>
             <b-tab-item label="Invite People">
-              <p>Share this room code with people you want to share stuff with :</p>
-              <pre class="is-size-4">{{ roomID }}</pre>
-              <h3 style="margin-top: 0">OR</h3>
-              <p>Share this link</p>
-              <b-field grouped group-multiline>
-                <div class="control is-expanded">
-                  <input class="input is-info is-medium is-flat" onclick="this.select()" v-bind:value='internetInviteLink' readonly />
+              <div class="side-items">
+                <div class="side-item" style="flex-grow: 1;padding: 0 10px;">
+                  <img aria-label="Qr Code Image" v-bind:src="qrURL" />
                 </div>
-                <div class="control">
-                  <span class="button is-info is-primary is-medium" @click="copyInviteLink" v-clipboard="internetInviteLink" style="width: 100%">Copy</span>
+                <div class="side-item" style="flex-grow: 5">
+                  <p>Share the room code <b class="is-size-4">{{ roomID }}</b> or this link with people you want to share stuff with :</p>
+                  <b-field grouped group-multiline>
+                    <div class="control is-expanded">
+                      <input class="input is-info is-medium is-flat" onclick="this.select()" v-bind:value='internetInviteLink' readonly />
+                    </div>
+                    <div class="control">
+                      <span class="button is-info is-primary is-medium" @click="copyInviteLink" v-clipboard="internetInviteLink" style="width: 100%">Copy</span>
+                    </div>
+                  </b-field>
                 </div>
-              </b-field>
+              </div>
             </b-tab-item>
             <b-tab-item label="Join Room">
-              <p>Paste the room code here :</p>
-              <input class="input is-info is-medium is-flat" v-model="internetRoomInput" v-on:keyup.enter="joinInternetRoom" /><br/><br/>
-              <div class="button is-info is-medium" @click="joinInternetRoom" style="width: 100%;">Join</div>
+              <input class="input is-info is-medium is-flat" placeholder="Paste the room code here" v-model="internetRoomInput" v-on:keyup.enter="onJoinClick" /><br/><br/>
+              <div class="button is-info is-medium" @click="onJoinClick" style="width: 100%;">Join</div>
             </b-tab-item>
           </b-tabs>
         </div>
@@ -64,6 +67,7 @@
 
 <script>
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
+import QrCreator from 'qr-creator'
 
 export default {
   name: 'Header',
@@ -76,7 +80,9 @@ export default {
     return {
       internetShareModelActive: false,
       internetShareModelActiveTab: 0,
-      internetRoomInput: ''
+      internetRoomInput: '',
+
+      qrURL: ''
     }
   },
 
@@ -105,6 +111,8 @@ export default {
       }
 
       this.internetShareModelActive = true
+
+      this.makeQr()
     },
 
     copyInviteLink () {
@@ -116,7 +124,7 @@ export default {
       })
     },
 
-    joinInternetRoom () {
+    onJoinClick () {
       if (this.internetRoomInput.length !== this.$INTERNET_ROOM_CODE_LENGTH) {
         this.$buefy.toast.open({
           duration: 2000,
@@ -125,8 +133,22 @@ export default {
           type: 'is-danger',
           queue: false
         })
-        return
+      } else if (Object.keys(this.$store.state.users).length > 0) {
+        this.$buefy.snackbar.open({
+          message: 'Joining another room will remove all your current connected devices. Proceed ?',
+          type: 'is-success',
+          position: 'is-top',
+          indefinite: true,
+          queue: false,
+          actionText: 'Yes',
+          onAction: () => {
+            this.joinInternetRoom()
+          }
+        })
       }
+    },
+
+    joinInternetRoom () {
       this.$store.commit('activateInternetShare', this.internetRoomInput)
 
       this.$buefy.toast.open({
@@ -136,6 +158,21 @@ export default {
         type: 'is-warning'
       })
       this.internetShareModelActive = false
+
+      this.makeQr()
+    },
+
+    makeQr () {
+      const canvas = document.createElement('canvas')
+      QrCreator.render({
+        text: this.internetInviteLink,
+        radius: 0.5, // 0.0 to 0.5
+        ecLevel: 'Q', // L, M, Q, H
+        fill: '#536DFE', // foreground color
+        background: null, // color or null for transparent
+        size: 128 // in pixels
+      }, canvas)
+      this.qrURL = canvas.toDataURL()
     }
   },
 
@@ -143,7 +180,7 @@ export default {
     const roomID = this.$route.query.room
     if (roomID) {
       this.internetRoomInput = roomID
-      this.joinInternetRoom()
+      this.onJoinClick()
     }
   }
 }
@@ -173,4 +210,11 @@ export default {
 
 .main-navbar .navbar-brand
   width: auto
+
+.side-items
+  display: flex
+  align-items: center
+
+.side-item
+  flex-grow: 1
 </style>
