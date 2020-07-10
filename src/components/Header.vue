@@ -11,7 +11,9 @@
         <div class="actions">
           <b-tooltip :label="internetShare ? 'Joined An Internet Share Room' : 'Share via Internet'" position="is-bottom" :type="internetShare ? 'is-warning' : 'is-primary'">
             <b-navbar-item tag="div" @click="shareViaInternet">
-              <b-button :type="internetShare ? 'is-warning' : 'is-text'"><img src="img/web.png" height="100%" /></b-button>
+              <a class="button is-text" v-bind:class="{ 'is-warning' : internetShare }" :aria-label="internetShare ? 'Joined An Internet Share Room' : 'Share via Internet'">
+                <earth-icon class="icon is-medium"></earth-icon>
+              </a>
             </b-navbar-item>
           </b-tooltip>
           <b-navbar-item tag="router-link" :to="{ path: '/about' }">
@@ -61,8 +63,14 @@
 </template>
 
 <script>
+import EarthIcon from 'vue-material-design-icons/Earth.vue'
+
 export default {
   name: 'Header',
+
+  components: {
+    EarthIcon
+  },
 
   data () {
     return {

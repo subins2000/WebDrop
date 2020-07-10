@@ -10,7 +10,8 @@
           <b-field class="content is-grouped is-grouped-multiline">
             <div class="control">
               <b-upload v-model="files" multiple allowdirs @input="onFileChange">
-                <a class="button is-info">
+                <a class="button is-info" aria-label="Add File/Folder" title="Add File/Folder">
+                  <file-upload-icon class="icon is-small"></file-upload-icon>
                   <span>Add File</span>
                 </a>
               </b-upload>
@@ -46,11 +47,11 @@
             </div>
             <b-field class="control" id="speedParams" grouped>
               <b-taglist attached>
-                <b-tag type="is-dark">🔼</b-tag>
+                <a class="tag is-dark"><upload-icon class="icon is-small"></upload-icon></a>
                 <b-tag type="is-info">{{ uploadSpeed }}/s</b-tag>
               </b-taglist>
               <b-taglist attached>
-                <b-tag type="is-dark">🔽</b-tag>
+                <a class="tag is-dark"><download-icon class="icon is-small"></download-icon></a>
                 <b-tag type="is-success">{{ downloadSpeed }}/s</b-tag>
               </b-taglist>
             </b-field>
@@ -79,7 +80,7 @@
                     <span v-show="props.row.paused" class="has-text-black">&nbsp;(Paused)</span>
                   </b-progress>
                 </div>
-                <b-tag v-show="props.row.mine" type="is-info" title="Ready for other devices to download">🔼</b-tag>
+                <a class="tag is-info" v-show="props.row.mine"><upload-icon class="icon is-small" title="Ready for other devices to download"></upload-icon></a>
               </b-table-column>
             </template>
             <template slot="empty">
@@ -156,6 +157,10 @@
 </template>
 
 <script>
+import DownloadIcon from 'vue-material-design-icons/Download.vue'
+import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
+import UploadIcon from 'vue-material-design-icons/Upload.vue'
+
 const torrentsWT = {} // WebTorrent objects
 let speedCheck = null
 
@@ -173,6 +178,12 @@ function formatBytes (bytes, decimals = 2) {
 
 export default {
   name: 'Send',
+
+  components: {
+    UploadIcon,
+    FileUploadIcon,
+    DownloadIcon
+  },
 
   data () {
     return {
