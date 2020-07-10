@@ -67,11 +67,23 @@ export default {
         p2pt.send(peer, JSON.stringify({
           type: 'init',
           name: this.$store.state.myName,
-          color: this.$store.state.myColor
+          color: this.$store.state.myColor,
+          torrentsCount: Object.keys(this.$store.state.torrents).length,
+          msgsCount: this.$store.state.msgs.length
         }))
       })
 
       p2pt.on('msg', (peer, msg) => {
+        if (msg === 'getTorrents') {
+          this.sendTorrentsState(p2pt, peer)
+          return
+        }
+
+        if (msg === 'getMsgs') {
+          this.sendMsgsState(p2pt, peer)
+          return
+        }
+
         try {
           msg = JSON.parse(msg)
         } catch (_) {
@@ -85,6 +97,14 @@ export default {
             color: msg.color,
             conn: peer
           })
+
+          if (msg.torrentsCount > Object.keys(this.$store.state.torrents).length) {
+            p2pt.send(peer, 'getTorrents')
+          }
+
+          if (msg.msgsCount > this.$store.state.msgs.length) {
+            p2pt.send(peer, 'getMsgs')
+          }
         } else if (msg.type === 'ping') {
           this.$buefy.snackbar.open({
             duration: 3000,
@@ -93,14 +113,25 @@ export default {
             queue: false
           })
         } else if (msg.type === 'newTorrent') {
+          // torrent exists check
+          if (this.$store.state.torrents[msg.i]) return
+
           delete msg.type
           msg.peer = peer
           this.$store.commit('newTorrent', msg)
         } else if (msg.type === 'msg') {
-          delete msg.type
+          // msg exist check
+          if (msg.id && this.$store.state.msgs[msg.id]) {
+            return
+          }
 
-          msg.name = this.$store.state.users[peer.id].name
-          msg.color = this.$store.state.users[peer.id].color
+          // msgs being restored will have name & color with them
+          if (!msg.name) {
+            msg.name = this.$store.state.users[peer.id].name
+            msg.color = this.$store.state.users[peer.id].color
+          }
+
+          delete msg.type
 
           this.$store.commit('addMessage', msg)
         }
@@ -116,8 +147,6 @@ export default {
         warningCount++
 
         if (warningCount >= stats.total && !trackerConnected) {
-          console.log(blah)
-
           this.$buefy.snackbar.open({
             message: 'We couldn\'t connect to any WebTorrent trackers. Your ISP might be blocking them 🤔',
             position: 'is-top',
@@ -141,6 +170,32 @@ export default {
 
       this.$store.commit('setP2PT', p2pt)
       p2pt.start()
+    },
+
+    sendTorrentsState (p2pt, peer) {
+      for (const infoHash in this.$store.state.torrents) {
+        const torrent = {
+          ...this.$store.state.torrents[infoHash],
+          ...{
+            type: 'newTorrent',
+            i: infoHash
+          }
+        }
+        p2pt.send(peer, JSON.stringify(torrent))
+      }
+    },
+
+    sendMsgsState (p2pt, peer) {
+      for (const id in this.$store.state.msgs) {
+        const msg = this.$store.state.msgs[id]
+        p2pt.send(peer, JSON.stringify({
+          ...msg,
+          ...{
+            type: 'msg',
+            id: id
+          }
+        }))
+      }
     }
   },
 

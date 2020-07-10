@@ -138,7 +138,7 @@
             <p></p>
           </div>
           <p v-show="Object.keys($store.state.users).length === 0">
-            <center>Make sure your devices are connected to the same WiFi.</center>
+            <center>Open WebDrop on your devices and make sure the devices are connected to the same WiFi.</center>
           </p>
           <b-field v-for="(user, userID) in $store.state.users" :key="userID" grouped group-multiline>
             <b-taglist attached class="control">
