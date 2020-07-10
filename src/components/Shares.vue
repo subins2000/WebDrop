@@ -76,9 +76,10 @@
                   </a>
                   <b-progress v-show="!props.row.done" type="is-success" size="is-medium" :value="props.row.progress" show-value>
                     <span>{{ props.row.progress }}%</span>
-                    <span v-show="props.row.paused">&nbsp;(Paused)</span>
+                    <span v-show="props.row.paused" class="has-text-black">&nbsp;(Paused)</span>
                   </b-progress>
                 </div>
+                <b-tag v-show="props.row.mine" type="is-info" title="Ready for other devices to download">🔼</b-tag>
               </b-table-column>
             </template>
             <template slot="empty">
