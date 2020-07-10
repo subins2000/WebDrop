@@ -329,6 +329,8 @@ export default {
 
     resumeTorrent () {
       for (const torrent of this.tableCheckedRows) {
+        this.$set(this.torrents[this.getIndexOfTorrent(torrent.infoHash)], 'paused', false)
+
         if (torrentsWT[torrent.infoHash]) {
           torrentsWT[torrent.infoHash].resume()
         } else {
