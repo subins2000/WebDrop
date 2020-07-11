@@ -47,14 +47,14 @@
               </div>
             </div>
             <b-field class="control" id="speedParams" grouped>
-              <b-taglist attached>
+              <div class="tags has-addons">
                 <a class="tag is-dark"><upload-icon class="icon is-small"></upload-icon></a>
-                <b-tag type="is-info">{{ uploadSpeed }}/s</b-tag>
-              </b-taglist>
-              <b-taglist attached>
+                <span class="tag is-info">{{ uploadSpeed }}/s</span>
+              </div>
+              <div class="tags has-addons">
                 <a class="tag is-dark"><download-icon class="icon is-small"></download-icon></a>
-                <b-tag type="is-success">{{ downloadSpeed }}/s</b-tag>
-              </b-taglist>
+                <span class="tag is-success">{{ downloadSpeed }}/s</span>
+              </div>
             </b-field>
           </b-field>
           <b-table
