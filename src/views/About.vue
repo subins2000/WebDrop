@@ -13,10 +13,18 @@
             <li>Open this website on your devices</li>
             <li>Choose files and share !</li>
           </ol>
+          <h3 class="content is-size-5">Features</h3>
+          <ul>
+            <li>Send files over local network & Internet</li>
+            <li>Auto discover devices on local network</li>
+            <li>Resume interrupted downloads</li>
+          </ul>
           <h3 class="content is-size-4">FAQ</h3>
           <ul>
             <li>Isn't file passed through internet ? Wouldn't it be slow ?</li>
             <p><b>Ans:</b>&nbsp;Internet is only required for discovering devices. Your devices are connected <b>Peer To Peer</b>. This P2P connection can be made through LAN using the same WiFi hotspot, thus increasing transfer speed ! Files are not shared through internet unless you use "Share via Internet" feature. WebTorrent is used to transfer files which is efficient in multiple device transfers.</p>
+            <li>How to transfer files to someone over the internet ?</li>
+            <p><b>Ans:</b>&nbsp;Click the "globe" icon on navbar, share the room code or invite link with your friends. Once your friends join your room, you can share files with them. Remember, you'll have to keep WebDrop open until transfer is complete.</p>
             <li>Will you know the files being sent ?</li>
             <p><b>Ans:</b>&nbsp;No ! Absolutely not ! P2P connection made ensures that you and only the other connected devices will know the data/files passed between each other.</p>
             <li>Is A Server Being Used ?</li>
