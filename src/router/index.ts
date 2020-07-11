@@ -1,20 +1,27 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
+
 import Grid from '../views/Grid.vue'
+import Settings from '../components/Settings.vue'
 import Shares from '../components/Shares.vue'
 
 Vue.use(VueRouter)
 
 const routes: Array<RouteConfig> = [
   {
+    path: '/',
+    name: 'Shares',
+    component: Shares
+  },
+  {
     path: '/grid',
     name: 'Grid',
     component: Grid
   },
   {
-    path: '/',
-    name: 'Shares',
-    component: Shares
+    path: '/settings',
+    name: 'Settings',
+    component: Settings
   },
   {
     path: '/about',

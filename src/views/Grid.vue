@@ -173,7 +173,7 @@ export default {
         i++
       }
 
-      this.addUserCircle('me', this.$store.state.myName, this.$store.state.myColor, this.circleStartingX, this.circleStartingY)
+      this.addUserCircle('me', this.$store.state.settings.name, this.$store.state.settings.color, this.circleStartingX, this.circleStartingY)
     },
 
     addUser (user) {

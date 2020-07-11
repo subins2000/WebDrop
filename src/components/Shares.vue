@@ -5,24 +5,22 @@
         <b-tab-item label="Files">
           <template slot="header">
             <file-multiple-icon class="icon is-small"></file-multiple-icon>
-            <span><span class="tab-header">Files</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
+            <span><span class="icon-text">Files</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
           </template>
           <!-- using class for purgecss to detect -->
-          <b-field class="content is-grouped is-grouped-multiline">
+          <div class="field content is-grouped is-grouped-multiline">
             <div class="control">
               <b-upload v-model="files" multiple allowdirs @input="onFileChange">
                 <a class="button is-info" aria-label="Add File/Folder" title="Add File/Folder">
                   <file-upload-icon class="icon is-small"></file-upload-icon>
-                  <span>Add File</span>
+                  <span class="icon-text">Add File</span>
                 </a>
               </b-upload>
             </div>
-            <div class="control" id="autoStart" v-show="tableCheckedRows.length === 0">
-              <b-tooltip label="Start downloading files on receive" position="is-bottom">
-                <b-checkbox v-model="autoStart" type="is-warning">
-                  Auto Start
-                </b-checkbox>
-              </b-tooltip>
+            <div class="control action" v-show="tableCheckedRows.length === 0">
+              <router-link to="/settings" class="tag is-primary is-medium" title="Settings">
+                <cog-icon class="icon is-medium"></cog-icon>
+              </router-link>
             </div>
             <div class="control" id="torrentButtons" v-show="tableCheckedRows.length > 0">
               <div class="control" v-if="tableCheckedRows.length === 1">
@@ -46,7 +44,7 @@
                 </b-field>
               </div>
             </div>
-            <b-field class="control" id="speedParams" grouped>
+            <b-field class="control action" grouped>
               <div class="tags has-addons">
                 <a class="tag is-dark"><upload-icon class="icon is-small"></upload-icon></a>
                 <span class="tag is-info">{{ uploadSpeed }}/s</span>
@@ -56,7 +54,7 @@
                 <span class="tag is-success">{{ downloadSpeed }}/s</span>
               </div>
             </b-field>
-          </b-field>
+          </div>
           <b-table
             class="content"
             id="torrents"
@@ -94,7 +92,7 @@
         <b-tab-item label="Messages">
           <template slot="header">
             <android-messages-icon class="icon is-small"></android-messages-icon>
-            <span><span class="tab-header">Messages</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowMsgsBtn }" rounded>{{ msgs.length }}</b-tag></span>
+            <span><span class="icon-text">Messages</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowMsgsBtn }" rounded>{{ msgs.length }}</b-tag></span>
           </template>
           <b-field label="Message" class="is-floating-label">
             <b-input type="textarea" v-model="msg" placeholder="Type message here..."></b-input>
@@ -125,7 +123,7 @@
         <b-tab-item label="Devices">
           <template slot="header">
             <devices-icon class="icon is-small"></devices-icon>
-            <span><span class="tab-header">Devices</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
+            <span><span class="icon-text">Devices</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
           </template>
           <div class="content" style="position: relative;border-bottom: 2px dashed #dbdbdb;">
             <p>
@@ -133,8 +131,8 @@
                 <b-button type="is-primary" style="float: right;">Show Grid</b-button>
               </router-link>
               <b-taglist attached>
-                <b-tag type="is-success" size="is-medium" v-bind:style="{ 'background-color': $store.state.myColor }" class="has-text-white" style="text-overflow: ellipsis;max-width: 50vw;">
-                  {{ $store.state.myName }}
+                <b-tag type="is-success" size="is-medium" v-bind:style="{ 'background-color': $store.state.settings.color }" class="has-text-white" style="text-overflow: ellipsis;max-width: 50vw;">
+                  {{ $store.state.settings.color }}
                 </b-tag>
                 <b-tag type="is-warning" size="is-medium">Me</b-tag>
               </b-taglist>
@@ -162,6 +160,7 @@
 
 <script>
 import AndroidMessagesIcon from 'vue-material-design-icons/AndroidMessages.vue'
+import CogIcon from 'vue-material-design-icons/Cog.vue'
 import DevicesIcon from 'vue-material-design-icons/Devices.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import FileMultipleIcon from 'vue-material-design-icons/FileMultiple.vue'
@@ -188,6 +187,7 @@ export default {
 
   components: {
     AndroidMessagesIcon,
+    CogIcon,
     DevicesIcon,
     DownloadIcon,
     FileMultipleIcon,
@@ -435,8 +435,8 @@ export default {
       this.$store.commit('addMessage', {
         ...data,
         ...{
-          name: this.$store.state.myName,
-          color: this.$store.state.myColor
+          name: this.$store.state.settings.name,
+          color: this.$store.state.settings.color
         }
       })
 
@@ -625,14 +625,14 @@ export default {
         text-align: right
 
 @media screen and (max-width: 460px)
-  .tabs .tab-header
+  .icon-text
     display: none
+
+  .file-upload-icon
+    margin: 0 !important
 
 .countTag
   transition: 0.25s all
-
-#autoStart
-  padding: 0.5em 0 0
 
 #torrents
   // margin-top: 20px
@@ -640,7 +640,8 @@ export default {
   .upload
     display: block
 
-#speedParams
+.action
+  display: inline-flex
   align-items: center
 
   .tags, .tags .tag
