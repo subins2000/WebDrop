@@ -27,7 +27,7 @@ export default function registerWorker (vue) {
           type: 'is-success',
           queue: false,
           indefinite: true,
-          actionText: 'Reload',
+          actionText: 'Refresh',
           onAction: () => {
             window.location.reload(true)
           }
