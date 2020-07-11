@@ -1,6 +1,6 @@
+import linkify from 'vue-linkify'
 import Vue from 'vue'
 import VueClipboard from 'vue-clipboard2'
-
 import WebTorrent from 'webtorrent'
 
 import App from './App.vue'
@@ -50,6 +50,7 @@ for (const comp of comps) {
 }
 
 Vue.component('Header', Header)
+Vue.directive('linkified', linkify)
 
 let announceURLs = [
   'wss://tracker.openwebtorrent.com',
