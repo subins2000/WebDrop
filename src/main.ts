@@ -8,7 +8,6 @@ import router from './router'
 import store from './store'
 import registerWorker from './registerServiceWorker'
 
-import device from './device'
 import Header from './components/Header.vue'
 
 import Button from 'buefy/dist/components/button'
@@ -71,25 +70,6 @@ Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://ShareThisFile.Online/#/?room=
 Vue.prototype.$p2pt = null
 Vue.prototype.$wt = new WebTorrent()
 
-let myColor = sessionStorage.getItem('myColor')
-let myName = sessionStorage.getItem('myName')
-
-// Length limit to prevent malicious inputs
-if (!myColor || myColor.length > 20) {
-  // random color
-  myColor = `hsla(${~~(360 * Math.random())},60%,60%,1)`
-  sessionStorage.setItem('myColor', myColor)
-}
-
-if (!myName || myName.length > 30) {
-  myName = `${device.os} ${device.browser}`
-  sessionStorage.setItem('myName', myName)
-}
-
-store.commit('initProfile', {
-  name: myName,
-  color: myColor
-})
 store.commit('initSettings')
 
 const vue = new Vue({

@@ -3,7 +3,7 @@
     <Header />
     <transition name='slide-fade'>
       <keep-alive>
-        <router-view/>
+        <router-view v-bind:class="{ noanim: !$store.state.settings.anim }" />
       </keep-alive>
     </transition>
   </div>
@@ -219,6 +219,13 @@ export default {
   font-family: 'Ubuntu', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.noanim {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
 }
 
 // Import Bulma's core

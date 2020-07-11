@@ -1,15 +1,13 @@
+import P2PT from 'p2pt'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import P2PT from 'p2pt'
+import device from '../device'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    myColor: '',
-    myName: '',
-
     users: {} as any,
     selectedUsers: [] as any,
 
@@ -19,7 +17,11 @@ export default new Vuex.Store({
     p2pt: P2PT,
 
     settings: {
-      autoStart: true
+      autoStart: true,
+      anim: true,
+
+      name: '',
+      color: ''
     },
 
     internetShare: false,
@@ -31,11 +33,28 @@ export default new Vuex.Store({
       if (settings) {
         state.settings = JSON.parse(settings)
       }
+
+      // Length limit to prevent malicious inputs
+
+      const name = state.settings.name
+      if (!name || name.length > 30) {
+        state.settings.name = `${device.os} ${device.browser}`
+      }
+
+      const color = state.settings.color
+      if (!color || color.length > 20) {
+        // random color
+        state.settings.color = `hsla(${~~(360 * Math.random())},60%,60%,1)`
+      }
     },
 
-    initProfile (state, payload) {
-      state.myColor = payload.color
-      state.myName = payload.name
+    updateSettings (state, payload) {
+      Vue.set(state, 'settings', {
+        ...state.settings,
+        ...payload
+      })
+
+      window.localStorage.setItem('settings', JSON.stringify(state.settings))
     },
 
     addUser (state, payload) {
@@ -101,13 +120,6 @@ export default new Vuex.Store({
 
     addMessage (state, payload) {
       Vue.set(state.msgs, state.msgs.length, payload)
-    },
-
-    // change a setting
-    setting (state, payload) {
-      Vue.set(state.settings, payload.name, payload.value)
-
-      window.localStorage.setItem('settings', JSON.stringify(state.settings))
     }
   },
   actions: {
