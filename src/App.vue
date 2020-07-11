@@ -68,8 +68,8 @@ export default {
       p2pt.on('peerconnect', (peer) => {
         p2pt.send(peer, JSON.stringify({
           type: 'init',
-          name: this.$store.state.myName,
-          color: this.$store.state.myColor,
+          name: this.$store.state.settings.name,
+          color: this.$store.state.settings.color,
           torrentsCount: Object.keys(this.$store.state.torrents).length,
           msgsCount: this.$store.state.msgs.length
         }))

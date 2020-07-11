@@ -115,7 +115,7 @@
                 </a>
               </header>
               <div class="card-content">
-                <div class="content">{{ msg.msg }}</div>
+                <div class="content" v-html="msg.msg" v-linkified></div>
               </div>
             </div>
           </div>
