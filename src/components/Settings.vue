@@ -11,6 +11,12 @@
           <b-checkbox v-model="settings.autoStart">Start downloading files on receive</b-checkbox>
         </div>
       </div>
+      <div class="field">
+        <label class="label">Animations</label>
+        <div class="control">
+          <b-checkbox v-model="settings.anim">Animations & Transitions</b-checkbox>
+        </div>
+      </div>
       <div class="field is-grouped">
         <div class="control">
           <button class="button is-success" @click="save">Save</button>

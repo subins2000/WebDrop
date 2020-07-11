@@ -18,6 +18,8 @@ export default new Vuex.Store({
 
     settings: {
       autoStart: true,
+      anim: true,
+
       name: '',
       color: ''
     },

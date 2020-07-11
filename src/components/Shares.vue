@@ -2,7 +2,7 @@
   <div>
     <div class="container">
       <b-tabs v-model="activeTab" type="is-boxed" expanded>
-        <b-tab-item label="Files">
+        <b-tab-item label="Files" v-bind:class="{ noanim: !$store.state.settings.anim }">
           <template slot="header">
             <file-multiple-icon class="icon is-small"></file-multiple-icon>
             <span><span class="icon-text">Files</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
@@ -18,7 +18,7 @@
               </b-upload>
             </div>
             <div class="control action" v-show="tableCheckedRows.length === 0">
-              <router-link to="/settings" class="tag is-primary is-medium" title="Settings">
+              <router-link to="/settings" class="tag is-primary is-medium" title="Settings" aria-label="Settings">
                 <cog-icon class="icon is-medium"></cog-icon>
               </router-link>
             </div>
@@ -89,7 +89,7 @@
             </template>
           </b-table>
         </b-tab-item>
-        <b-tab-item label="Messages">
+        <b-tab-item label="Messages" v-bind:class="{ noanim: !$store.state.settings.anim }">
           <template slot="header">
             <android-messages-icon class="icon is-small"></android-messages-icon>
             <span><span class="icon-text">Messages</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowMsgsBtn }" rounded>{{ msgs.length }}</b-tag></span>
@@ -120,7 +120,7 @@
             </div>
           </div>
         </b-tab-item>
-        <b-tab-item label="Devices">
+        <b-tab-item label="Devices" v-bind:class="{ noanim: !$store.state.settings.anim }">
           <template slot="header">
             <devices-icon class="icon is-small"></devices-icon>
             <span><span class="icon-text">Devices</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowUsersBtn }" rounded>{{ usersCount }}</b-tag></span>
@@ -132,7 +132,7 @@
               </router-link>
               <b-taglist attached>
                 <b-tag type="is-success" size="is-medium" v-bind:style="{ 'background-color': $store.state.settings.color }" class="has-text-white" style="text-overflow: ellipsis;max-width: 50vw;">
-                  {{ $store.state.settings.color }}
+                  {{ $store.state.settings.name }}
                 </b-tag>
                 <b-tag type="is-warning" size="is-medium">Me</b-tag>
               </b-taglist>
