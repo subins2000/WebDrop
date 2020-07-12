@@ -131,10 +131,12 @@
                 <b-button type="is-primary" style="float: right;">Show Grid</b-button>
               </router-link>
               <b-taglist attached>
-                <b-tag type="is-success" size="is-medium" v-bind:style="{ 'background-color': $store.state.settings.color }" class="has-text-white" style="text-overflow: ellipsis;max-width: 50vw;">
-                  {{ $store.state.settings.name }}
-                </b-tag>
-                <b-tag type="is-warning" size="is-medium">Me</b-tag>
+                <router-link to="/settings">
+                  <b-tag type="is-success" size="is-medium" v-bind:style="{ 'background-color': $store.state.settings.color }" class="has-text-white" style="text-overflow: ellipsis;max-width: 50vw;">
+                    {{ $store.state.settings.name }}
+                  </b-tag>
+                  <b-tag type="is-warning" size="is-medium">Me</b-tag>
+                </router-link>
               </b-taglist>
             </p>
             <span style="position: absolute;bottom: -11px">Devices</span>
