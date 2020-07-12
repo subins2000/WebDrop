@@ -23,7 +23,7 @@
             <feGaussianBlur result="blurOut" in="offOut" stdDeviation="2" />
             <feBlend in="SourceGraphic" in2="blurOut" mode="normal" />
           </filter>
-          <animate id="searchCircleAnim" xlink:href="#search-circle" attributeName="r" from="0" to="400" dur="6s" begin="2s;searchCircleAnim.end+2s"  restart="whenNotActive" />
+          <animate v-if="$store.state.settings.anim" id="searchCircleAnim" xlink:href="#search-circle" attributeName="r" v-bind:from="radarFromVal" v-bind:to="radarToVal" dur="6s" begin="2s;searchCircleAnim.end+2s" restart="whenNotActive" />
           <radialGradient id="searchCircleGradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
             <stop offset="70%" style="stop-color:rgb(255,255,255);
             stop-opacity:0" />
@@ -48,9 +48,10 @@ export default {
 
   data () {
     return {
-      status: 'Connecting...',
+      circleSlots: [],
 
-      circleSlots: []
+      radarFromVal: 0,
+      radarToVal: 0
     }
   },
 
@@ -131,9 +132,8 @@ export default {
       // 5% of width
       this.userCircleRadius = canvasSize[1] * 0.03
 
-      const anim = document.getElementById('searchCircleAnim')
-      anim.setAttribute('from', this.userCircleRadius)
-      anim.setAttribute('to', biggestCircleRadius + biggestCircleRadius * 0.5)
+      this.radarFromVal = this.userCircleRadius
+      this.radarToVal = biggestCircleRadius + biggestCircleRadius * 0.5
 
       let curCircleRadius = this.userCircleRadius
 
