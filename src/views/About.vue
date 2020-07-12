@@ -21,6 +21,8 @@
           </ul>
           <h3 class="content is-size-4">FAQ</h3>
           <ul>
+            <li>Do I need to wait for devices to get discovered before adding files ?</li>
+            <p><b>Ans:</b>&nbsp;<b>No</b>, you can add files even if the device count is <b>0</b>. When a new device joins the room, they will receive the already added files in the room.</p>
             <li>Isn't file passed through internet ? Wouldn't it be slow ?</li>
             <p><b>Ans:</b>&nbsp;Internet is only required for discovering devices. Your devices are connected <b>Peer To Peer</b>. This P2P connection can be made through LAN using the same WiFi hotspot, thus increasing transfer speed ! Files are not shared through internet unless you use "Share via Internet" feature. WebTorrent is used to transfer files which is efficient in multiple device transfers.</p>
             <li>How to transfer files to someone over the internet ?</li>
@@ -37,7 +39,7 @@
         <b-tab-item label="About">
           <center class="content">
             <p>Made by <a href="https://twitter.com/SubinSiby" target="_blank">Subin Siby</a></p>
-            <p>WebDrop is <a href="https://en.wikipedia.org/wiki/Free_Software" target="_blank">സ്വതന്ത്ര/free/libre</a> software [AGPL-3]</p>
+            <p>WebDrop is a <a href="https://en.wikipedia.org/wiki/Free_Software" target="_blank">സ്വതന്ത്ര/free/libre</a> software [AGPL-3]</p>
             <b-field class="is-grouped is-grouped-centered">
               <div class="control">
                 <a href="https://subinsb.com/donate" target="_blank">
