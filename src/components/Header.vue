@@ -2,13 +2,13 @@
   <div>
     <b-navbar v-if="$route.name !== 'About'" class="is-success has-shadow" :mobile-burger="false" :transparent="true">
       <template slot="brand">
-        <b-navbar-item tag="router-link" :to="{ path: '/' }">
+        <b-navbar-item id="brand" tag="router-link" :to="{ path: '/' }">
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
-        <b-navbar-item tag="router-link" :to="{ path: '/grid' }">
-          <span class="is-size-6">Grid</span>
-        </b-navbar-item>
         <div class="actions">
+          <b-navbar-item tag="router-link" :to="{ path: '/grid' }" title="Show Grid">
+            <radar-icon class="icon is-medium"></radar-icon>
+          </b-navbar-item>
           <b-tooltip :label="internetShare ? 'Joined An Internet Share Room' : 'Share via Internet'" position="is-bottom" :type="internetShare ? 'is-warning' : 'is-primary'">
             <b-navbar-item tag="div" @click="shareViaInternet">
               <a class="button is-text" v-bind:class="{ 'is-warning' : internetShare }" :aria-label="internetShare ? 'Joined An Internet Share Room' : 'Share via Internet'">
@@ -16,6 +16,9 @@
               </a>
             </b-navbar-item>
           </b-tooltip>
+          <b-navbar-item tag="router-link" :to="{ path: '/settings' }" title="Settings">
+            <cog-icon class="icon is-medium"></cog-icon>
+          </b-navbar-item>
           <b-navbar-item tag="router-link" :to="{ path: '/about' }">
             <b-button type="is-warning">Help</b-button>
           </b-navbar-item>
@@ -66,14 +69,18 @@
 </template>
 
 <script>
+import CogIcon from 'vue-material-design-icons/Cog.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
+import RadarIcon from 'vue-material-design-icons/Radar.vue'
 import QrCreator from 'qr-creator'
 
 export default {
   name: 'Header',
 
   components: {
-    EarthIcon
+    CogIcon,
+    EarthIcon,
+    RadarIcon
   },
 
   data () {
@@ -208,6 +215,10 @@ export default {
     a
       color: #fff
 
+.navbar-item
+  background: none
+  outline: none
+
 .main-navbar .navbar-brand
   width: auto
 
@@ -217,4 +228,11 @@ export default {
 
 .side-item
   flex-grow: 1
+
+@media screen and (max-width: 460px)
+  #brand
+    padding: 0.5rem 0.25rem
+
+  .actions .navbar-item
+    padding: 0.5rem 0.5rem
 </style>
