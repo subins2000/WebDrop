@@ -10,7 +10,7 @@
           <!-- using class for purgecss to detect -->
           <div class="field content is-grouped is-grouped-multiline">
             <div class="control">
-              <b-upload v-model="files" multiple allowdirs @input="onFileChange">
+              <b-upload v-model="files" multiple="true" allowdirs="true" webkitdirectory="true" @input="onFileChange">
                 <a class="button is-info" aria-label="Add File/Folder" title="Add File/Folder">
                   <file-upload-icon class="icon is-small"></file-upload-icon>
                   <span class="icon-text">Add File</span>
@@ -83,7 +83,7 @@
               </b-table-column>
             </template>
             <template slot="empty">
-              <b-upload v-model="files" @input="onFileChange" multiple>
+              <b-upload v-model="files" @input="onFileChange" multiple="true" allowdirs="true" webkitdirectory="true">
                 <p id="drop-area">Drop your files here or click to upload</p>
               </b-upload>
             </template>

@@ -27,8 +27,29 @@ Case 2: I want to copy a text from my phone to computer, arghh😫 I have to ope
 
 Both the above problems are solved with [WebDrop](https://ShareThisFile.Online). Simply open the website on any number of your devices (even simultaneously) and share files & messages !
 
+### Development
+
+Clone the repo and do :
+
+```
+yarn install
+yarn start
+```
+
+WebTorrent trackers list is included in `src/main.ts`. You may want to change that or add/start your [own tracker](https://github.com/subins2000/p2pt/blob/master/startTracker.js) locally for development.
+
+#### Starting Local Tracker
+
+Install [bittorrent-tracker] globally :
+
+```
+yarn global add bittorrent-tracker
+```
+
+Download [this script](https://github.com/subins2000/p2pt/blob/master/startTracker.js) and run it. It only requires `bittorrent-tracker`.
+
 ## Thanks
 
-* https://commons.wikimedia.org/wiki/File:GNOME_Web_logo--2018.svg - GPL-3.0 license
-* Buefy
-* WebTorrent
+* [Buefy](https://buefy.org/)
+* [Material Design Icons](https://materialdesignicons.com/)
+* [WebTorrent](https://webtorrent.io)
