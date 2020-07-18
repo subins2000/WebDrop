@@ -88,7 +88,7 @@
               </b-upload>
               <center>
                 <p>Open <a href="https://ShareThisFile.Online">WebDrop</a> on your devices to join this room. Devices under the same WiFi will auto join the same room.</p>
-                <p><span style="display: inline-block;vertical-align: top;">Use the Internet icon (</span><span style="display: inline-block;vertical-align: bottom;"><earth-icon></earth-icon></span><span  style="display: inline-block;vertical-align: top;">) above to transfer files over internet</span></p>
+                <p><span style="display: inline-block;vertical-align: top;">Use the Internet icon </span><span style="display: inline-block;vertical-align: bottom;"><earth-icon></earth-icon></span><span  style="display: inline-block;vertical-align: top;"> above to transfer files over internet</span></p>
               </center>
             </template>
           </b-table>
