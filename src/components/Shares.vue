@@ -86,6 +86,10 @@
               <b-upload v-model="files" @input="onFileChange" multiple="true" allowdirs="true" webkitdirectory="true">
                 <p id="drop-area">Drop your files here or click to upload</p>
               </b-upload>
+              <center>
+                <p>Open <a href="https://ShareThisFile.Online">WebDrop</a> on your devices to join this room. Devices under the same WiFi will auto join the same room.</p>
+                <p><span style="display: inline-block;vertical-align: top;">Use the Internet icon (</span><span style="display: inline-block;vertical-align: bottom;"><earth-icon></earth-icon></span><span  style="display: inline-block;vertical-align: top;">) above to transfer files over internet</span></p>
+              </center>
             </template>
           </b-table>
         </b-tab-item>
@@ -165,6 +169,7 @@ import AndroidMessagesIcon from 'vue-material-design-icons/AndroidMessages.vue'
 import CogIcon from 'vue-material-design-icons/Cog.vue'
 import DevicesIcon from 'vue-material-design-icons/Devices.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
+import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import FileMultipleIcon from 'vue-material-design-icons/FileMultiple.vue'
 import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
 import UploadIcon from 'vue-material-design-icons/Upload.vue'
@@ -192,6 +197,7 @@ export default {
     CogIcon,
     DevicesIcon,
     DownloadIcon,
+    EarthIcon,
     FileMultipleIcon,
     FileUploadIcon,
     UploadIcon
