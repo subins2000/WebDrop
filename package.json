@@ -8,7 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@beyonk/google-fonts-webpack-plugin": "^1.2.3",
+    "@beyonk/google-fonts-webpack-plugin": "^1.4",
     "buefy": "^0.8.19",
     "end-of-stream": "1.4.1",
     "hash-sum": "^1.0.2",
