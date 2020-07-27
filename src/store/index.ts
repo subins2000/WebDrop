@@ -17,6 +17,7 @@ export default new Vuex.Store({
     p2pt: P2PT,
 
     settings: {
+      autoCopy: false,
       autoStart: true,
       anim: true,
 

@@ -136,6 +136,18 @@ export default {
           delete msg.type
 
           this.$store.commit('addMessage', msg)
+
+          // copy to clipboard ?
+          if (this.$store.state.settings.autoCopy) {
+            this.$copyText(msg.msg).then(e => {
+              this.$buefy.toast.open({
+                duration: 2000,
+                message: 'Message Copied !',
+                position: 'is-top',
+                type: 'is-primary'
+              })
+            })
+          }
         }
       })
 
