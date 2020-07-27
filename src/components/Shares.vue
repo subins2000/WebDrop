@@ -17,11 +17,6 @@
                 </a>
               </b-upload>
             </div>
-            <div class="control action" v-show="tableCheckedRows.length === 0">
-              <router-link to="/settings" class="tag is-primary is-medium" title="Settings" aria-label="Settings">
-                <cog-icon class="icon is-medium"></cog-icon>
-              </router-link>
-            </div>
             <div class="control" id="torrentButtons" v-show="tableCheckedRows.length > 0">
               <div class="control" v-if="tableCheckedRows.length === 1">
                 <b-field grouped>
@@ -166,7 +161,6 @@
 
 <script>
 import AndroidMessagesIcon from 'vue-material-design-icons/AndroidMessages.vue'
-import CogIcon from 'vue-material-design-icons/Cog.vue'
 import DevicesIcon from 'vue-material-design-icons/Devices.vue'
 import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
@@ -194,7 +188,6 @@ export default {
 
   components: {
     AndroidMessagesIcon,
-    CogIcon,
     DevicesIcon,
     DownloadIcon,
     EarthIcon,
