@@ -205,7 +205,7 @@ export default {
 
   data () {
     return {
-      activeTab: 0,
+      activeTab: Number(this.$store.state.settings.defaultTab),
       autoStart: this.$store.state.settings.autoStart,
 
       glowFilesBtn: false,

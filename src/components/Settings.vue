@@ -18,6 +18,12 @@
         </div>
       </div>
       <div class="field">
+        <label class="label">Default Tab</label>
+        <div class="control">
+          <b-checkbox v-model="settings.defaultTab" true-value="1" false-value="0">Make <b>Messages</b> tab the default</b-checkbox>
+        </div>
+      </div>
+      <div class="field">
         <label class="label">Animations</label>
         <div class="control">
           <b-checkbox v-model="settings.anim">Animations & Transitions</b-checkbox>
