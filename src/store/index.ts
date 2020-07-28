@@ -20,6 +20,7 @@ export default new Vuex.Store({
       autoCopy: false,
       autoStart: true,
       anim: true,
+      defaultTab: 0,
 
       name: '',
       color: ''
@@ -30,9 +31,10 @@ export default new Vuex.Store({
   },
   mutations: {
     initSettings (state) {
-      const settings = window.localStorage.getItem('settings')
+      let settings = window.localStorage.getItem('settings')
       if (settings) {
-        state.settings = JSON.parse(settings)
+        settings = JSON.parse(settings)
+        state.settings = Object.assign({}, state.settings, settings)
       }
 
       // Length limit to prevent malicious inputs
