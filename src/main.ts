@@ -67,7 +67,7 @@ if (window.location.hostname === 'localhost') {
 
 Vue.prototype.$ANNOUNCE_URLS = announceURLs
 Vue.prototype.$INTERNET_ROOM_CODE_LENGTH = 4
-Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://ShareThisFile.Online/#/?room='
+Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://WebDrop.Space/#/?room='
 
 Vue.prototype.$p2pt = null
 Vue.prototype.$wt = new WebTorrent()

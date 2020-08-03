@@ -2,7 +2,7 @@
   <div class="about">
     <div class="container">
       <div class="content">
-        <h3 class="is-size-3">ShareThisFile.Online</h3>
+        <h3 class="is-size-3">WebDrop.Space</h3>
         <p>Easily share files across devices !</p>
       </div>
       <b-tabs v-model="tab" expanded>

@@ -2,7 +2,7 @@
 
 P2P file transfer in browser similar to Apple's AirDrop.
 
-Simply go to the website [ShareThisFile.Online](https://ShareThisFile.Online) on the devices, choose files and share !
+Simply go to the website [WebDrop.Space](https://WebDrop.Space) on the devices, choose files and share !
 
 No installations whatsoever, just a website !
 
@@ -25,7 +25,7 @@ Case 1: I want to share files with my friend's phone or computer, but we don't h
 
 Case 2: I want to copy a text from my phone to computer, arghh😫 I have to open WhatsApp Web/Telegram now, send a message to myself -_- 😒
 
-Both the above problems are solved with [WebDrop](https://ShareThisFile.Online). Simply open the website on any number of your devices (even simultaneously) and share files & messages !
+Both the above problems are solved with [WebDrop](https://WebDrop.Space). Simply open the website on any number of your devices (even simultaneously) and share files & messages !
 
 ### Development
 
