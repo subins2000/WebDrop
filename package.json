@@ -15,7 +15,7 @@
     "public-ip": "^4.0.1",
     "qr-creator": "^1.0.0",
     "register-service-worker": "^1.7.1",
-    "simple-peer-file": "../simple-peer-file/",
+    "simple-peer-file": "file:./../simple-peer-file/",
     "throttleit": "^1.0.0",
     "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.1",
@@ -52,5 +52,11 @@
     "vue-cli-plugin-webpack-bundle-analyzer": "^2.0.0",
     "vue-property-decorator": "^8.4.1",
     "vue-template-compiler": "^2.6.11"
+  },
+  "eslintConfig": {
+    "rules": {
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "error"
+    }
   }
 }

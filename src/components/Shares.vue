@@ -40,14 +40,8 @@
               </div>
             </div>
             <b-field class="control action" grouped>
-              <div class="tags has-addons">
-                <a class="tag is-dark"><upload-icon class="icon is-small"></upload-icon></a>
-                <span class="tag is-info">{{ uploadSpeed }}/s</span>
-              </div>
-              <div class="tags has-addons">
-                <a class="tag is-dark"><download-icon class="icon is-small"></download-icon></a>
-                <span class="tag is-success">{{ downloadSpeed }}/s</span>
-              </div>
+              <a class="tag is-dark"><upload-icon class="icon is-small"></upload-icon><download-icon class="icon is-small"></download-icon></a>
+              <span class="tag is-info">{{ speed }}/s</span>
             </b-field>
           </div>
           <b-table
@@ -169,11 +163,12 @@ import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
 import UploadIcon from 'vue-material-design-icons/Upload.vue'
 
 import * as sha1 from 'simple-sha1'
-import { PeerFileSend } from 'simple-peer-file'
+import { PeerFileReceive } from 'simple-peer-file'
 
 const shares = {}
 
 let speedCheck = null
+let bytesTransferred = 0 // this gets filled and reset every second as speedCheck porgresses
 
 function formatBytes (bytes, decimals = 2) {
   if (bytes === 0) return '0 B'
@@ -213,8 +208,7 @@ export default {
       msg: '', // input field
       shares: [], // shares
 
-      uploadSpeed: '0B',
-      downloadSpeed: '0B',
+      speed: '0B',
 
       tableCheckedRows: []
     }
@@ -265,9 +259,7 @@ export default {
         paused: share.paused,
         done: false,
         mine,
-        progress: 0,
-        uploadSpeed: 0,
-        downloadSpeed: 0
+        progress: 0
       }
 
       this.$set(this.shares, this.shares.length, shareInfo)
@@ -275,65 +267,36 @@ export default {
 
     makeShare (file) {
       const shareID = sha1.sync(file.name + file.size)
-      shares[shareID] = {
-        file
-      }
 
       const share = {
         shareID: shareID,
+        file,
         name: file.name,
         length: file.size,
         paused: false
       }
 
-      this.$store.commit('addShare', {
-        i: share.shareID,
-        n: share.name,
-        l: share.length
-      })
+      this.$store.commit('addShare', share)
 
       // this share was added by user
       this.addShareToList(share, true)
     },
 
-    // share is WebShare's Share object
-    onShare (share) {
-      const index = this.getIndexOfShare(share.shareID)
-
-      share.on('done', () => {
-        // there will be only one file
-        const file = share.files[0]
-        file.getBlobURL((err, url) => {
-          if (err) throw err
-
-          this.$set(this.shares[index], 'done', true)
-          this.$set(this.shares[index], 'downloadURL', url)
-        })
-      })
-
-      this.$set(this.shares[index], 'paused', false)
-
-      this.startSpeedCheck()
-    },
-
     // add new share obtained from a peer
     addNewShare (shareInfo) {
-      const shareID = shareInfo.i
+      const shareID = shareInfo.shareID
 
       if (shares[shareID]) {
         // share with same hash exist
         shares[shareID].addPeer(shareInfo.peer)
       } else {
+        shareInfo.paused = !this.autoStart
+
         // add new item
-        this.addShareToList({
-          shareID: shareInfo.i,
-          name: shareInfo.n,
-          length: shareInfo.l,
-          paused: !this.autoStart
-        }, false)
+        this.addShareToList(shareInfo, false)
 
         if (this.autoStart) {
-          this.startShare(shareInfo.i)
+          this.downloadShare(shareInfo)
         }
       }
 
@@ -361,20 +324,62 @@ export default {
       }
     },
 
-    startShare (shareID, peer) {
+    // Start downloading
+    downloadShare (shareInfo) {
+      const shareID = shareInfo.shareID
+      const peer = shareInfo.peer
+
       if (shares[shareID]) return
 
-      shares[shareID] = {
+      const share = {
         file: null,
-        transfer: new PeerFileSend()
+        transfer: new PeerFileReceive(peer, {
+          shareID,
+          senderSocketID: peer.id,
+          filesizeBytes: shareInfo.length
+        })
       }
 
-      this.$wt.add(shareID, {
-        announce: this.$ANNOUNCE_URLS
-      }, (share) => {
-        this.onShare(share)
+      const index = this.getIndexOfShare(shareID)
+
+      let prevBytes = 0
+      let prevProgress = 0
+      share.transfer.on('progress', receivedBytes => {
+        bytesTransferred += receivedBytes - prevBytes
+        prevBytes = receivedBytes
+
+        const progress = parseInt((100 * (receivedBytes / shareInfo.length)).toFixed(1))
+
+        if (prevProgress !== progress) {
+          this.$set(this.shares[index], 'progress', progress)
+          prevProgress = progress
+        }
       })
-      return null
+
+      share.transfer.on('done', file => {
+        const url = URL.createObjectURL(file)
+
+        this.$set(this.shares[index], 'done', true)
+        this.$set(this.shares[index], 'downloadURL', url)
+
+        delete shares[shareID]
+
+        // Are there other transfers happening ?
+        if (Object.keys(shares).length === 0) {
+          this.stopSpeedUpdate()
+        }
+      })
+
+      share.transfer.start()
+      this.startSpeedUpdate()
+
+      shares[shareID] = share
+      this.$set(this.shares[index], 'paused', false)
+
+      this.$store.state.p2pt.send(peer, {
+        type: 'startSending',
+        shareID
+      })
     },
 
     resumeShare () {
@@ -384,7 +389,7 @@ export default {
         if (shares[share.shareID]) {
           shares[share.shareID].resume()
         } else {
-          this.startShare(share.shareID)
+          this.downloadShare(share.shareID)
         }
       }
     },
@@ -443,7 +448,7 @@ export default {
 
       for (const key in this.$store.state.users) {
         const user = this.$store.state.users[key]
-        this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+        this.$store.state.p2pt.send(user.conn, data)
       }
 
       this.$buefy.toast.open({
@@ -455,26 +460,20 @@ export default {
       this.msg = ''
     },
 
-    startSpeedCheck () {
+    startSpeedUpdate () {
       if (!speedCheck) {
-        speedCheck = setInterval(() => {
-          this.uploadSpeed = formatBytes(this.$wt.uploadSpeed)
-          this.downloadSpeed = formatBytes(this.$wt.downloadSpeed)
+        const speed = () => {
+          this.speed = formatBytes(bytesTransferred)
+          bytesTransferred = 0
+        }
 
-          for (const index in this.shares) {
-            const share = this.shares[index]
-
-            if (share.done || !shares[share.shareID]) continue
-
-            // Vue will make rendering delay and slows down file transfer if progress value is directly given
-            const progress = parseInt((100 * shares[share.shareID].progress).toFixed(1))
-
-            if (share.progress !== progress) {
-              this.$set(this.shares[index], 'progress', progress)
-            }
-          }
-        }, 1000)
+        setTimeout(speed, 1000)
+        speedCheck = setInterval(speed, 1000)
       }
+    },
+
+    stopSpeedUpdate () {
+      clearInterval(speedCheck)
     }
   },
 
@@ -497,10 +496,12 @@ export default {
           ...{ type: 'newShare' }
         }
 
+        delete data.file
+
         // let peers know of this share
         for (const key in this.$store.state.users) {
           const user = this.$store.state.users[key]
-          p2pt.send(user.conn, JSON.stringify(data))
+          p2pt.send(user.conn, data)
         }
       } else if (mutation.type === 'addUser') {
         this.glowUsersBtn = true

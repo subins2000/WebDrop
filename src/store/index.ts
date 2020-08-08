@@ -6,13 +6,23 @@ import device from '../device'
 
 Vue.use(Vuex)
 
+interface Shares {
+  [shareID: string]: {
+    shareID: string;
+    name: string;
+    length: number;
+    paused: boolean;
+    mine: boolean;
+  };
+}
+
 export default new Vuex.Store({
   state: {
     users: {} as any,
     selectedUsers: [] as any,
 
     msgs: [],
-    shares: {},
+    shares: {} as Shares,
 
     p2pt: P2PT,
 
@@ -87,17 +97,17 @@ export default new Vuex.Store({
 
     // share added by user
     addShare (state, payload) {
-      Vue.set(state.shares, payload.i, {
+      Vue.set(state.shares, payload.shareID, {
         ...payload,
-        ...{ m: true } // m for mine
+        ...{ mine: true } // m for mine
       })
     },
 
     // share received from a peer
     newShare (state, payload) {
-      Vue.set(state.shares, payload.i, {
+      Vue.set(state.shares, payload.shareID, {
         ...payload,
-        ...{ m: false } // m for mine
+        ...{ mine: false } // m for mine
       })
     },
 

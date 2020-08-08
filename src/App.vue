@@ -14,6 +14,8 @@ import * as hashSum from 'hash-sum'
 import * as P2PT from 'p2pt'
 import * as publicIP from 'public-ip'
 
+import { PeerFileSend } from 'simple-peer-file'
+
 // import 'vue-material-design-icons/styles.css'
 
 export default {
@@ -35,7 +37,7 @@ export default {
           type: 'ping'
         }
         for (const user of users) {
-          this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+          this.$store.state.p2pt.send(user.conn, data)
         }
       })
     },
@@ -66,33 +68,25 @@ export default {
       p2pt.setIdentifier('webdrop' + identifier)
 
       p2pt.on('peerconnect', (peer) => {
-        p2pt.send(peer, JSON.stringify({
+        p2pt.send(peer, {
           type: 'init',
           name: this.$store.state.settings.name,
           color: this.$store.state.settings.color,
           sharesCount: Object.keys(this.$store.state.shares).length,
           msgsCount: this.$store.state.msgs.length
-        }))
+        })
       })
 
       p2pt.on('msg', (peer, msg) => {
-        if (msg === 'getShares') {
+        if (typeof msg !== 'object') return
+
+        const type = msg.type
+
+        if (type === 'getShares') {
           this.sendSharesState(p2pt, peer)
-          return
-        }
-
-        if (msg === 'getMsgs') {
+        } else if (type === 'getMsgs') {
           this.sendMsgsState(p2pt, peer)
-          return
-        }
-
-        try {
-          msg = JSON.parse(msg)
-        } catch (_) {
-          return
-        }
-
-        if (msg.type === 'init') {
+        } else if (type === 'init') {
           this.$store.commit('addUser', {
             id: peer.id,
             name: msg.name,
@@ -101,27 +95,40 @@ export default {
           })
 
           if (msg.sharesCount > Object.keys(this.$store.state.shares).length) {
-            p2pt.send(peer, 'getShares')
+            p2pt.send(peer, {
+              type: 'getShares'
+            })
           }
 
           if (msg.msgsCount > this.$store.state.msgs.length) {
-            p2pt.send(peer, 'getMsgs')
+            p2pt.send(peer, {
+              type: 'getMsgs'
+            })
           }
-        } else if (msg.type === 'ping') {
+        } else if (type === 'ping') {
           this.$buefy.snackbar.open({
             duration: 3000,
             message: `<b>${this.$store.state.users[peer.id].name}</b> pinged!`,
             type: 'is-warning',
             queue: false
           })
-        } else if (msg.type === 'newShare') {
+        } else if (type === 'newShare') {
           // share exists check
-          if (this.$store.state.shares[msg.i]) return
+          if (this.$store.state.shares[msg.shareID]) return
 
           delete msg.type
           msg.peer = peer
+
           this.$store.commit('newShare', msg)
-        } else if (msg.type === 'msg') {
+        } else if (type === 'startSending') {
+          const share = this.$store.state.shares[msg.shareID]
+
+          if (share && share.file) {
+            share.transfer = new PeerFileSend(peer, share.file)
+            share.transfer.start()
+            peer.respond(1)
+          }
+        } else if (type === 'msg') {
           // msg exist check
           if (msg.id && this.$store.state.msgs[msg.id]) {
             return
@@ -139,7 +146,7 @@ export default {
 
           // copy to clipboard ?
           if (this.$store.state.settings.autoCopy) {
-            this.$copyText(msg.msg).then(e => {
+            this.$copyText(msg.msg).then(_ => {
               this.$buefy.toast.open({
                 duration: 2000,
                 message: 'Message Copied !',
@@ -158,6 +165,7 @@ export default {
       let warningCount = 0
       let trackerConnected = false
       let warningMsg = false
+
       p2pt.on('trackerwarning', (error, stats) => {
         warningCount++
         console.log(error)
@@ -193,8 +201,8 @@ export default {
       for (const infoHash in this.$store.state.shares) {
         let share = this.$store.state.shares[infoHash]
 
-        // only send shares created by me (m = mine)
-        if (!share.m) continue
+        // only send shares created by me
+        if (!share.mine) continue
 
         share = {
           ...share,
@@ -203,20 +211,20 @@ export default {
             i: infoHash
           }
         }
-        p2pt.send(peer, JSON.stringify(share))
+        p2pt.send(peer, share)
       }
     },
 
     sendMsgsState (p2pt, peer) {
       for (const id in this.$store.state.msgs) {
         const msg = this.$store.state.msgs[id]
-        p2pt.send(peer, JSON.stringify({
+        p2pt.send(peer, {
           ...msg,
           ...{
             type: 'msg',
             id: id
           }
-        }))
+        })
       }
     }
   },
