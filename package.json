@@ -10,20 +10,19 @@
   "dependencies": {
     "@beyonk/google-fonts-webpack-plugin": "^1.4",
     "buefy": "^0.8.19",
-    "end-of-stream": "1.4.1",
     "hash-sum": "^1.0.2",
     "p2pt": "1.4.1",
     "public-ip": "^4.0.1",
     "qr-creator": "^1.0.0",
     "register-service-worker": "^1.7.1",
+    "simple-peer-file": "../simple-peer-file/",
     "throttleit": "^1.0.0",
     "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.1",
     "vue-linkify": "^1.0.1",
     "vue-material-design-icons": "^4.7.1",
     "vue-router": "^3.1.6",
-    "vuex": "^3.1.3",
-    "webtorrent": "^0.108.3"
+    "vuex": "^3.1.3"
   },
   "devDependencies": {
     "@fullhuman/postcss-purgecss": "^2.1.0",
@@ -53,8 +52,5 @@
     "vue-cli-plugin-webpack-bundle-analyzer": "^2.0.0",
     "vue-property-decorator": "^8.4.1",
     "vue-template-compiler": "^2.6.11"
-  },
-  "dependenciesComments": {
-    "end-of-stream": "Downgraded end-of-stream because of https://github.com/webtorrent/instant.io/issues/210#issuecomment-609687048"
   }
 }

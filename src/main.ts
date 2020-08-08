@@ -1,7 +1,6 @@
 import linkify from 'vue-linkify'
 import Vue from 'vue'
 import VueClipboard from 'vue-clipboard2'
-import WebTorrent from 'webtorrent'
 
 import App from './App.vue'
 import router from './router'
@@ -53,10 +52,10 @@ Vue.component('Header', Header)
 Vue.directive('linkified', linkify)
 
 let announceURLs = [
-  'wss://tracker.openwebtorrent.com',
+  'wss://tracker.openwebshare.com',
   'wss://tracker.sloppyta.co:443/announce',
   'wss://tracker.novage.com.ua:443/announce',
-  'wss://tracker.btorrent.xyz:443/announce',
+  'wss://tracker.bshare.xyz:443/announce',
   'wss://track.file.pizza:443/announce'
   // 'ws://10.42.0.1:5000'
 ]
@@ -70,7 +69,6 @@ Vue.prototype.$INTERNET_ROOM_CODE_LENGTH = 4
 Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://WebDrop.Space/#/?room='
 
 Vue.prototype.$p2pt = null
-Vue.prototype.$wt = new WebTorrent()
 
 store.commit('initSettings')
 

@@ -12,7 +12,7 @@ export default new Vuex.Store({
     selectedUsers: [] as any,
 
     msgs: [],
-    torrents: {},
+    shares: {},
 
     p2pt: P2PT,
 
@@ -85,17 +85,17 @@ export default new Vuex.Store({
       state.selectedUsers = []
     },
 
-    // torrent added by user
-    addTorrent (state, payload) {
-      Vue.set(state.torrents, payload.i, {
+    // share added by user
+    addShare (state, payload) {
+      Vue.set(state.shares, payload.i, {
         ...payload,
         ...{ m: true } // m for mine
       })
     },
 
-    // torrent received from a peer
-    newTorrent (state, payload) {
-      Vue.set(state.torrents, payload.i, {
+    // share received from a peer
+    newShare (state, payload) {
+      Vue.set(state.shares, payload.i, {
         ...payload,
         ...{ m: false } // m for mine
       })

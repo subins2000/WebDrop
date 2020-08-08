@@ -70,14 +70,14 @@ export default {
           type: 'init',
           name: this.$store.state.settings.name,
           color: this.$store.state.settings.color,
-          torrentsCount: Object.keys(this.$store.state.torrents).length,
+          sharesCount: Object.keys(this.$store.state.shares).length,
           msgsCount: this.$store.state.msgs.length
         }))
       })
 
       p2pt.on('msg', (peer, msg) => {
-        if (msg === 'getTorrents') {
-          this.sendTorrentsState(p2pt, peer)
+        if (msg === 'getShares') {
+          this.sendSharesState(p2pt, peer)
           return
         }
 
@@ -100,8 +100,8 @@ export default {
             conn: peer
           })
 
-          if (msg.torrentsCount > Object.keys(this.$store.state.torrents).length) {
-            p2pt.send(peer, 'getTorrents')
+          if (msg.sharesCount > Object.keys(this.$store.state.shares).length) {
+            p2pt.send(peer, 'getShares')
           }
 
           if (msg.msgsCount > this.$store.state.msgs.length) {
@@ -114,13 +114,13 @@ export default {
             type: 'is-warning',
             queue: false
           })
-        } else if (msg.type === 'newTorrent') {
-          // torrent exists check
-          if (this.$store.state.torrents[msg.i]) return
+        } else if (msg.type === 'newShare') {
+          // share exists check
+          if (this.$store.state.shares[msg.i]) return
 
           delete msg.type
           msg.peer = peer
-          this.$store.commit('newTorrent', msg)
+          this.$store.commit('newShare', msg)
         } else if (msg.type === 'msg') {
           // msg exist check
           if (msg.id && this.$store.state.msgs[msg.id]) {
@@ -164,7 +164,7 @@ export default {
 
         if (warningCount >= stats.total && !trackerConnected) {
           warningMsg = this.$buefy.snackbar.open({
-            message: 'We couldn\'t connect to any WebTorrent trackers. Your ISP might be blocking them 🤔',
+            message: 'We couldn\'t connect to any WebShare trackers. Your ISP might be blocking them 🤔',
             position: 'is-top',
             type: 'is-danger',
             queue: true,
@@ -189,21 +189,21 @@ export default {
       p2pt.start()
     },
 
-    sendTorrentsState (p2pt, peer) {
-      for (const infoHash in this.$store.state.torrents) {
-        let torrent = this.$store.state.torrents[infoHash]
+    sendSharesState (p2pt, peer) {
+      for (const infoHash in this.$store.state.shares) {
+        let share = this.$store.state.shares[infoHash]
 
-        // only send torrents created by me (m = mine)
-        if (!torrent.m) continue
+        // only send shares created by me (m = mine)
+        if (!share.m) continue
 
-        torrent = {
-          ...torrent,
+        share = {
+          ...share,
           ...{
-            type: 'newTorrent',
+            type: 'newShare',
             i: infoHash
           }
         }
-        p2pt.send(peer, JSON.stringify(torrent))
+        p2pt.send(peer, JSON.stringify(share))
       }
     },
 

@@ -24,15 +24,15 @@
             <li>Do I need to wait for devices to get discovered before adding files ?</li>
             <p><b>Ans:</b>&nbsp;<b>No</b>, you can add files even if the device count is <b>0</b>. When a new device joins the room, they will receive the already added files in the room.</p>
             <li>Isn't file passed through internet ? Wouldn't it be slow ?</li>
-            <p><b>Ans:</b>&nbsp;Internet is only required for discovering devices. Your devices are connected <b>Peer To Peer</b>. This P2P connection can be made through LAN using the same WiFi hotspot, thus increasing transfer speed ! Files are not shared through internet unless you use "Share via Internet" feature. WebTorrent is used to transfer files which is efficient in multiple device transfers.</p>
+            <p><b>Ans:</b>&nbsp;Internet is only required for discovering devices. Your devices are connected <b>Peer To Peer</b>. This P2P connection can be made through LAN using the same WiFi hotspot, thus increasing transfer speed ! Files are not shared through internet unless you use "Share via Internet" feature. WebShare is used to transfer files which is efficient in multiple device transfers.</p>
             <li>How to transfer files to someone over the internet ?</li>
             <p><b>Ans:</b>&nbsp;Click the "globe" icon on navbar, share the room code or invite link with your friends. Once your friends join your room, you can share files with them. Remember, you'll have to keep WebDrop open until transfer is complete.</p>
             <li>Will you know the files being sent ?</li>
             <p><b>Ans:</b>&nbsp;No ! Absolutely not ! P2P connection made ensures that you and only the other connected devices will know the data/files passed between each other.</p>
             <li>Is A Server Being Used ?</li>
-            <p><b>Ans:</b>&nbsp;Only public WebTorrent trackers are used to share files and make P2P connections. Everything else happens in your device and browser. <a href="https://github.com/subins2000/p2pt#how-does-it-work-" target="_blank">Know More</a></p>
+            <p><b>Ans:</b>&nbsp;Only public WebShare trackers are used to share files and make P2P connections. Everything else happens in your device and browser. <a href="https://github.com/subins2000/p2pt#how-does-it-work-" target="_blank">Know More</a></p>
             <li>Error: Can't connect to Trackers!</li>
-            <p><b>Ans:</b>&nbsp;There are some unknown issues with some routers and internet service providers (ISP) for making P2P connections to other users. Try changing your internet connection or browser. Some ISPs purposefully block Torrent services :(</p>
+            <p><b>Ans:</b>&nbsp;There are some unknown issues with some routers and internet service providers (ISP) for making P2P connections to other users. Try changing your internet connection or browser. Some ISPs purposefully block Share services :(</p>
           </ul>
           <p class="has-text-centered">WebDrop is a <a href="https://github.com/subins2000/WebDrop" target="_blank">Free & Open Source (FOSS)</a> software 🔍❤️</p>
         </b-tab-item>

@@ -1,2 +1,2 @@
-declare module 'webtorrent';
+declare module 'webshare';
 declare module 'p2pt';

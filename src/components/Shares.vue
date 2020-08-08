@@ -5,7 +5,7 @@
         <b-tab-item label="Files" v-bind:class="{ noanim: !$store.state.settings.anim }">
           <template slot="header">
             <file-multiple-icon class="icon is-small"></file-multiple-icon>
-            <span><span class="icon-text">Files</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
+            <span><span class="icon-text">Files</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ shares.length }}</b-tag> </span>
           </template>
           <!-- using class for purgecss to detect -->
           <div class="field content is-grouped is-grouped-multiline">
@@ -17,24 +17,24 @@
                 </a>
               </b-upload>
             </div>
-            <div class="control" id="torrentButtons" v-show="tableCheckedRows.length > 0">
+            <div class="control" id="shareButtons" v-show="tableCheckedRows.length > 0">
               <div class="control" v-if="tableCheckedRows.length === 1">
                 <b-field grouped>
                   <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
-                    <b-button @click="resumeTorrent">Start</b-button>
+                    <b-button @click="resumeShare">Start</b-button>
                   </div>
                   <div class="control">
-                    <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
+                    <b-button type="is-danger" @click="removeShare">Remove</b-button>
                   </div>
                 </b-field>
               </div>
               <div class="control" v-else>
                 <b-field grouped>
                   <div class="control">
-                    <b-button @click="resumeTorrent">Start</b-button>
+                    <b-button @click="resumeShare">Start</b-button>
                   </div>
                   <div class="control">
-                    <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
+                    <b-button type="is-danger" @click="removeShare">Remove</b-button>
                   </div>
                 </b-field>
               </div>
@@ -52,8 +52,8 @@
           </div>
           <b-table
             class="content"
-            id="torrents"
-            :data.sync="torrents"
+            id="shares"
+            :data.sync="shares"
             :checked-rows.sync="tableCheckedRows"
             checkable
             checkbox-position="left">
@@ -168,7 +168,11 @@ import FileMultipleIcon from 'vue-material-design-icons/FileMultiple.vue'
 import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
 import UploadIcon from 'vue-material-design-icons/Upload.vue'
 
-const torrentsWT = {} // WebTorrent objects
+import * as sha1 from 'simple-sha1'
+import { PeerFileSend } from 'simple-peer-file'
+
+const shares = {}
+
 let speedCheck = null
 
 function formatBytes (bytes, decimals = 2) {
@@ -207,7 +211,7 @@ export default {
 
       files: [],
       msg: '', // input field
-      torrents: [], // torrents
+      shares: [], // shares
 
       uploadSpeed: '0B',
       downloadSpeed: '0B',
@@ -248,17 +252,17 @@ export default {
   methods: {
     onFileChange (files) {
       for (const key in files) {
-        this.makeTorrent(files[key])
+        this.makeShare(files[key])
       }
       this.files = []
     },
 
-    addTorrentToList (torrent, mine = false) {
-      const torrentInfo = {
-        infoHash: torrent.infoHash,
-        name: torrent.name,
-        size: formatBytes(torrent.length),
-        paused: torrent.paused,
+    addShareToList (share, mine = false) {
+      const shareInfo = {
+        shareID: share.shareID,
+        name: share.name,
+        size: formatBytes(share.length),
+        paused: share.paused,
         done: false,
         mine,
         progress: 0,
@@ -266,79 +270,70 @@ export default {
         downloadSpeed: 0
       }
 
-      this.$set(this.torrents, this.torrents.length, torrentInfo)
+      this.$set(this.shares, this.shares.length, shareInfo)
     },
 
-    makeTorrent (file) {
-      const snack = this.$buefy.snackbar.open({
-        message: 'Preparing file. This might take a while depending on file size',
-        type: 'is-warning',
-        queue: true,
-        indefinite: true,
-        actionText: 'Ok'
+    makeShare (file) {
+      const shareID = sha1.sync(file.name + file.size)
+      shares[shareID] = {
+        file
+      }
+
+      const share = {
+        shareID: shareID,
+        name: file.name,
+        length: file.size,
+        paused: false
+      }
+
+      this.$store.commit('addShare', {
+        i: share.shareID,
+        n: share.name,
+        l: share.length
       })
 
-      this.$wt.seed(file, {
-        announceList: [this.$ANNOUNCE_URLS],
-        name: file.name
-      }, (torrent) => {
-        snack.close()
-
-        this.$store.commit('addTorrent', {
-          i: torrent.infoHash,
-          n: torrent.name,
-          l: torrent.length
-        })
-
-        // this torrent was added by user
-        this.addTorrentToList(torrent, true)
-
-        this.onTorrent(torrent)
-      })
+      // this share was added by user
+      this.addShareToList(share, true)
     },
 
-    // torrent is WebTorrent's Torrent object
-    onTorrent (torrent) {
-      const index = this.getIndexOfTorrent(torrent.infoHash)
+    // share is WebShare's Share object
+    onShare (share) {
+      const index = this.getIndexOfShare(share.shareID)
 
-      torrent.on('done', () => {
+      share.on('done', () => {
         // there will be only one file
-        const file = torrent.files[0]
+        const file = share.files[0]
         file.getBlobURL((err, url) => {
           if (err) throw err
 
-          this.$set(this.torrents[index], 'done', true)
-          this.$set(this.torrents[index], 'downloadURL', url)
+          this.$set(this.shares[index], 'done', true)
+          this.$set(this.shares[index], 'downloadURL', url)
         })
       })
 
-      if (!torrentsWT[torrent.infoHash]) {
-        torrentsWT[torrent.infoHash] = torrent
-      }
-
-      this.$set(this.torrents[index], 'paused', false)
+      this.$set(this.shares[index], 'paused', false)
 
       this.startSpeedCheck()
     },
 
-    // add new torrent obtained from a peer
-    addNewTorrent (torrentInfo) {
-      const infoHash = torrentInfo.i
+    // add new share obtained from a peer
+    addNewShare (shareInfo) {
+      const shareID = shareInfo.i
 
-      if (torrentsWT[infoHash]) {
-        // torrent with same hash exist
-        torrentsWT[infoHash].addPeer(torrentInfo.peer)
+      if (shares[shareID]) {
+        // share with same hash exist
+        shares[shareID].addPeer(shareInfo.peer)
       } else {
         // add new item
-        this.addTorrentToList({
-          infoHash: torrentInfo.i,
-          name: torrentInfo.n,
-          length: torrentInfo.l,
+        this.addShareToList({
+          shareID: shareInfo.i,
+          name: shareInfo.n,
+          length: shareInfo.l,
           paused: !this.autoStart
         }, false)
 
         if (this.autoStart) {
-          this.startTorrent(torrentInfo.i)
+          this.startShare(shareInfo.i)
         }
       }
 
@@ -366,46 +361,51 @@ export default {
       }
     },
 
-    startTorrent (infoHash) {
-      if (torrentsWT[infoHash]) return
+    startShare (shareID, peer) {
+      if (shares[shareID]) return
 
-      this.$wt.add(infoHash, {
+      shares[shareID] = {
+        file: null,
+        transfer: new PeerFileSend()
+      }
+
+      this.$wt.add(shareID, {
         announce: this.$ANNOUNCE_URLS
-      }, (torrent) => {
-        this.onTorrent(torrent)
+      }, (share) => {
+        this.onShare(share)
       })
       return null
     },
 
-    resumeTorrent () {
-      for (const torrent of this.tableCheckedRows) {
-        this.$set(this.torrents[this.getIndexOfTorrent(torrent.infoHash)], 'paused', false)
+    resumeShare () {
+      for (const share of this.tableCheckedRows) {
+        this.$set(this.shares[this.getIndexOfShare(share.shareID)], 'paused', false)
 
-        if (torrentsWT[torrent.infoHash]) {
-          torrentsWT[torrent.infoHash].resume()
+        if (shares[share.shareID]) {
+          shares[share.shareID].resume()
         } else {
-          this.startTorrent(torrent.infoHash)
+          this.startShare(share.shareID)
         }
       }
     },
 
-    removeTorrent () {
+    removeShare () {
       const rows = this.tableCheckedRows
 
       for (const key in rows) {
-        const infoHash = rows[key].infoHash
-        const torrent = torrentsWT[infoHash]
+        const shareID = rows[key].shareID
+        const share = shares[shareID]
 
-        this.$delete(this.torrents, this.getIndexOfTorrent(infoHash))
+        this.$delete(this.shares, this.getIndexOfShare(shareID))
 
-        if (torrent) torrent.destroy()
+        if (share) share.destroy()
       }
       this.tableCheckedRows = []
     },
 
-    getIndexOfTorrent (infoHash) {
-      for (const index in this.torrents) {
-        if (this.torrents[index].infoHash === infoHash) {
+    getIndexOfShare (shareID) {
+      for (const index in this.shares) {
+        if (this.shares[index].shareID === shareID) {
           return index
         }
       }
@@ -461,16 +461,16 @@ export default {
           this.uploadSpeed = formatBytes(this.$wt.uploadSpeed)
           this.downloadSpeed = formatBytes(this.$wt.downloadSpeed)
 
-          for (const index in this.torrents) {
-            const torrent = this.torrents[index]
+          for (const index in this.shares) {
+            const share = this.shares[index]
 
-            if (torrent.done || !torrentsWT[torrent.infoHash]) continue
+            if (share.done || !shares[share.shareID]) continue
 
             // Vue will make rendering delay and slows down file transfer if progress value is directly given
-            const progress = parseInt((100 * torrentsWT[torrent.infoHash].progress).toFixed(1))
+            const progress = parseInt((100 * shares[share.shareID].progress).toFixed(1))
 
-            if (torrent.progress !== progress) {
-              this.$set(this.torrents[index], 'progress', progress)
+            if (share.progress !== progress) {
+              this.$set(this.shares[index], 'progress', progress)
             }
           }
         }, 1000)
@@ -480,22 +480,24 @@ export default {
 
   mounted () {
     this.$store.subscribe((mutation) => {
-      // new torrent is torrent received from peers
-      if (mutation.type === 'newTorrent') {
-        this.addNewTorrent(mutation.payload)
+      // newShare is share received from peers
+      if (mutation.type === 'newShare') {
+        this.addNewShare(mutation.payload)
 
         this.glowFilesBtn = true
         setTimeout(() => {
           this.glowFilesBtn = false
         }, 500)
-      } else if (mutation.type === 'addTorrent') {
+      } else if (mutation.type === 'addShare') {
+        // addShare is a new file added by user
+
         const p2pt = this.$store.state.p2pt
         const data = {
           ...mutation.payload,
-          ...{ type: 'newTorrent' }
+          ...{ type: 'newShare' }
         }
 
-        // let peers know of this torrent
+        // let peers know of this share
         for (const key in this.$store.state.users) {
           const user = this.$store.state.users[key]
           p2pt.send(user.conn, JSON.stringify(data))
@@ -635,7 +637,7 @@ export default {
 .countTag
   transition: 0.25s all
 
-#torrents
+#shares
   // margin-top: 20px
 
   .upload

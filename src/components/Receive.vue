@@ -55,20 +55,20 @@ export default {
   methods: {
     init () {
       const set = this.$set
-      const onTorrent = (torrent) => {
-        for (const key in torrent.files) {
-          const file = torrent.files[key]
+      const onShare = (share) => {
+        for (const key in share.files) {
+          const file = share.files[key]
 
-          this.$set(this.files, torrent.infoHash + file.name, {
-            name: this.$store.state.receivedFiles[torrent.infoHash],
-            infoHash: torrent.infoHash,
+          this.$set(this.files, share.infoHash + file.name, {
+            name: this.$store.state.receivedFiles[share.infoHash],
+            infoHash: share.infoHash,
             progress: file.progress,
             length: file.length,
-            downloadSpeed: torrent.downloadSpeed,
+            downloadSpeed: share.downloadSpeed,
             download: ''
           })
 
-          const item = this.files[torrent.infoHash + file.name]
+          const item = this.files[share.infoHash + file.name]
 
           file.getBlobURL(function (err, url) {
             if (err) throw err
@@ -81,11 +81,11 @@ export default {
 
       for (const infoHash in this.$store.state.receivedFiles) {
         if (this.$wt.get(infoHash)) {
-          onTorrent(this.$wt.get(infoHash))
+          onShare(this.$wt.get(infoHash))
         } else {
           this.$wt.add(infoHash, {
             announce: this.$ANNOUNCE_URLS
-          }, onTorrent)
+          }, onShare)
         }
       }
     },
