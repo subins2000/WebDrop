@@ -1,6 +1,7 @@
 import linkify from 'vue-linkify'
 import Vue from 'vue'
 import VueClipboard from 'vue-clipboard2'
+import PeerFile from 'simple-peer-file'
 
 import App from './App.vue'
 import router from './router'
@@ -69,6 +70,7 @@ Vue.prototype.$INTERNET_ROOM_CODE_LENGTH = 4
 Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://WebDrop.Space/#/?room='
 
 Vue.prototype.$p2pt = null
+Vue.prototype.$pf = new PeerFile()
 
 store.commit('initSettings')
 

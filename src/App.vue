@@ -14,7 +14,7 @@ import * as hashSum from 'hash-sum'
 import * as P2PT from 'p2pt'
 import * as publicIP from 'public-ip'
 
-import { PeerFileSend } from 'simple-peer-file'
+import PeerFile from 'simple-peer-file'
 
 // import 'vue-material-design-icons/styles.css'
 
@@ -124,9 +124,11 @@ export default {
           const share = this.$store.state.shares[msg.shareID]
 
           if (share && share.file) {
-            share.transfer = new PeerFileSend(peer, share.file)
-            share.transfer.start()
-            peer.respond(1)
+            this.$pf.send(peer, share.file).then(transfer => {
+              share.transfer = transfer
+              console.log(transfer)
+              transfer.start()
+            })
           }
         } else if (type === 'msg') {
           // msg exist check

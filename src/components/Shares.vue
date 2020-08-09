@@ -163,7 +163,6 @@ import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
 import UploadIcon from 'vue-material-design-icons/Upload.vue'
 
 import * as sha1 from 'simple-sha1'
-import { PeerFileReceive } from 'simple-peer-file'
 
 const shares = {}
 
@@ -331,50 +330,50 @@ export default {
 
       if (shares[shareID]) return
 
-      const share = {
-        file: null,
-        transfer: new PeerFileReceive(peer, {
-          shareID,
-          senderSocketID: peer.id,
-          filesizeBytes: shareInfo.length
+      this.$pf.receive(peer).then(transfer => {
+        const share = {
+          file: null,
+          transfer
+        }
+
+        const index = this.getIndexOfShare(shareID)
+
+        let prevBytes = 0
+        let prevProgress = 0
+
+        console.log(transfer)
+        transfer.on('progress', receivedBytes => {
+          bytesTransferred += receivedBytes - prevBytes
+          prevBytes = receivedBytes
+
+          const progress = parseInt((100 * (receivedBytes / shareInfo.length)).toFixed(1))
+
+          if (prevProgress !== progress) {
+            this.$set(this.shares[index], 'progress', progress)
+            prevProgress = progress
+          }
         })
-      }
 
-      const index = this.getIndexOfShare(shareID)
+        transfer.on('done', file => {
+          const url = URL.createObjectURL(file)
 
-      let prevBytes = 0
-      let prevProgress = 0
-      share.transfer.on('progress', receivedBytes => {
-        bytesTransferred += receivedBytes - prevBytes
-        prevBytes = receivedBytes
+          this.$set(this.shares[index], 'done', true)
+          this.$set(this.shares[index], 'downloadURL', url)
 
-        const progress = parseInt((100 * (receivedBytes / shareInfo.length)).toFixed(1))
+          delete shares[shareID]
 
-        if (prevProgress !== progress) {
-          this.$set(this.shares[index], 'progress', progress)
-          prevProgress = progress
-        }
+          // Are there other transfers happening ?
+          if (Object.keys(shares).length === 0) {
+            this.stopSpeedUpdate()
+          }
+        })
+
+        transfer.start()
+        this.startSpeedUpdate()
+
+        shares[shareID] = share
+        this.$set(this.shares[index], 'paused', false)
       })
-
-      share.transfer.on('done', file => {
-        const url = URL.createObjectURL(file)
-
-        this.$set(this.shares[index], 'done', true)
-        this.$set(this.shares[index], 'downloadURL', url)
-
-        delete shares[shareID]
-
-        // Are there other transfers happening ?
-        if (Object.keys(shares).length === 0) {
-          this.stopSpeedUpdate()
-        }
-      })
-
-      share.transfer.start()
-      this.startSpeedUpdate()
-
-      shares[shareID] = share
-      this.$set(this.shares[index], 'paused', false)
 
       this.$store.state.p2pt.send(peer, {
         type: 'startSending',
