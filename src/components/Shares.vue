@@ -330,7 +330,7 @@ export default {
 
       if (shares[shareID]) return
 
-      this.$pf.receive(peer).then(transfer => {
+      this.$pf.receive(peer, shareID).then(transfer => {
         const share = {
           file: null,
           transfer
@@ -341,7 +341,6 @@ export default {
         let prevBytes = 0
         let prevProgress = 0
 
-        console.log(transfer)
         transfer.on('progress', receivedBytes => {
           bytesTransferred += receivedBytes - prevBytes
           prevBytes = receivedBytes

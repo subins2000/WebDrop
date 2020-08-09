@@ -14,8 +14,6 @@ import * as hashSum from 'hash-sum'
 import * as P2PT from 'p2pt'
 import * as publicIP from 'public-ip'
 
-import PeerFile from 'simple-peer-file'
-
 // import 'vue-material-design-icons/styles.css'
 
 export default {
@@ -124,9 +122,8 @@ export default {
           const share = this.$store.state.shares[msg.shareID]
 
           if (share && share.file) {
-            this.$pf.send(peer, share.file).then(transfer => {
+            this.$pf.send(peer, msg.shareID, share.file).then(transfer => {
               share.transfer = transfer
-              console.log(transfer)
               transfer.start()
             })
           }
