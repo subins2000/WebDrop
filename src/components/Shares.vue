@@ -361,10 +361,7 @@ export default {
 
           delete shares[shareID]
 
-          // Are there other transfers happening ?
-          if (Object.keys(shares).length === 0) {
-            this.stopSpeedUpdate()
-          }
+          this.stopSpeedUpdate()
         })
 
         transfer.start()
@@ -459,6 +456,7 @@ export default {
     },
 
     startSpeedUpdate () {
+      console.log(speedCheck)
       if (!speedCheck) {
         const speed = () => {
           this.speed = formatBytes(bytesTransferred)
@@ -471,7 +469,11 @@ export default {
     },
 
     stopSpeedUpdate () {
-      clearInterval(speedCheck)
+      // Are there other transfers happening ?
+      if (Object.keys(shares).length === 0) {
+        clearInterval(speedCheck)
+        speedCheck = null
+      }
     }
   },
 
