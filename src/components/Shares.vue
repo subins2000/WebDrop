@@ -40,8 +40,7 @@
               </div>
             </div>
             <b-field class="control action" grouped>
-              <a class="tag is-dark"><upload-icon class="icon is-small"></upload-icon><download-icon class="icon is-small"></download-icon></a>
-              <span class="tag is-info">{{ speed }}/s</span>
+              <span class="tag is-dark"><speed-icon class="icon is-small"></speed-icon><span>{{ speed }}/s</span></span>
             </b-field>
           </div>
           <b-table
@@ -156,10 +155,10 @@
 <script>
 import AndroidMessagesIcon from 'vue-material-design-icons/AndroidMessages.vue'
 import DevicesIcon from 'vue-material-design-icons/Devices.vue'
-import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import FileMultipleIcon from 'vue-material-design-icons/FileMultiple.vue'
 import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
+import SpeedIcon from 'vue-material-design-icons/Speedometer.vue'
 import UploadIcon from 'vue-material-design-icons/Upload.vue'
 
 import * as sha1 from 'simple-sha1'
@@ -187,10 +186,10 @@ export default {
   components: {
     AndroidMessagesIcon,
     DevicesIcon,
-    DownloadIcon,
     EarthIcon,
     FileMultipleIcon,
     FileUploadIcon,
+    SpeedIcon,
     UploadIcon
   },
 
