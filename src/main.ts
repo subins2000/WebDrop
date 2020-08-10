@@ -1,7 +1,7 @@
 import linkify from 'vue-linkify'
 import Vue from 'vue'
 import VueClipboard from 'vue-clipboard2'
-import PeerFile from 'simple-peer-file'
+import PeerFile from 'simple-peer-files'
 
 import App from './App.vue'
 import router from './router'

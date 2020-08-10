@@ -2,6 +2,8 @@ import P2PT from 'p2pt'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import { PeerFileSend, PeerFileReceive } from 'simple-peer-files'
+
 import device from '../device'
 
 Vue.use(Vuex)
@@ -13,6 +15,7 @@ interface Shares {
     length: number;
     paused: boolean;
     mine: boolean;
+    transfer: PeerFileSend | PeerFileReceive
   };
 }
 
@@ -109,6 +112,21 @@ export default new Vuex.Store({
         ...payload,
         ...{ mine: false } // m for mine
       })
+    },
+
+    setTransfer (state, payload) {
+      Vue.set(state.shares[payload.shareID], 'transfer', payload.transfer)
+    },
+
+    // This will prevent others from downloading
+    // unless they've already started it
+    pauseShare (state, shareID) {
+      Vue.set(state.shares[shareID], 'paused', true)
+      state.shares[shareID].transfer.pause()
+    },
+
+    removeShare (state, shareID) {
+      Vue.delete(state.shares, shareID)
     },
 
     setRoom (state, roomID: string) {

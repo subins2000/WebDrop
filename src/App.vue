@@ -111,9 +111,6 @@ export default {
             queue: false
           })
         } else if (type === 'newShare') {
-          // share exists check
-          if (this.$store.state.shares[msg.shareID]) return
-
           delete msg.type
           msg.peer = peer
 
@@ -121,9 +118,12 @@ export default {
         } else if (type === 'startSending') {
           const share = this.$store.state.shares[msg.shareID]
 
-          if (share && share.file) {
+          if (share && share.file && !share.paused) {
             this.$pf.send(peer, msg.shareID, share.file).then(transfer => {
-              share.transfer = transfer
+              this.$store.commit('setTransfer', {
+                shareID: msg.shareID,
+                transfer
+              })
               transfer.start()
             })
           }

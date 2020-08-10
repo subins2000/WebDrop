@@ -20,8 +20,11 @@
             <div class="control" id="shareButtons" v-show="tableCheckedRows.length > 0">
               <div class="control" v-if="tableCheckedRows.length === 1">
                 <b-field grouped>
-                  <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
-                    <b-button @click="resumeShare">Start</b-button>
+                  <div class="control" v-if="tableCheckedRows[0].paused">
+                    <b-button @click="resumeShare">Resume</b-button>
+                  </div>
+                  <div class="control" v-else>
+                    <b-button @click="pauseShare">Pause</b-button>
                   </div>
                   <div class="control">
                     <b-button type="is-danger" @click="removeShare">Remove</b-button>
@@ -31,7 +34,10 @@
               <div class="control" v-else>
                 <b-field grouped>
                   <div class="control">
-                    <b-button @click="resumeShare">Start</b-button>
+                    <b-button @click="resumeShare">Resume</b-button>
+                  </div>
+                  <div class="control">
+                    <b-button @click="pauseShare">Pause</b-button>
                   </div>
                   <div class="control">
                     <b-button type="is-danger" @click="removeShare">Remove</b-button>
@@ -266,6 +272,8 @@ export default {
     makeShare (file) {
       const shareID = sha1.sync(file.name + file.size)
 
+      if (this.$store.state.shares[shareID]) return
+
       const share = {
         shareID: shareID,
         file,
@@ -284,18 +292,15 @@ export default {
     addNewShare (shareInfo) {
       const shareID = shareInfo.shareID
 
-      if (shares[shareID]) {
-        // share with same hash exist
-        shares[shareID].addPeer(shareInfo.peer)
-      } else {
+      if (this.getIndexOfShare(shareID) === null) {
         shareInfo.paused = !this.autoStart
 
         // add new item
         this.addShareToList(shareInfo, false)
+      }
 
-        if (this.autoStart) {
-          this.downloadShare(shareInfo)
-        }
+      if (this.autoStart) {
+        this.downloadShare(shareInfo)
       }
 
       // Notify new files if user is not currently seeing Files tab
@@ -327,8 +332,6 @@ export default {
       const shareID = shareInfo.shareID
       const peer = shareInfo.peer
 
-      if (shares[shareID]) return
-
       this.$pf.receive(peer, shareID).then(transfer => {
         const share = {
           file: null,
@@ -340,11 +343,13 @@ export default {
         let prevBytes = 0
         let prevProgress = 0
 
-        transfer.on('progress', receivedBytes => {
+        transfer.on('progress', (progress, receivedBytes) => {
           bytesTransferred += receivedBytes - prevBytes
           prevBytes = receivedBytes
 
-          const progress = parseInt((100 * (receivedBytes / shareInfo.length)).toFixed(1))
+          console.log(progress, receivedBytes, shareInfo.length)
+          // parseInt will make it single digit
+          progress = parseInt(progress)
 
           if (prevProgress !== progress) {
             this.$set(this.shares[index], 'progress', progress)
@@ -353,6 +358,8 @@ export default {
         })
 
         transfer.on('done', file => {
+          this.$set(this.shares[index], 'progress', 100)
+
           const url = URL.createObjectURL(file)
 
           this.$set(this.shares[index], 'done', true)
@@ -363,10 +370,13 @@ export default {
           this.stopSpeedUpdate()
         })
 
-        transfer.start()
+        this.$store.commit('setTransfer', {
+          shareID,
+          transfer
+        })
+
         this.startSpeedUpdate()
 
-        shares[shareID] = share
         this.$set(this.shares[index], 'paused', false)
       })
 
@@ -376,14 +386,21 @@ export default {
       })
     },
 
-    resumeShare () {
-      for (const share of this.tableCheckedRows) {
-        this.$set(this.shares[this.getIndexOfShare(share.shareID)], 'paused', false)
+    pauseShare () {
+      for (const shareInfo of this.tableCheckedRows) {
+        this.$store.commit('pauseShare', shareInfo.shareID)
+      }
+    },
 
-        if (shares[share.shareID]) {
-          shares[share.shareID].resume()
+    resumeShare () {
+      for (const shareInfo of this.tableCheckedRows) {
+        this.$set(this.shares[this.getIndexOfShare(shareInfo.shareID)], 'paused', false)
+
+        const share = this.$store.state.shares[shareInfo.shareID]
+        if (share) {
+          share.transfer.resume()
         } else {
-          this.downloadShare(share.shareID)
+          this.downloadShare(shareInfo.shareID)
         }
       }
     },
@@ -455,7 +472,6 @@ export default {
     },
 
     startSpeedUpdate () {
-      console.log(speedCheck)
       if (!speedCheck) {
         const speed = () => {
           this.speed = formatBytes(bytesTransferred)
@@ -502,6 +518,8 @@ export default {
           const user = this.$store.state.users[key]
           p2pt.send(user.conn, data)
         }
+      } else if (mutation.type === 'pauseShare') {
+        this.$set(this.shares[this.getIndexOfShare(mutation.payload)], 'paused', true)
       } else if (mutation.type === 'addUser') {
         this.glowUsersBtn = true
         setTimeout(() => {
