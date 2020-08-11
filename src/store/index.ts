@@ -121,15 +121,17 @@ export default new Vuex.Store({
     // This will prevent others from downloading
     // unless they've already started it
     pauseShare (state, shareID) {
+      if (!state.shares[shareID]) return
+
       Vue.set(state.shares[shareID], 'paused', true)
       state.shares[shareID].transfer.pause()
     },
 
     removeShare (state, shareID) {
-      try {
-        const transfer = state.shares[shareID].transfer
-        if (transfer) transfer.cancel()
-      } catch (err) { console.log(err) }
+      if (!state.shares[shareID]) return
+
+      const transfer = state.shares[shareID].transfer
+      if (transfer) transfer.cancel()
       Vue.delete(state.shares, shareID)
     },
 

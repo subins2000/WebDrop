@@ -78,8 +78,10 @@
                     <span class="tag is-info"><upload-icon class="icon is-small" title="Ready for other devices to download"></upload-icon></span>
                   </span>
                   <span class="tags control has-addons" v-for="(progress, userID) in props.row.users" :key="userID">
-                    <span class="tag" v-bind:style="{ 'background-color': $store.state.users[userID].color }">{{ $store.state.users[userID].name }}</span>
-                    <span class="tag is-dark">{{ progress }}%</span>
+                    <span v-if="$store.state.users[userID]">
+                      <span class="tag" v-bind:style="{ 'background-color': $store.state.users[userID].color }">{{ $store.state.users[userID].name }}</span>
+                      <span class="tag is-dark">{{ progress }}%</span>
+                    </span>
                   </span>
                 </b-field>
               </b-table-column>
@@ -411,7 +413,7 @@ export default {
         this.$set(this.shares[this.getIndexOfShare(shareInfo.shareID)], 'paused', false)
 
         const share = this.$store.state.shares[shareInfo.shareID]
-        if (share) {
+        if (share && share.transfer) {
           share.transfer.resume()
         } else {
           this.downloadShare(shareInfo.shareID)
@@ -540,6 +542,14 @@ export default {
           const user = this.$store.state.users[key]
           p2pt.send(user.conn, data)
         }
+      } else if (type === 'removeUser') {
+        // Remove user from upload progress
+        // This only applies to the uploader
+        Object.entries(this.shares).forEach((share, shareID) => {
+          if (this.shares[shareID].mine) {
+            this.$delete(this.shares[shareID].users, payload)
+          }
+        })
       } else if (type === 'addUser') {
         this.glowUsersBtn = true
         setTimeout(() => {

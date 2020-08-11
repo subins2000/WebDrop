@@ -185,19 +185,21 @@ export default {
         warningCount++
         console.log(error)
 
-        if (warningCount >= stats.total && !trackerConnected) {
+        if (warningCount >= stats.total && !trackerConnected && !warningMsg) {
           warningMsg = this.$buefy.snackbar.open({
             message: 'We couldn\'t connect to any WebShare trackers. Your ISP might be blocking them 🤔',
             position: 'is-top',
             type: 'is-danger',
-            queue: true,
+            queue: false,
             indefinite: true,
             actionText: 'Retry',
             onAction: () => {
               if (!trackerConnected) {
                 this.$store.commit('destroyP2PT')
+                p2pt.destroy()
                 this.startP2PT(identifier)
               }
+              warningMsg.close()
             }
           })
         }

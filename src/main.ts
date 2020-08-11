@@ -55,11 +55,9 @@ Vue.directive('linkified', linkify)
 let announceURLs = [
   'wss://tracker.openwebtorrent.com',
   'wss://tracker.btorrent.xyz',
-  'wss://tracker.fastcast.nz',
   'wss://tracker.sloppyta.co:443/announce',
-  'wss://tracker.novage.com.ua:443/announce',
-  'wss://tracker.bshare.xyz:443/announce'
-  // 'ws://10.42.0.1:5000'
+  'wss://tracker.novage.com.ua:443/announce'
+  // 'ws://192.168.100.7:5000'
 ]
 
 if (window.location.hostname === 'localhost') {
