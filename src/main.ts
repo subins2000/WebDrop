@@ -73,6 +73,10 @@ Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://WebDrop.Space/#/?room='
 Vue.prototype.$p2pt = null
 Vue.prototype.$pf = new PeerFile()
 
+// Event Bus
+// https://stackoverflow.com/a/47759612
+Vue.prototype.$eventBus = new Vue()
+
 store.commit('initSettings')
 
 const vue = new Vue({

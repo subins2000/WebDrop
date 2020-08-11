@@ -73,7 +73,15 @@
                     <span v-show="props.row.paused" class="has-text-black">&nbsp;(Paused)</span>
                   </b-progress>
                 </div>
-                <a class="tag is-info" v-show="props.row.mine"><upload-icon class="icon is-small" title="Ready for other devices to download"></upload-icon></a>
+                <b-field grouped group-multiline v-if="props.row.mine">
+                  <span class="tags control has-addons">
+                    <span class="tag is-info"><upload-icon class="icon is-small" title="Ready for other devices to download"></upload-icon></span>
+                  </span>
+                  <span class="tags control has-addons" v-for="(progress, userID) in props.row.users" :key="userID">
+                    <span class="tag" v-bind:style="{ 'background-color': $store.state.users[userID].color }">{{ $store.state.users[userID].name }}</span>
+                    <span class="tag is-dark">{{ progress }}%</span>
+                  </span>
+                </b-field>
               </b-table-column>
             </template>
             <template slot="empty">
@@ -266,6 +274,11 @@ export default {
         done: false,
         mine,
         progress: 0
+      }
+
+      if (mine) {
+        // For storing upload progress
+        shareInfo.users = {}
       }
 
       this.$set(this.shares, this.shares.length, shareInfo)
@@ -491,29 +504,32 @@ export default {
     stopSpeedUpdate () {
       // Are there other transfers happening ?
       if (Object.keys(this.$store.state.shares).length === 0) {
-        noSleep.disable()
         clearInterval(speedCheck)
         speedCheck = null
+        noSleep.disable()
       }
     }
   },
 
   mounted () {
     this.$store.subscribe((mutation) => {
+      const type = mutation.type
+      const payload = mutation.payload
+
       // newShare is share received from peers
-      if (mutation.type === 'newShare') {
-        this.addNewShare(mutation.payload)
+      if (type === 'newShare') {
+        this.addNewShare(payload)
 
         this.glowFilesBtn = true
         setTimeout(() => {
           this.glowFilesBtn = false
         }, 500)
-      } else if (mutation.type === 'addShare') {
+      } else if (type === 'addShare') {
         // addShare is a new file added by user
 
         const p2pt = this.$store.state.p2pt
         const data = {
-          ...mutation.payload,
+          ...payload,
           ...{ type: 'newShare' }
         }
 
@@ -524,17 +540,26 @@ export default {
           const user = this.$store.state.users[key]
           p2pt.send(user.conn, data)
         }
-      } else if (mutation.type === 'addUser') {
+      } else if (type === 'addUser') {
         this.glowUsersBtn = true
         setTimeout(() => {
           this.glowUsersBtn = false
         }, 500)
-      } else if (mutation.type === 'addMessage') {
+      } else if (type === 'addMessage') {
         this.glowMsgsBtn = true
         setTimeout(() => {
           this.glowMsgsBtn = false
         }, 500)
       }
+    })
+
+    this.$eventBus.$on('uploadProgress', (userID, shareID, progress) => {
+      const index = this.getIndexOfShare(shareID)
+      this.$set(
+        this.shares[index].users,
+        userID,
+        progress
+      )
     })
 
     // handle file drop on page

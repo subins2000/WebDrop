@@ -116,13 +116,29 @@ export default {
 
           this.$store.commit('newShare', msg)
         } else if (type === 'startSending') {
-          const share = this.$store.state.shares[msg.shareID]
+          const shareID = msg.shareID
+          const share = this.$store.state.shares[shareID]
 
           if (share && share.file && !share.paused) {
-            this.$pf.send(peer, msg.shareID, share.file).then(transfer => {
+            this.$pf.send(peer, shareID, share.file).then(transfer => {
               this.$store.commit('setTransfer', {
-                shareID: msg.shareID,
+                shareID,
                 transfer
+              })
+              let prevProgress = 0
+              transfer.on('progress', progress => {
+                // parseInt will make it single digit
+                progress = parseInt(progress)
+
+                if (prevProgress !== progress) {
+                  this.$eventBus.$emit(
+                    'uploadProgress',
+                    peer.id,
+                    shareID,
+                    progress
+                  )
+                  prevProgress = progress
+                }
               })
               transfer.start()
             })
