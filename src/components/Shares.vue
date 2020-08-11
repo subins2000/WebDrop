@@ -167,9 +167,10 @@ import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
 import SpeedIcon from 'vue-material-design-icons/Speedometer.vue'
 import UploadIcon from 'vue-material-design-icons/Upload.vue'
 
+import NoSleep from 'nosleep.js'
 import * as sha1 from 'simple-sha1'
 
-const shares = {}
+const noSleep = new NoSleep()
 
 let speedCheck = null
 let bytesTransferred = 0 // this gets filled and reset every second as speedCheck porgresses
@@ -347,7 +348,6 @@ export default {
           bytesTransferred += receivedBytes - prevBytes
           prevBytes = receivedBytes
 
-          console.log(progress, receivedBytes, shareInfo.length)
           // parseInt will make it single digit
           progress = parseInt(progress)
 
@@ -365,8 +365,7 @@ export default {
           this.$set(this.shares[index], 'done', true)
           this.$set(this.shares[index], 'downloadURL', url)
 
-          delete shares[shareID]
-
+          this.$store.commit('removeShare', shareID)
           this.stopSpeedUpdate()
         })
 
@@ -410,11 +409,9 @@ export default {
 
       for (const key in rows) {
         const shareID = rows[key].shareID
-        const share = shares[shareID]
 
+        this.$store.commit('removeShare', shareID)
         this.$delete(this.shares, this.getIndexOfShare(shareID))
-
-        if (share) share.destroy()
       }
       this.tableCheckedRows = []
     },
@@ -478,6 +475,14 @@ export default {
           bytesTransferred = 0
         }
 
+        // Keep mobile screen on
+        document.addEventListener('click', function enableNoSleep () {
+          document.removeEventListener('click', enableNoSleep, false)
+          noSleep.enable()
+        }, false)
+
+        noSleep.enable()
+
         setTimeout(speed, 1000)
         speedCheck = setInterval(speed, 1000)
       }
@@ -485,7 +490,8 @@ export default {
 
     stopSpeedUpdate () {
       // Are there other transfers happening ?
-      if (Object.keys(shares).length === 0) {
+      if (Object.keys(this.$store.state.shares).length === 0) {
+        noSleep.disable()
         clearInterval(speedCheck)
         speedCheck = null
       }
