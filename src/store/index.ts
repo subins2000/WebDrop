@@ -126,8 +126,10 @@ export default new Vuex.Store({
     },
 
     removeShare (state, shareID) {
-      const transfer = state.shares[shareID].transfer
-      if (transfer) transfer.cancel()
+      try {
+        const transfer = state.shares[shareID].transfer
+        if (transfer) transfer.cancel()
+      } catch (err) { console.log(err) }
       Vue.delete(state.shares, shareID)
     },
 

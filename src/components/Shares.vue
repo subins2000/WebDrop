@@ -254,6 +254,7 @@ export default {
         this.makeShare(files[key])
       }
       this.files = []
+      noSleep.enable()
     },
 
     addShareToList (share, mine = false) {
@@ -387,6 +388,7 @@ export default {
 
     pauseShare () {
       for (const shareInfo of this.tableCheckedRows) {
+        this.$set(this.shares[this.getIndexOfShare(shareInfo.shareID)], 'paused', true)
         this.$store.commit('pauseShare', shareInfo.shareID)
       }
     },
@@ -410,8 +412,8 @@ export default {
       for (const key in rows) {
         const shareID = rows[key].shareID
 
-        this.$store.commit('removeShare', shareID)
         this.$delete(this.shares, this.getIndexOfShare(shareID))
+        this.$store.commit('removeShare', shareID)
       }
       this.tableCheckedRows = []
     },
@@ -481,8 +483,6 @@ export default {
           noSleep.enable()
         }, false)
 
-        noSleep.enable()
-
         setTimeout(speed, 1000)
         speedCheck = setInterval(speed, 1000)
       }
@@ -524,8 +524,6 @@ export default {
           const user = this.$store.state.users[key]
           p2pt.send(user.conn, data)
         }
-      } else if (mutation.type === 'pauseShare') {
-        this.$set(this.shares[this.getIndexOfShare(mutation.payload)], 'paused', true)
       } else if (mutation.type === 'addUser') {
         this.glowUsersBtn = true
         setTimeout(() => {

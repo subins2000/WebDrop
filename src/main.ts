@@ -53,11 +53,12 @@ Vue.component('Header', Header)
 Vue.directive('linkified', linkify)
 
 let announceURLs = [
-  'wss://tracker.openwebshare.com',
+  'wss://tracker.openwebtorrent.com',
+  'wss://tracker.btorrent.xyz',
+  'wss://tracker.fastcast.nz',
   'wss://tracker.sloppyta.co:443/announce',
   'wss://tracker.novage.com.ua:443/announce',
-  'wss://tracker.bshare.xyz:443/announce',
-  'wss://track.file.pizza:443/announce'
+  'wss://tracker.bshare.xyz:443/announce'
   // 'ws://10.42.0.1:5000'
 ]
 
