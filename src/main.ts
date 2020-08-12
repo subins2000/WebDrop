@@ -54,6 +54,7 @@ Vue.directive('linkified', linkify)
 
 let announceURLs = [
   'wss://tracker.openwebtorrent.com',
+  'wss://wsswt.herokuapp.com',
   'wss://tracker.btorrent.xyz',
   'wss://tracker.sloppyta.co:443/announce',
   'wss://tracker.novage.com.ua:443/announce'

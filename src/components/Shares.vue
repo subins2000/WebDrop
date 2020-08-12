@@ -74,15 +74,17 @@
                   </b-progress>
                 </div>
                 <b-field grouped group-multiline v-if="props.row.mine">
-                  <span class="tags control has-addons">
-                    <span class="tag is-info"><upload-icon class="icon is-small" title="Ready for other devices to download"></upload-icon></span>
-                  </span>
-                  <span class="tags control has-addons" v-for="(progress, userID) in props.row.users" :key="userID">
-                    <span v-if="$store.state.users[userID]">
+                  <div class="control">
+                    <span class="tags has-addons">
+                      <span class="tag is-info"><upload-icon class="icon is-small" title="Ready for other devices to download"></upload-icon></span>
+                    </span>
+                  </div>
+                  <div class="control" v-for="(progress, userID) in props.row.users" :key="userID">
+                    <div class="tags has-addons" v-if="$store.state.users[userID]">
                       <span class="tag" v-bind:style="{ 'background-color': $store.state.users[userID].color }">{{ $store.state.users[userID].name }}</span>
                       <span class="tag is-dark">{{ progress }}%</span>
-                    </span>
-                  </span>
+                    </div>
+                  </div>
                 </b-field>
               </b-table-column>
             </template>
@@ -309,11 +311,17 @@ export default {
     addNewShare (shareInfo) {
       const shareID = shareInfo.shareID
 
-      if (this.getIndexOfShare(shareID) === null) {
+      // Will return number if the share is already in list
+      const index = this.getIndexOfShare(shareID)
+
+      if (index === null) {
         shareInfo.paused = !this.autoStart
 
         // add new item
         this.addShareToList(shareInfo, false)
+      } else if (this.shares[index].done) {
+        // File already completed
+        return
       }
 
       if (this.autoStart) {
@@ -507,6 +515,7 @@ export default {
       // Are there other transfers happening ?
       if (Object.keys(this.$store.state.shares).length === 0) {
         clearInterval(speedCheck)
+        this.speed = '0B'
         speedCheck = null
         noSleep.disable()
       }
@@ -652,6 +661,10 @@ export default {
 .container
   padding: 20px 0
 
+// Disabling overflow because .tags in last row causes an unneeded vertical scrollbar
+.table-wrapper
+  overflow-y: hidden
+
 @media screen and (max-width: 960px)
   .container
     padding: 20px 2%
@@ -672,7 +685,7 @@ export default {
     margin-top: 5px
 
   // Show check all row box on mobile
-  // Merge this to buefy :https://github.com/buefy/buefy/issues/2479
+  // Merge this to buefy: https://github.com/buefy/buefy/issues/2479
   .b-table .table-wrapper.has-mobile-cards
     thead
       display: block
