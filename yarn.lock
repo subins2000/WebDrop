@@ -8535,10 +8535,10 @@ simple-get@^4.0.0:
     once "^1.3.1"
     simple-concat "^1.0.0"
 
-simple-peer-files@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/simple-peer-files/-/simple-peer-files-1.2.0.tgz#3468043d8dc7dcfd999f61f206b01f85e1910fc1"
-  integrity sha512-2ANu6QalaPXKKyAMwqSek5Mk4TKE+UPFd2bgCd6VJ3qBNmRrD42yZGwjOykuRlsasfoUEsJKfUhCcxLP8WrVOQ==
+simple-peer-files@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/simple-peer-files/-/simple-peer-files-1.2.1.tgz#37f1ceee660df4fbfd3a4f569a146b5bbd9e6494"
+  integrity sha512-oOT6LL6WbRq2NN/HUggdwXfJ0mTmruFfZWFsu6l/Sad2j7VLEaOKlYA316K4Npgcid+uC3a6WiWiGDHE/SvaDA==
   dependencies:
     ee-ts "^1.0.2"
     filereader-stream "^2.0.0"
@@ -8857,6 +8857,11 @@ stream-shift@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/stream-shift/-/stream-shift-1.0.1.tgz#d7088281559ab2778424279b0877da3c392d5a3d"
   integrity sha512-AiisoFqQ0vbGcZgQPY1cdP2I76glaVA/RauYR4G4thNFgkTqr90yXTo4LYX60Jl+sIlPNHHdGSwo01AvbKUSVQ==
+
+streamsaver@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/streamsaver/-/streamsaver-2.0.4.tgz#ecd1b40749dc5a81d7c03c2bfdc842de372191e2"
+  integrity sha512-rGES0zmHIPxinV32H2Dz55qgOE5dXui8yfu+JEjPAI294cDmwX4Oe7tCZLrnhjc/1z7hyIv9H6TMH2kqN2Tdqw==
 
 strict-uri-encode@^1.0.0:
   version "1.1.0"
@@ -9834,6 +9839,11 @@ wcwidth@^1.0.1:
   integrity sha1-8LDc+RW8X/FSivrbLA4XtTLaL+g=
   dependencies:
     defaults "^1.0.3"
+
+web-streams-polyfill@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-3.0.0.tgz#c8bcb1e2ec1820088ca201674486a0f1feae848b"
+  integrity sha512-tcZlIJ+VBxuDXdRFF3PCZTJ3yUISGklG4hkl3CDGOlZ8XwpN90L5YsJNoSPH72wZ4nbsatE/OfIaxfM3p+6W7w==
 
 webidl-conversions@^4.0.2:
   version "4.0.2"
