@@ -181,6 +181,8 @@ import UploadIcon from 'vue-material-design-icons/Upload.vue'
 
 import NoSleep from 'nosleep.js'
 import * as sha1 from 'simple-sha1'
+import * as streamSaver from 'streamsaver'
+import * as ponyfill from 'web-streams-polyfill/ponyfill'
 
 const noSleep = new NoSleep()
 
@@ -273,7 +275,7 @@ export default {
       const shareInfo = {
         shareID: share.shareID,
         name: share.name,
-        size: formatBytes(share.length),
+        size: formatBytes(share.size),
         paused: share.paused,
         done: false,
         mine,
@@ -297,7 +299,7 @@ export default {
         shareID: shareID,
         file,
         name: file.name,
-        length: file.size,
+        size: file.size,
         paused: false
       }
 
@@ -392,6 +394,21 @@ export default {
           this.$store.commit('removeShare', shareID)
           this.stopSpeedUpdate()
         })
+
+        if (this.$store.state.settings.autoBrowserDownload) {
+          const fileStream = transfer.createReadStream()
+
+          // Allows downloading file to browser as file progresses
+          streamSaver.WritableStream = ponyfill.WritableStream
+          const downloadStream = streamSaver.createWriteStream(shareInfo.name, {
+            size: shareInfo.size
+          })
+          const writer = downloadStream.getWriter()
+
+          fileStream
+            .on('data', chunk => writer.write(chunk))
+            .on('end', () => writer.close())
+        }
 
         this.$store.commit('setTransfer', {
           shareID,

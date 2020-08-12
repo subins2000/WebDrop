@@ -12,6 +12,12 @@
         </div>
       </div>
       <div class="field">
+        <label class="label">Start Downloading In Browser</label>
+        <div class="control">
+          <b-checkbox v-model="settings.autoBrowserDownload">Start downloading files via browser download manager on receive</b-checkbox>
+        </div>
+      </div>
+      <div class="field">
         <label class="label">Auto Copy</label>
         <div class="control">
           <b-checkbox v-model="settings.autoCopy">Copy message to clipboard on receive</b-checkbox>

@@ -32,6 +32,7 @@ export default new Vuex.Store({
     settings: {
       autoCopy: false,
       autoStart: true,
+      autoBrowserDownload: true,
       anim: true,
       defaultTab: 0,
 
@@ -131,7 +132,8 @@ export default new Vuex.Store({
       if (!state.shares[shareID]) return
 
       const transfer = state.shares[shareID].transfer
-      if (transfer) transfer.cancel()
+      if (transfer.cancel) transfer.cancel()
+
       Vue.delete(state.shares, shareID)
     },
 
