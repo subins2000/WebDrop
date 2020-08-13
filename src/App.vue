@@ -27,6 +27,13 @@ export default {
         if (mutation.type === 'activateInternetShare') {
           this.$store.commit('destroyP2PT')
           this.startP2PT(this.$store.state.roomID)
+
+          this.$buefy.toast.open({
+            duration: 4000,
+            message: `Joined Room <b>${this.$store.state.roomID}</b>`,
+            position: 'is-top',
+            type: 'is-info'
+          })
         }
       })
 
@@ -35,7 +42,7 @@ export default {
           type: 'ping'
         }
         for (const user of users) {
-          this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+          this.$store.state.p2pt.send(user.conn, data)
         }
       })
     },
@@ -43,22 +50,30 @@ export default {
     setUpP2PT () {
       // for testing purposes
       // this.startP2PT('a')
-      publicIP.v4().then((ip) => {
-        const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
-        this.$store.commit('setRoom', roomID)
+
+      // If user came from a room invite link
+      const roomID = this.$route.query.room
+      if (roomID && this.$validateRoomCode(roomID)) {
+        this.$store.commit('activateInternetShare', roomID)
         this.startP2PT(roomID)
-      }).catch(error => {
-        console.log(error)
-        this.$buefy.snackbar.open({
-          message: 'Could not find your IP address',
-          position: 'is-top',
-          type: 'is-danger',
-          queue: true,
-          indefinite: true,
-          actionText: 'Retry',
-          onAction: this.setUpP2PT
+      } else {
+        publicIP.v4().then((ip) => {
+          const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
+          this.$store.commit('setRoom', roomID)
+          this.startP2PT(roomID)
+        }).catch(error => {
+          console.log(error)
+          this.$buefy.snackbar.open({
+            message: 'Could not find your IP address',
+            position: 'is-top',
+            type: 'is-danger',
+            queue: true,
+            indefinite: true,
+            actionText: 'Retry',
+            onAction: this.setUpP2PT
+          })
         })
-      })
+      }
     },
 
     startP2PT (identifier) {
@@ -66,33 +81,25 @@ export default {
       p2pt.setIdentifier('webdrop' + identifier)
 
       p2pt.on('peerconnect', (peer) => {
-        p2pt.send(peer, JSON.stringify({
+        p2pt.send(peer, {
           type: 'init',
           name: this.$store.state.settings.name,
           color: this.$store.state.settings.color,
-          torrentsCount: Object.keys(this.$store.state.torrents).length,
+          sharesCount: Object.keys(this.$store.state.shares).length,
           msgsCount: this.$store.state.msgs.length
-        }))
+        })
       })
 
       p2pt.on('msg', (peer, msg) => {
-        if (msg === 'getTorrents') {
-          this.sendTorrentsState(p2pt, peer)
-          return
-        }
+        if (typeof msg !== 'object') return
 
-        if (msg === 'getMsgs') {
+        const type = msg.type
+
+        if (type === 'getShares') {
+          this.sendSharesState(p2pt, peer)
+        } else if (type === 'getMsgs') {
           this.sendMsgsState(p2pt, peer)
-          return
-        }
-
-        try {
-          msg = JSON.parse(msg)
-        } catch (_) {
-          return
-        }
-
-        if (msg.type === 'init') {
+        } else if (type === 'init') {
           this.$store.commit('addUser', {
             id: peer.id,
             name: msg.name,
@@ -100,28 +107,67 @@ export default {
             conn: peer
           })
 
-          if (msg.torrentsCount > Object.keys(this.$store.state.torrents).length) {
-            p2pt.send(peer, 'getTorrents')
+          if (msg.sharesCount > Object.keys(this.$store.state.shares).length) {
+            p2pt.send(peer, {
+              type: 'getShares'
+            })
           }
 
           if (msg.msgsCount > this.$store.state.msgs.length) {
-            p2pt.send(peer, 'getMsgs')
+            p2pt.send(peer, {
+              type: 'getMsgs'
+            })
           }
-        } else if (msg.type === 'ping') {
+        } else if (type === 'ping') {
           this.$buefy.snackbar.open({
             duration: 3000,
             message: `<b>${this.$store.state.users[peer.id].name}</b> pinged!`,
             type: 'is-warning',
             queue: false
           })
-        } else if (msg.type === 'newTorrent') {
-          // torrent exists check
-          if (this.$store.state.torrents[msg.i]) return
-
+        } else if (type === 'newShare') {
           delete msg.type
           msg.peer = peer
-          this.$store.commit('newTorrent', msg)
-        } else if (msg.type === 'msg') {
+
+          this.$store.commit('newShare', msg)
+        } else if (type === 'startSending') {
+          const shareID = msg.shareID
+          const share = this.$store.state.shares[shareID]
+
+          if (share && share.file && !share.paused) {
+            this.$pf.send(peer, shareID, share.file).then(transfer => {
+              this.$store.commit('setTransfer', {
+                shareID,
+                transfer
+              })
+
+              let prevBytes = 0
+              transfer.on('progress', (progress, receivedBytes) => {
+                // parseInt will make it single digit
+                progress = parseInt(progress)
+
+                const bytesTransferred = receivedBytes - prevBytes
+                prevBytes = receivedBytes
+
+                this.$store.dispatch(
+                  'uploadProgress', {
+                    shareID,
+                    userID: peer.id,
+                    progress,
+                    bytes: bytesTransferred
+                  }
+                )
+              })
+
+              transfer.on('done', () => this.$store.commit('removeTransfer', {
+                shareID,
+                userID: transfer.peer._id
+              }))
+
+              transfer.start()
+            })
+          }
+        } else if (type === 'msg') {
           // msg exist check
           if (msg.id && this.$store.state.msgs[msg.id]) {
             return
@@ -139,7 +185,7 @@ export default {
 
           // copy to clipboard ?
           if (this.$store.state.settings.autoCopy) {
-            this.$copyText(msg.msg).then(e => {
+            this.$copyText(msg.msg).then(_ => {
               this.$buefy.toast.open({
                 duration: 2000,
                 message: 'Message Copied !',
@@ -158,23 +204,26 @@ export default {
       let warningCount = 0
       let trackerConnected = false
       let warningMsg = false
+
       p2pt.on('trackerwarning', (error, stats) => {
         warningCount++
         console.log(error)
 
-        if (warningCount >= stats.total && !trackerConnected) {
+        if (warningCount >= stats.total && !trackerConnected && !warningMsg) {
           warningMsg = this.$buefy.snackbar.open({
             message: 'We couldn\'t connect to any WebTorrent trackers. Your ISP might be blocking them 🤔',
             position: 'is-top',
             type: 'is-danger',
-            queue: true,
+            queue: false,
             indefinite: true,
             actionText: 'Retry',
             onAction: () => {
               if (!trackerConnected) {
                 this.$store.commit('destroyP2PT')
+                p2pt.destroy()
                 this.startP2PT(identifier)
               }
+              warningMsg.close()
             }
           })
         }
@@ -189,34 +238,34 @@ export default {
       p2pt.start()
     },
 
-    sendTorrentsState (p2pt, peer) {
-      for (const infoHash in this.$store.state.torrents) {
-        let torrent = this.$store.state.torrents[infoHash]
+    sendSharesState (p2pt, peer) {
+      for (const infoHash in this.$store.state.shares) {
+        let share = this.$store.state.shares[infoHash]
 
-        // only send torrents created by me (m = mine)
-        if (!torrent.m) continue
+        // only send shares created by me
+        if (!share.mine) continue
 
-        torrent = {
-          ...torrent,
+        share = {
+          ...share,
           ...{
-            type: 'newTorrent',
+            type: 'newShare',
             i: infoHash
           }
         }
-        p2pt.send(peer, JSON.stringify(torrent))
+        p2pt.send(peer, share)
       }
     },
 
     sendMsgsState (p2pt, peer) {
       for (const id in this.$store.state.msgs) {
         const msg = this.$store.state.msgs[id]
-        p2pt.send(peer, JSON.stringify({
+        p2pt.send(peer, {
           ...msg,
           ...{
             type: 'msg',
             id: id
           }
-        }))
+        })
       }
     }
   },
@@ -300,9 +349,6 @@ $speed-slower: 250ms !default
 @import "~buefy/src/scss/utils/_functions.scss";
 
 @import "~buefy/src/scss/components/_checkbox.scss";
-
-@import "~bulma/sass/components/modal.sass";
-@import "~buefy/src/scss/components/_modal.scss";
 
 @import "~buefy/src/scss/components/_notices.scss";
 @import "~buefy/src/scss/components/_progress.scss";

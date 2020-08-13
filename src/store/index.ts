@@ -2,9 +2,23 @@ import P2PT from 'p2pt'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import { PeerFileSend, PeerFileReceive } from 'simple-peer-files'
+
 import device from '../device'
 
 Vue.use(Vuex)
+
+interface Shares {
+  [shareID: string]: {
+    shareID: string,
+    file: File, // Will be only in sender
+    name: string,
+    size: number,
+    paused: boolean,
+    mine: boolean,
+    transfers: Array<PeerFileSend | PeerFileReceive>
+  };
+}
 
 export default new Vuex.Store({
   state: {
@@ -12,13 +26,14 @@ export default new Vuex.Store({
     selectedUsers: [] as any,
 
     msgs: [],
-    torrents: {},
+    shares: {} as Shares,
 
     p2pt: P2PT,
 
     settings: {
       autoCopy: false,
       autoStart: true,
+      autoBrowserDownload: true,
       anim: true,
       defaultTab: 0,
 
@@ -85,20 +100,64 @@ export default new Vuex.Store({
       state.selectedUsers = []
     },
 
-    // torrent added by user
-    addTorrent (state, payload) {
-      Vue.set(state.torrents, payload.i, {
+    // share added by user
+    addShare (state, payload) {
+      Vue.set(state.shares, payload.shareID, {
         ...payload,
-        ...{ m: true } // m for mine
+        ...{
+          mine: true, // I'm the sender
+          transfers: []
+        }
       })
     },
 
-    // torrent received from a peer
-    newTorrent (state, payload) {
-      Vue.set(state.torrents, payload.i, {
+    // share received from a peer
+    newShare (state, payload) {
+      Vue.set(state.shares, payload.shareID, {
         ...payload,
-        ...{ m: false } // m for mine
+        ...{
+          mine: false, // I'm the receiver
+          transfers: []
+        }
       })
+    },
+
+    setTransfer (state, payload) {
+      const transfers = state.shares[payload.shareID].transfers
+      Vue.set(transfers, transfers.length, payload.transfer)
+    },
+
+    // This is called when a transfer is completed
+    removeTransfer (state, payload) {
+      state.shares[payload.shareID].transfers.forEach((t, index) => {
+        // ._id is the channel name
+        if (t.peer._id === payload.userID) {
+          Vue.delete(state.shares[payload.shareID].transfers, index)
+        }
+      })
+    },
+
+    // This will prevent others from downloading
+    // unless they've already started it
+    pauseShare (state, shareID) {
+      if (!state.shares[shareID]) return
+
+      state.shares[shareID].transfers.forEach(t => {
+        t.pause()
+      })
+
+      Vue.set(state.shares[shareID], 'paused', true)
+    },
+
+    // Share will be removed by receiver after download completes
+    removeShare (state, shareID) {
+      if (!state.shares[shareID]) return
+
+      state.shares[shareID].transfers.forEach(t => {
+        t.cancel()
+      })
+
+      Vue.delete(state.shares, shareID)
     },
 
     setRoom (state, roomID: string) {
@@ -125,8 +184,14 @@ export default new Vuex.Store({
       Vue.set(state.msgs, state.msgs.length, payload)
     }
   },
+
+  // ----
+  // We use Vuex Actions as cross component event bus
+  // ----
   actions: {
-  },
-  modules: {
+    /* eslint-disable @typescript-eslint/no-empty-function */
+    uploadProgress () {},
+    invalidRoomCode () {}
+    /* esline-enable @typescript-eslint/no-empty-function */
   }
 })

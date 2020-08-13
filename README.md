@@ -12,7 +12,7 @@ Made with [P2PT](https://github.com/subins2000/p2pt), WebRTC 🔥. No servers in
 
 * Easy to use
 * Auto discover devices in the same network (LAN)
-* Shared transfer of files (Torrent 🔥)
+* Shared transfer of files (Share 🔥)
 * Resume connection interrupted downloads
 * Share through internet with a room code !
 * Easily share Text Messages too !
@@ -36,20 +36,20 @@ yarn install
 yarn start
 ```
 
-WebTorrent trackers list is included in `src/main.ts`. You may want to change that or add/start your [own tracker](https://github.com/subins2000/p2pt/blob/master/startTracker.js) locally for development.
+WebShare trackers list is included in `src/main.ts`. You may want to change that or add/start your [own tracker](https://github.com/subins2000/p2pt/blob/master/startTracker.js) locally for development.
 
 #### Starting Local Tracker
 
-Install [bittorrent-tracker] globally :
+Install [bitshare-tracker] globally :
 
 ```
-yarn global add bittorrent-tracker
+yarn global add bitshare-tracker
 ```
 
-Download [this script](https://github.com/subins2000/p2pt/blob/master/startTracker.js) and run it. It only requires `bittorrent-tracker`.
+Download [this script](https://github.com/subins2000/p2pt/blob/master/startTracker.js) and run it. It only requires `bitshare-tracker`.
 
 ## Thanks
 
 * [Buefy](https://buefy.org/)
 * [Material Design Icons](https://materialdesignicons.com/)
-* [WebTorrent](https://webtorrent.io)
+* [WebShare](https://webshare.io)

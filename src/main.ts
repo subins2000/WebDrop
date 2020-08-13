@@ -1,7 +1,7 @@
 import linkify from 'vue-linkify'
 import Vue from 'vue'
 import VueClipboard from 'vue-clipboard2'
-import WebTorrent from 'webtorrent'
+import PeerFiles from 'simple-peer-files'
 
 import App from './App.vue'
 import router from './router'
@@ -14,7 +14,6 @@ import Button from 'buefy/dist/components/button'
 import Checkbox from 'buefy/dist/components/checkbox'
 import Field from 'buefy/dist/components/field'
 import Input from 'buefy/dist/components/input'
-import Modal from 'buefy/dist/components/modal'
 import Navbar from 'buefy/dist/components/navbar'
 import Progress from 'buefy/dist/components/progress'
 import Tabs from 'buefy/dist/components/tabs'
@@ -33,15 +32,14 @@ const comps = [
   Checkbox,
   Field,
   Input,
-  Modal,
   Navbar,
   Progress,
   Tabs,
   Table,
   Tag,
+  Toast,
   Tooltip,
   Snackbar,
-  Toast,
   Upload
 ]
 
@@ -54,23 +52,29 @@ Vue.directive('linkified', linkify)
 
 let announceURLs = [
   'wss://tracker.openwebtorrent.com',
+  'wss://wsswt.herokuapp.com',
+  'wss://tracker.btorrent.xyz',
   'wss://tracker.sloppyta.co:443/announce',
-  'wss://tracker.novage.com.ua:443/announce',
-  'wss://tracker.btorrent.xyz:443/announce',
-  'wss://track.file.pizza:443/announce'
-  // 'ws://10.42.0.1:5000'
+  'wss://tracker.novage.com.ua:443/announce'
+  // 'ws://192.168.100.7:5000'
 ]
 
 if (window.location.hostname === 'localhost') {
   announceURLs = ['ws://0.0.0.0:5000']
 }
 
+const INTERNET_ROOM_CODE_LENGTH = 4
+
 Vue.prototype.$ANNOUNCE_URLS = announceURLs
-Vue.prototype.$INTERNET_ROOM_CODE_LENGTH = 4
+Vue.prototype.$INTERNET_ROOM_CODE_LENGTH = INTERNET_ROOM_CODE_LENGTH
 Vue.prototype.$INTERNET_ROOM_SHARE_LINK = 'https://WebDrop.Space/#/?room='
 
 Vue.prototype.$p2pt = null
-Vue.prototype.$wt = new WebTorrent()
+Vue.prototype.$pf = new PeerFiles()
+
+Vue.prototype.$validateRoomCode = (roomCode: string) => {
+  return roomCode.length === INTERNET_ROOM_CODE_LENGTH
+}
 
 store.commit('initSettings')
 

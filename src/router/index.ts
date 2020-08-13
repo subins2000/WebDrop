@@ -2,7 +2,8 @@ import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 
 import Grid from '../views/Grid.vue'
-import Settings from '../components/Settings.vue'
+import Settings from '../views/Settings.vue'
+import Room from '../views/Room.vue'
 import Shares from '../components/Shares.vue'
 
 Vue.use(VueRouter)
@@ -22,6 +23,11 @@ const routes: Array<RouteConfig> = [
     path: '/settings',
     name: 'Settings',
     component: Settings
+  },
+  {
+    path: '/room',
+    name: 'Room',
+    component: Room
   },
   {
     path: '/about',

@@ -5,7 +5,7 @@
         <b-tab-item label="Files" v-bind:class="{ noanim: !$store.state.settings.anim }">
           <template slot="header">
             <file-multiple-icon class="icon is-small"></file-multiple-icon>
-            <span><span class="icon-text">Files</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ torrents.length }}</b-tag> </span>
+            <span><span class="icon-text">Files</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowFilesBtn }" rounded>{{ shares.length }}</b-tag> </span>
           </template>
           <!-- using class for purgecss to detect -->
           <div class="field content is-grouped is-grouped-multiline">
@@ -17,51 +17,63 @@
                 </a>
               </b-upload>
             </div>
-            <div class="control" id="torrentButtons" v-show="tableCheckedRows.length > 0">
+            <div class="control" id="shareButtons" v-show="tableCheckedRows.length > 0">
               <div class="control" v-if="tableCheckedRows.length === 1">
                 <b-field grouped>
-                  <div class="control" v-if="!tableCheckedRows[0].mine && tableCheckedRows[0].paused">
-                    <b-button @click="resumeTorrent">Start</b-button>
+                  <div class="control" v-if="tableCheckedRows[0].paused">
+                    <a class="button is-warning" @click="resumeShare" aria-label="Resume" title="Resume">
+                      <play-icon class="icon is-small"></play-icon>
+                    </a>
+                  </div>
+                  <div class="control" v-else>
+                    <a class="button" @click="pauseShare" aria-label="Pause" title="Pause">
+                      <pause-icon class="icon is-small"></pause-icon>
+                    </a>
                   </div>
                   <div class="control">
-                    <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
+                    <a class="button is-danger" @click="removeShare" aria-label="Delete" title="Delete">
+                      <delete-icon class="icon is-small"></delete-icon>
+                    </a>
                   </div>
                 </b-field>
               </div>
               <div class="control" v-else>
                 <b-field grouped>
                   <div class="control">
-                    <b-button @click="resumeTorrent">Start</b-button>
+                    <a class="button is-warning" @click="resumeShare" aria-label="Resume" title="Resume">
+                      <play-icon class="icon is-small"></play-icon>
+                    </a>
                   </div>
                   <div class="control">
-                    <b-button type="is-danger" @click="removeTorrent">Remove</b-button>
+                    <a class="button" @click="pauseShare" aria-label="Pause" title="Pause">
+                      <pause-icon class="icon is-small"></pause-icon>
+                    </a>
+                  </div>
+                  <div class="control">
+                    <a class="button is-danger" @click="removeShare" aria-label="Delete" title="Delete">
+                      <delete-icon class="icon is-small"></delete-icon>
+                    </a>
                   </div>
                 </b-field>
               </div>
             </div>
             <b-field class="control action" grouped>
-              <div class="tags has-addons">
-                <a class="tag is-dark"><upload-icon class="icon is-small"></upload-icon></a>
-                <span class="tag is-info">{{ uploadSpeed }}/s</span>
-              </div>
-              <div class="tags has-addons">
-                <a class="tag is-dark"><download-icon class="icon is-small"></download-icon></a>
-                <span class="tag is-success">{{ downloadSpeed }}/s</span>
-              </div>
+              <span class="tag is-dark"><speed-icon class="icon is-small"></speed-icon><span>{{ speed }}/s</span></span>
             </b-field>
           </div>
           <b-table
             class="content"
-            id="torrents"
-            :data.sync="torrents"
+            id="shares"
+            :data.sync="shares"
             :checked-rows.sync="tableCheckedRows"
             checkable
-            checkbox-position="left">
+            checkbox-position="left"
+            sortable>
             <template slot-scope="props">
-              <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }">
+              <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }" sortable>
                 <span style="word-break: break-word;max-width: 60vw;">{{ props.row.name }}</span>
               </b-table-column>
-              <b-table-column field="size" label="Size" width="10vw" v-bind:class="{ 'is-warning' : props.row.paused }">
+              <b-table-column field="size" label="Size" width="10vw" v-bind:class="{ 'is-warning' : props.row.paused }" sortable>
                 {{ props.row.size }}
               </b-table-column>
               <b-table-column field="stats" label="Stats" width="50vw">
@@ -74,7 +86,19 @@
                     <span v-show="props.row.paused" class="has-text-black">&nbsp;(Paused)</span>
                   </b-progress>
                 </div>
-                <a class="tag is-info" v-show="props.row.mine"><upload-icon class="icon is-small" title="Ready for other devices to download"></upload-icon></a>
+                <b-field grouped group-multiline v-if="props.row.mine">
+                  <div class="control">
+                    <span class="tags has-addons">
+                      <span class="tag is-info"><upload-icon class="icon is-small" title="Ready for other devices to download"></upload-icon></span>
+                    </span>
+                  </div>
+                  <div class="control" v-for="(progress, userID) in props.row.users" :key="userID">
+                    <div class="tags has-addons" v-if="$store.state.users[userID]">
+                      <span class="tag" v-bind:style="{ 'background-color': $store.state.users[userID].color }">{{ $store.state.users[userID].name }}</span>
+                      <span class="tag is-dark">{{ progress }}%</span>
+                    </div>
+                  </div>
+                </b-field>
               </b-table-column>
             </template>
             <template slot="empty">
@@ -82,8 +106,8 @@
                 <p id="drop-area">Drop your files here or click to upload</p>
               </b-upload>
               <center>
-                <p>Open <a href="https://WebDrop.Space">WebDrop</a> on your devices to join this room. Devices under the same WiFi will auto join the same room.</p>
-                <p><span style="display: inline-block;vertical-align: top;">Use the Internet icon </span><span style="display: inline-block;vertical-align: bottom;"><earth-icon></earth-icon></span><span  style="display: inline-block;vertical-align: top;"> above to transfer files over internet</span></p>
+                <p>Open <a href="https://WebDrop.Space">WebDrop.Space</a> on your devices to join this room. Devices under the same WiFi will auto join the same room.</p>
+                <p>Do you want to transfer files over internet ?<br/><earth-icon></earth-icon><br/><router-link to="/room">Share Invite Link or Join Room</router-link></p>
               </center>
             </template>
           </b-table>
@@ -98,6 +122,9 @@
           </b-field>
           <b-field>
             <b-button type="button is-primary" @click="sendMsg">Send</b-button>
+            <router-link to="/settings">
+              <b-button type="button is-text">Auto copy to clipboard</b-button>
+            </router-link>
           </b-field>
           <div id="messages">
             <p v-show="msgs.length === 0">
@@ -161,15 +188,26 @@
 
 <script>
 import AndroidMessagesIcon from 'vue-material-design-icons/AndroidMessages.vue'
+import ArrowUpIcon from 'vue-material-design-icons/ArrowUp.vue'
+import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 import DevicesIcon from 'vue-material-design-icons/Devices.vue'
-import DownloadIcon from 'vue-material-design-icons/Download.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import FileMultipleIcon from 'vue-material-design-icons/FileMultiple.vue'
 import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
+import PauseIcon from 'vue-material-design-icons/Pause.vue'
+import PlayIcon from 'vue-material-design-icons/Play.vue'
+import SpeedIcon from 'vue-material-design-icons/Speedometer.vue'
 import UploadIcon from 'vue-material-design-icons/Upload.vue'
 
-const torrentsWT = {} // WebTorrent objects
+import NoSleep from 'nosleep.js'
+import * as sha1 from 'simple-sha1'
+import * as streamSaver from 'streamsaver'
+import * as ponyfill from 'web-streams-polyfill/ponyfill'
+
+const noSleep = new NoSleep()
+
 let speedCheck = null
+let bytesTransferred = 0 // this gets filled and reset every second as speedCheck porgresses
 
 function formatBytes (bytes, decimals = 2) {
   if (bytes === 0) return '0 B'
@@ -188,11 +226,14 @@ export default {
 
   components: {
     AndroidMessagesIcon,
+    DeleteIcon,
     DevicesIcon,
-    DownloadIcon,
     EarthIcon,
     FileMultipleIcon,
     FileUploadIcon,
+    PauseIcon,
+    PlayIcon,
+    SpeedIcon,
     UploadIcon
   },
 
@@ -207,10 +248,9 @@ export default {
 
       files: [],
       msg: '', // input field
-      torrents: [], // torrents
+      shares: [], // shares
 
-      uploadSpeed: '0B',
-      downloadSpeed: '0B',
+      speed: '0B',
 
       tableCheckedRows: []
     }
@@ -242,104 +282,83 @@ export default {
       //   }
       // ]
       return this.$store.state.msgs.slice().reverse()
+    },
+
+    activeTransfers () {
+      let transfers = 0
+      Object.values(this.$store.state.shares).forEach(share => {
+        transfers += share.transfers.length
+      })
+      return transfers
     }
   },
 
   methods: {
     onFileChange (files) {
       for (const key in files) {
-        this.makeTorrent(files[key])
+        this.makeShare(files[key])
       }
       this.files = []
+      noSleep.enable()
     },
 
-    addTorrentToList (torrent, mine = false) {
-      const torrentInfo = {
-        infoHash: torrent.infoHash,
-        name: torrent.name,
-        size: formatBytes(torrent.length),
-        paused: torrent.paused,
+    addShareToList (share, mine = false) {
+      const shareInfo = {
+        shareID: share.shareID,
+        name: share.name,
+        size: formatBytes(share.size),
+        paused: share.paused,
         done: false,
         mine,
-        progress: 0,
-        uploadSpeed: 0,
-        downloadSpeed: 0
+        progress: 0
       }
 
-      this.$set(this.torrents, this.torrents.length, torrentInfo)
-    },
-
-    makeTorrent (file) {
-      const snack = this.$buefy.snackbar.open({
-        message: 'Preparing file. This might take a while depending on file size',
-        type: 'is-warning',
-        queue: true,
-        indefinite: true,
-        actionText: 'Ok'
-      })
-
-      this.$wt.seed(file, {
-        announceList: [this.$ANNOUNCE_URLS],
-        name: file.name
-      }, (torrent) => {
-        snack.close()
-
-        this.$store.commit('addTorrent', {
-          i: torrent.infoHash,
-          n: torrent.name,
-          l: torrent.length
-        })
-
-        // this torrent was added by user
-        this.addTorrentToList(torrent, true)
-
-        this.onTorrent(torrent)
-      })
-    },
-
-    // torrent is WebTorrent's Torrent object
-    onTorrent (torrent) {
-      const index = this.getIndexOfTorrent(torrent.infoHash)
-
-      torrent.on('done', () => {
-        // there will be only one file
-        const file = torrent.files[0]
-        file.getBlobURL((err, url) => {
-          if (err) throw err
-
-          this.$set(this.torrents[index], 'done', true)
-          this.$set(this.torrents[index], 'downloadURL', url)
-        })
-      })
-
-      if (!torrentsWT[torrent.infoHash]) {
-        torrentsWT[torrent.infoHash] = torrent
+      if (mine) {
+        // For storing upload progress
+        shareInfo.users = {}
       }
 
-      this.$set(this.torrents[index], 'paused', false)
-
-      this.startSpeedCheck()
+      this.$set(this.shares, this.shares.length, shareInfo)
     },
 
-    // add new torrent obtained from a peer
-    addNewTorrent (torrentInfo) {
-      const infoHash = torrentInfo.i
+    makeShare (file) {
+      const shareID = sha1.sync(file.name + file.size)
 
-      if (torrentsWT[infoHash]) {
-        // torrent with same hash exist
-        torrentsWT[infoHash].addPeer(torrentInfo.peer)
-      } else {
+      if (this.$store.state.shares[shareID]) return
+
+      const share = {
+        shareID: shareID,
+        file,
+        name: file.name,
+        size: file.size,
+        paused: false
+      }
+
+      this.$store.commit('addShare', share)
+
+      // this share was added by user
+      this.addShareToList(share, true)
+    },
+
+    // add new share obtained from a peer
+    addNewShare (shareInfo) {
+      const shareID = shareInfo.shareID
+
+      // Will return number if the share is already in list
+      const index = this.getIndexOfShare(shareID)
+
+      if (index === null) {
+        shareInfo.paused = !this.autoStart
+
         // add new item
-        this.addTorrentToList({
-          infoHash: torrentInfo.i,
-          name: torrentInfo.n,
-          length: torrentInfo.l,
-          paused: !this.autoStart
-        }, false)
+        this.addShareToList(shareInfo, false)
+      } else if (this.shares[index].done) {
+        // File already completed
+        return
+      }
 
-        if (this.autoStart) {
-          this.startTorrent(torrentInfo.i)
-        }
+      if (this.autoStart) {
+        this.downloadShare(shareInfo)
       }
 
       // Notify new files if user is not currently seeing Files tab
@@ -366,46 +385,116 @@ export default {
       }
     },
 
-    startTorrent (infoHash) {
-      if (torrentsWT[infoHash]) return
+    // Start downloading
+    downloadShare (shareInfo) {
+      const shareID = shareInfo.shareID
+      const peer = shareInfo.peer
 
-      this.$wt.add(infoHash, {
-        announce: this.$ANNOUNCE_URLS
-      }, (torrent) => {
-        this.onTorrent(torrent)
+      this.$pf.receive(peer, shareID).then(transfer => {
+        const share = {
+          file: null,
+          transfer
+        }
+
+        const index = this.getIndexOfShare(shareID)
+
+        let prevBytes = 0
+        let prevProgress = 0
+
+        transfer.on('progress', (progress, receivedBytes) => {
+          bytesTransferred += receivedBytes - prevBytes
+          prevBytes = receivedBytes
+
+          // parseInt will make it single digit
+          progress = parseInt(progress)
+
+          if (prevProgress !== progress) {
+            this.$set(this.shares[index], 'progress', progress)
+            prevProgress = progress
+          }
+        })
+
+        transfer.on('done', file => {
+          this.$set(this.shares[index], 'progress', 100)
+
+          const url = URL.createObjectURL(file)
+
+          this.$set(this.shares[index], 'done', true)
+          this.$set(this.shares[index], 'downloadURL', url)
+
+          this.$store.commit('removeTransfer', {
+            shareID,
+            userID: transfer.peer._id
+          })
+        })
+
+        this.$store.commit('setTransfer', {
+          shareID,
+          transfer
+        })
+
+        this.$set(this.shares[index], 'paused', false)
+
+        if (this.$store.state.settings.autoBrowserDownload) {
+          const fileStream = transfer.createReadStream()
+
+          // Allows downloading file to browser as file progresses
+          streamSaver.WritableStream = ponyfill.WritableStream
+          const downloadStream = streamSaver.createWriteStream(shareInfo.name, {
+            size: shareInfo.size
+          })
+          const writer = downloadStream.getWriter()
+
+          fileStream
+            .on('data', chunk => writer.write(chunk))
+            .on('end', () => writer.close())
+        }
       })
-      return null
+
+      this.$store.state.p2pt.send(peer, {
+        type: 'startSending',
+        shareID
+      })
     },
 
-    resumeTorrent () {
-      for (const torrent of this.tableCheckedRows) {
-        this.$set(this.torrents[this.getIndexOfTorrent(torrent.infoHash)], 'paused', false)
+    pauseShare () {
+      for (const shareInfo of this.tableCheckedRows) {
+        this.$set(this.shares[this.getIndexOfShare(shareInfo.shareID)], 'paused', true)
+        this.$store.commit('pauseShare', shareInfo.shareID)
+      }
+    },
 
-        if (torrentsWT[torrent.infoHash]) {
-          torrentsWT[torrent.infoHash].resume()
-        } else {
-          this.startTorrent(torrent.infoHash)
+    resumeShare () {
+      for (const shareInfo of this.tableCheckedRows) {
+        this.$set(this.shares[this.getIndexOfShare(shareInfo.shareID)], 'paused', false)
+
+        const share = this.$store.state.shares[shareInfo.shareID]
+        if (share && share.transfers.length > 0) {
+          share.transfers.forEach(t => {
+            t.resume()
+          })
+        } else if (!shareInfo.mine) {
+          // This will be only called in receiver
+          this.downloadShare(shareInfo.shareID)
         }
       }
     },
 
-    removeTorrent () {
+    removeShare () {
       const rows = this.tableCheckedRows
 
       for (const key in rows) {
-        const infoHash = rows[key].infoHash
-        const torrent = torrentsWT[infoHash]
+        const shareID = rows[key].shareID
 
-        this.$delete(this.torrents, this.getIndexOfTorrent(infoHash))
-
-        if (torrent) torrent.destroy()
+        this.$delete(this.shares, this.getIndexOfShare(shareID))
+        this.$store.commit('removeShare', shareID)
       }
       this.tableCheckedRows = []
     },
 
-    getIndexOfTorrent (infoHash) {
-      for (const index in this.torrents) {
-        if (this.torrents[index].infoHash === infoHash) {
+    getIndexOfShare (shareID) {
+      for (const index in this.shares) {
+        if (this.shares[index].shareID === shareID) {
           return index
         }
       }
@@ -443,7 +532,7 @@ export default {
 
       for (const key in this.$store.state.users) {
         const user = this.$store.state.users[key]
-        this.$store.state.p2pt.send(user.conn, JSON.stringify(data))
+        this.$store.state.p2pt.send(user.conn, data)
       }
 
       this.$buefy.toast.open({
@@ -455,61 +544,121 @@ export default {
       this.msg = ''
     },
 
-    startSpeedCheck () {
+    startSpeedUpdate () {
       if (!speedCheck) {
-        speedCheck = setInterval(() => {
-          this.uploadSpeed = formatBytes(this.$wt.uploadSpeed)
-          this.downloadSpeed = formatBytes(this.$wt.downloadSpeed)
+        const speed = () => {
+          this.speed = formatBytes(bytesTransferred)
+          bytesTransferred = 0
+        }
 
-          for (const index in this.torrents) {
-            const torrent = this.torrents[index]
+        // Keep mobile screen on
+        document.addEventListener('click', function enableNoSleep () {
+          document.removeEventListener('click', enableNoSleep, false)
+          noSleep.enable()
+        }, false)
 
-            if (torrent.done || !torrentsWT[torrent.infoHash]) continue
+        setTimeout(speed, 1000)
+        speedCheck = setInterval(speed, 1000)
+      }
+    },
 
-            // Vue will make rendering delay and slows down file transfer if progress value is directly given
-            const progress = parseInt((100 * torrentsWT[torrent.infoHash].progress).toFixed(1))
+    stopSpeedUpdate () {
+      if (this.activeTransfers === 0) {
+        clearInterval(speedCheck)
+        speedCheck = null
 
-            if (torrent.progress !== progress) {
-              this.$set(this.torrents[index], 'progress', progress)
-            }
-          }
-        }, 1000)
+        bytesTransferred = 0
+        this.speed = '0B'
+
+        noSleep.disable()
       }
     }
   },
 
   mounted () {
     this.$store.subscribe((mutation) => {
-      // new torrent is torrent received from peers
-      if (mutation.type === 'newTorrent') {
-        this.addNewTorrent(mutation.payload)
+      const type = mutation.type
+      const payload = mutation.payload
+
+      // newShare is share received from peers
+      if (type === 'newShare') {
+        this.addNewShare(payload)
 
         this.glowFilesBtn = true
         setTimeout(() => {
           this.glowFilesBtn = false
         }, 500)
-      } else if (mutation.type === 'addTorrent') {
+      } else if (type === 'addShare') {
+        // addShare is a new file added by user
+
         const p2pt = this.$store.state.p2pt
         const data = {
-          ...mutation.payload,
-          ...{ type: 'newTorrent' }
+          ...payload,
+          ...{ type: 'newShare' }
         }
 
-        // let peers know of this torrent
+        delete data.file
+
+        // let peers know of this share
         for (const key in this.$store.state.users) {
           const user = this.$store.state.users[key]
-          p2pt.send(user.conn, JSON.stringify(data))
+          p2pt.send(user.conn, data)
         }
-      } else if (mutation.type === 'addUser') {
+      } else if (type === 'removeUser') {
+        // Remove user from upload progress
+        // This only applies to the uploader
+        Object.entries(this.shares).forEach((share, shareID) => {
+          if (this.shares[shareID].mine) {
+            this.$delete(this.shares[shareID].users, payload)
+          }
+        })
+      } else if (type === 'addUser') {
         this.glowUsersBtn = true
         setTimeout(() => {
           this.glowUsersBtn = false
         }, 500)
-      } else if (mutation.type === 'addMessage') {
+      } else if (type === 'addMessage') {
         this.glowMsgsBtn = true
         setTimeout(() => {
           this.glowMsgsBtn = false
         }, 500)
+      } else if (type === 'setTransfer') {
+        // This will be called when transfer starts
+        this.startSpeedUpdate()
+      } else if (type === 'removeTransfer') {
+        // This will be called when transfer completes
+        setTimeout(() => {
+          // Timeout to let store clear the transfer
+          this.stopSpeedUpdate()
+        }, 1000)
+      }
+    })
+
+    // ----
+    // We use Vuex Actions as cross component event bus
+    // ----
+    this.$store.subscribeAction(action => {
+      const type = action.type
+      const payload = action.payload
+
+      if (type === 'uploadProgress') {
+        bytesTransferred += payload.bytes
+
+        const index = this.getIndexOfShare(payload.shareID)
+
+        this.$set(
+          this.shares[index].users,
+          payload.userID,
+          payload.progress
+        )
+      } else if (type === 'invalidRoomCode') {
+        this.$buefy.toast.open({
+          duration: 2000,
+          message: 'Invalid Room Code',
+          position: 'is-top',
+          type: 'is-danger',
+          queue: false
+        })
       }
     })
 
@@ -593,6 +742,10 @@ export default {
 .container
   padding: 20px 0
 
+// Disabling overflow because .tags in last row causes an unneeded vertical scrollbar
+.table-wrapper
+  overflow-y: hidden
+
 @media screen and (max-width: 960px)
   .container
     padding: 20px 2%
@@ -613,7 +766,7 @@ export default {
     margin-top: 5px
 
   // Show check all row box on mobile
-  // Merge this to buefy :https://github.com/buefy/buefy/issues/2479
+  // Merge this to buefy: https://github.com/buefy/buefy/issues/2479
   .b-table .table-wrapper.has-mobile-cards
     thead
       display: block
@@ -635,7 +788,7 @@ export default {
 .countTag
   transition: 0.25s all
 
-#torrents
+#shares
   // margin-top: 20px
 
   .upload
