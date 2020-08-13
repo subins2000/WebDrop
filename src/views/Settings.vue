@@ -19,9 +19,10 @@
         </div>
       </div>
       <div class="field">
-        <label class="label">Start Downloading In Browser</label>
+        <label class="label">Auto Start Downloading In Browser</label>
         <div class="control">
-          <b-checkbox v-model="settings.autoBrowserDownload">Start downloading files via browser download manager on receive (Won't work in some old browsers)</b-checkbox>
+          <b-checkbox v-model="settings.autoBrowserDownload">Start downloading files via browser download manager on receive</b-checkbox><br/>
+          (Won't work in some browsers)
         </div>
       </div>
       <div class="field">
@@ -84,7 +85,7 @@ export default {
     save () {
       this.$buefy.toast.open({
         duration: 2000,
-        message: 'Saved Settings',
+        message: 'Settings Saved',
         position: 'is-bottom',
         type: 'is-success'
       })
