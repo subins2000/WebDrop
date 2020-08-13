@@ -109,6 +109,9 @@
           </b-field>
           <b-field>
             <b-button type="button is-primary" @click="sendMsg">Send</b-button>
+            <router-link to="/settings">
+              <b-button type="button is-text">Auto copy to clipboard</b-button>
+            </router-link>
           </b-field>
           <div id="messages">
             <p v-show="msgs.length === 0">

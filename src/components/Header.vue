@@ -17,7 +17,7 @@
             </b-navbar-item>
           </b-tooltip>
           <b-navbar-item tag="router-link" :to="{ path: '/settings' }" title="Settings">
-            <cog-icon class="icon is-medium"></cog-icon>
+            <cog-icon class="icon is-medium has-text-dark"></cog-icon>
           </b-navbar-item>
           <b-navbar-item tag="router-link" :to="{ path: '/about' }">
             <b-button type="is-warning">Help</b-button>

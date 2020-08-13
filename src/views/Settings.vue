@@ -14,7 +14,7 @@
       <div class="field">
         <label class="label">Start Downloading In Browser</label>
         <div class="control">
-          <b-checkbox v-model="settings.autoBrowserDownload">Start downloading files via browser download manager on receive</b-checkbox>
+          <b-checkbox v-model="settings.autoBrowserDownload">Start downloading files via browser download manager on receive (Won't work in some old browsers)</b-checkbox>
         </div>
       </div>
       <div class="field">
