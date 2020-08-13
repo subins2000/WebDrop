@@ -21,26 +21,38 @@
               <div class="control" v-if="tableCheckedRows.length === 1">
                 <b-field grouped>
                   <div class="control" v-if="tableCheckedRows[0].paused">
-                    <b-button @click="resumeShare">Resume</b-button>
+                    <a class="button is-warning" @click="resumeShare" aria-label="Resume" title="Resume">
+                      <play-icon class="icon is-small"></play-icon>
+                    </a>
                   </div>
                   <div class="control" v-else>
-                    <b-button @click="pauseShare">Pause</b-button>
+                    <a class="button" @click="pauseShare" aria-label="Pause" title="Pause">
+                      <pause-icon class="icon is-small"></pause-icon>
+                    </a>
                   </div>
                   <div class="control">
-                    <b-button type="is-danger" @click="removeShare">Remove</b-button>
+                    <a class="button is-danger" @click="removeShare" aria-label="Delete" title="Delete">
+                      <delete-icon class="icon is-small"></delete-icon>
+                    </a>
                   </div>
                 </b-field>
               </div>
               <div class="control" v-else>
                 <b-field grouped>
                   <div class="control">
-                    <b-button @click="resumeShare">Resume</b-button>
+                    <a class="button is-warning" @click="resumeShare" aria-label="Resume" title="Resume">
+                      <play-icon class="icon is-small"></play-icon>
+                    </a>
                   </div>
                   <div class="control">
-                    <b-button @click="pauseShare">Pause</b-button>
+                    <a class="button" @click="pauseShare" aria-label="Pause" title="Pause">
+                      <pause-icon class="icon is-small"></pause-icon>
+                    </a>
                   </div>
                   <div class="control">
-                    <b-button type="is-danger" @click="removeShare">Remove</b-button>
+                    <a class="button is-danger" @click="removeShare" aria-label="Delete" title="Delete">
+                      <delete-icon class="icon is-small"></delete-icon>
+                    </a>
                   </div>
                 </b-field>
               </div>
@@ -55,12 +67,13 @@
             :data.sync="shares"
             :checked-rows.sync="tableCheckedRows"
             checkable
-            checkbox-position="left">
+            checkbox-position="left"
+            sortable>
             <template slot-scope="props">
-              <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }">
+              <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }" sortable>
                 <span style="word-break: break-word;max-width: 60vw;">{{ props.row.name }}</span>
               </b-table-column>
-              <b-table-column field="size" label="Size" width="10vw" v-bind:class="{ 'is-warning' : props.row.paused }">
+              <b-table-column field="size" label="Size" width="10vw" v-bind:class="{ 'is-warning' : props.row.paused }" sortable>
                 {{ props.row.size }}
               </b-table-column>
               <b-table-column field="stats" label="Stats" width="50vw">
@@ -94,7 +107,7 @@
               </b-upload>
               <center>
                 <p>Open <a href="https://WebDrop.Space">WebDrop.Space</a> on your devices to join this room. Devices under the same WiFi will auto join the same room.</p>
-                <p>Do you want to transfer files over internet ?<earth-icon></earth-icon><br/><router-link to="/room">Share Invite Link or Join Room</router-link></p>
+                <p>Do you want to transfer files over internet ?<br/><earth-icon></earth-icon><br/><router-link to="/room">Share Invite Link or Join Room</router-link></p>
               </center>
             </template>
           </b-table>
@@ -175,10 +188,14 @@
 
 <script>
 import AndroidMessagesIcon from 'vue-material-design-icons/AndroidMessages.vue'
+import ArrowUpIcon from 'vue-material-design-icons/ArrowUp.vue'
+import DeleteIcon from 'vue-material-design-icons/Delete.vue'
 import DevicesIcon from 'vue-material-design-icons/Devices.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import FileMultipleIcon from 'vue-material-design-icons/FileMultiple.vue'
 import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
+import PauseIcon from 'vue-material-design-icons/Pause.vue'
+import PlayIcon from 'vue-material-design-icons/Play.vue'
 import SpeedIcon from 'vue-material-design-icons/Speedometer.vue'
 import UploadIcon from 'vue-material-design-icons/Upload.vue'
 
@@ -209,10 +226,13 @@ export default {
 
   components: {
     AndroidMessagesIcon,
+    DeleteIcon,
     DevicesIcon,
     EarthIcon,
     FileMultipleIcon,
     FileUploadIcon,
+    PauseIcon,
+    PlayIcon,
     SpeedIcon,
     UploadIcon
   },
@@ -625,6 +645,7 @@ export default {
         bytesTransferred += payload.bytes
 
         const index = this.getIndexOfShare(payload.shareID)
+
         this.$set(
           this.shares[index].users,
           payload.userID,

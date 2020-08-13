@@ -8535,10 +8535,10 @@ simple-get@^4.0.0:
     once "^1.3.1"
     simple-concat "^1.0.0"
 
-simple-peer-files@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/simple-peer-files/-/simple-peer-files-1.2.2.tgz#093c4d18e1d830789c2d1a5fc27c03f22ae5def3"
-  integrity sha512-X/BqTDDwLSDsEUcOh7lnhlrgsnw/ID4zPGdVeEfD0BP6EmYeNMpDunFGqOkhA9Rm5DA+UVhUS5z9h3uljf0KQg==
+simple-peer-files@^1.2.3:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/simple-peer-files/-/simple-peer-files-1.2.3.tgz#8a091ae4d6b1cc9ff1946dacd78e2896d9cc2adb"
+  integrity sha512-rOWcoSfI8P5On1mjZJOoqkWuL6DUjUOnzs83fIPcww8UTfU/VkbhtZ0l+ZNPVmehCs4ZExY4BrHBeHzJ/m4n+A==
   dependencies:
     ee-ts "^1.0.2"
     filereader-stream "^2.0.0"

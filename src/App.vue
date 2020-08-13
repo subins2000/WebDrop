@@ -141,22 +141,22 @@ export default {
                 transfer
               })
 
-              let prevProgress = 0
-              transfer.on('progress', (progress, bytes) => {
+              let prevBytes = 0
+              transfer.on('progress', (progress, receivedBytes) => {
                 // parseInt will make it single digit
                 progress = parseInt(progress)
 
-                if (prevProgress !== progress) {
-                  this.$store.dispatch(
-                    'uploadProgress', {
-                      shareID,
-                      userID: peer.id,
-                      progress,
-                      bytes
-                    }
-                  )
-                  prevProgress = progress
-                }
+                const bytesTransferred = receivedBytes - prevBytes
+                prevBytes = receivedBytes
+
+                this.$store.dispatch(
+                  'uploadProgress', {
+                    shareID,
+                    userID: peer.id,
+                    progress,
+                    bytes: bytesTransferred
+                  }
+                )
               })
 
               transfer.on('done', () => this.$store.commit('removeTransfer', {
@@ -211,7 +211,7 @@ export default {
 
         if (warningCount >= stats.total && !trackerConnected && !warningMsg) {
           warningMsg = this.$buefy.snackbar.open({
-            message: 'We couldn\'t connect to any WebShare trackers. Your ISP might be blocking them 🤔',
+            message: 'We couldn\'t connect to any WebTorrent trackers. Your ISP might be blocking them 🤔',
             position: 'is-top',
             type: 'is-danger',
             queue: false,
