@@ -259,6 +259,14 @@ export default {
       //   }
       // ]
       return this.$store.state.msgs.slice().reverse()
+    },
+
+    activeTransfers () {
+      let transfers = 0
+      Object.values(this.$store.state.shares).forEach(share => {
+        transfers += share.transfers.length
+      })
+      return transfers
     }
   },
 
@@ -391,16 +399,16 @@ export default {
           this.$set(this.shares[index], 'done', true)
           this.$set(this.shares[index], 'downloadURL', url)
 
-          this.$store.commit('removeShare', shareID)
-          this.stopSpeedUpdate()
+          this.$store.commit('removeTransfer', {
+            shareID,
+            userID: transfer.peer._id
+          })
         })
 
         this.$store.commit('setTransfer', {
           shareID,
           transfer
         })
-
-        this.startSpeedUpdate()
 
         this.$set(this.shares[index], 'paused', false)
 
@@ -438,9 +446,12 @@ export default {
         this.$set(this.shares[this.getIndexOfShare(shareInfo.shareID)], 'paused', false)
 
         const share = this.$store.state.shares[shareInfo.shareID]
-        if (share && share.transfer) {
-          share.transfer.resume()
-        } else {
+        if (share && share.transfers.length > 0) {
+          share.transfers.forEach(t => {
+            t.resume()
+          })
+        } else if (!shareInfo.mine) {
+          // This will be only called in receiver
           this.downloadShare(shareInfo.shareID)
         }
       }
@@ -529,11 +540,13 @@ export default {
     },
 
     stopSpeedUpdate () {
-      // Are there other transfers happening ?
-      if (Object.keys(this.$store.state.shares).length === 0) {
+      if (this.activeTransfers === 0) {
         clearInterval(speedCheck)
-        this.speed = '0B'
         speedCheck = null
+
+        bytesTransferred = 0
+        this.speed = '0B'
+
         noSleep.disable()
       }
     }
@@ -586,6 +599,15 @@ export default {
         setTimeout(() => {
           this.glowMsgsBtn = false
         }, 500)
+      } else if (type === 'setTransfer') {
+        // This will be called when transfer starts
+        this.startSpeedUpdate()
+      } else if (type === 'removeTransfer') {
+        // This will be called when transfer completes
+        setTimeout(() => {
+          // Timeout to let store clear the transfer
+          this.stopSpeedUpdate()
+        }, 1000)
       }
     })
 
@@ -597,6 +619,8 @@ export default {
       const payload = action.payload
 
       if (type === 'uploadProgress') {
+        bytesTransferred += payload.bytes
+
         const index = this.getIndexOfShare(payload.shareID)
         this.$set(
           this.shares[index].users,

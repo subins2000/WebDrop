@@ -8535,15 +8535,9 @@ simple-get@^4.0.0:
     once "^1.3.1"
     simple-concat "^1.0.0"
 
-simple-peer-files@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/simple-peer-files/-/simple-peer-files-1.2.1.tgz#37f1ceee660df4fbfd3a4f569a146b5bbd9e6494"
-  integrity sha512-oOT6LL6WbRq2NN/HUggdwXfJ0mTmruFfZWFsu6l/Sad2j7VLEaOKlYA316K4Npgcid+uC3a6WiWiGDHE/SvaDA==
-  dependencies:
-    ee-ts "^1.0.2"
-    filereader-stream "^2.0.0"
-    readable-stream "^3.6.0"
-    simple-peer "^9.7.2"
+"simple-peer-files@link:./../simple-peer-files":
+  version "0.0.0"
+  uid ""
 
 simple-peer@^9.7.1, simple-peer@^9.7.2:
   version "9.7.2"

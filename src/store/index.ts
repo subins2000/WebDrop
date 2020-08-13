@@ -10,12 +10,13 @@ Vue.use(Vuex)
 
 interface Shares {
   [shareID: string]: {
-    shareID: string;
-    name: string;
-    length: number;
-    paused: boolean;
-    mine: boolean;
-    transfer: PeerFileSend | PeerFileReceive
+    shareID: string,
+    file: File, // Will be only in sender
+    name: string,
+    size: number,
+    paused: boolean,
+    mine: boolean,
+    transfers: Array<PeerFileSend | PeerFileReceive>
   };
 }
 
@@ -103,7 +104,10 @@ export default new Vuex.Store({
     addShare (state, payload) {
       Vue.set(state.shares, payload.shareID, {
         ...payload,
-        ...{ mine: true } // m for mine
+        ...{
+          mine: true, // I'm the sender
+          transfers: []
+        }
       })
     },
 
@@ -111,12 +115,26 @@ export default new Vuex.Store({
     newShare (state, payload) {
       Vue.set(state.shares, payload.shareID, {
         ...payload,
-        ...{ mine: false } // m for mine
+        ...{
+          mine: false, // I'm the receiver
+          transfers: []
+        }
       })
     },
 
     setTransfer (state, payload) {
-      Vue.set(state.shares[payload.shareID], 'transfer', payload.transfer)
+      const transfers = state.shares[payload.shareID].transfers
+      Vue.set(transfers, transfers.length, payload.transfer)
+    },
+
+    // This is called when a transfer is completed
+    removeTransfer (state, payload) {
+      state.shares[payload.shareID].transfers.forEach((t, index) => {
+        // ._id is the channel name
+        if (t.peer._id === payload.userID) {
+          Vue.delete(state.shares[payload.shareID].transfers, index)
+        }
+      })
     },
 
     // This will prevent others from downloading
@@ -125,14 +143,19 @@ export default new Vuex.Store({
       if (!state.shares[shareID]) return
 
       Vue.set(state.shares[shareID], 'paused', true)
-      state.shares[shareID].transfer.pause()
+
+      state.shares[shareID].transfers.forEach(t => {
+        t.pause()
+      })
     },
 
+    // Share will be removed by receiver after download completes
     removeShare (state, shareID) {
       if (!state.shares[shareID]) return
 
-      const transfer = state.shares[shareID].transfer
-      if (transfer.cancel) transfer.cancel()
+      state.shares[shareID].transfers.forEach(t => {
+        t.cancel()
+      })
 
       Vue.delete(state.shares, shareID)
     },

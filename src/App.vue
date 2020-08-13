@@ -125,22 +125,30 @@ export default {
                 shareID,
                 transfer
               })
+
               let prevProgress = 0
-              transfer.on('progress', progress => {
+              transfer.on('progress', (progress, bytes) => {
                 // parseInt will make it single digit
                 progress = parseInt(progress)
 
                 if (prevProgress !== progress) {
                   this.$store.dispatch(
                     'uploadProgress', {
-                      userID: peer.id,
                       shareID,
-                      progress
+                      userID: peer.id,
+                      progress,
+                      bytes
                     }
                   )
                   prevProgress = progress
                 }
               })
+
+              transfer.on('done', () => this.$store.commit('removeTransfer', {
+                shareID,
+                userID: transfer.peer._id
+              }))
+
               transfer.start()
             })
           }
