@@ -27,6 +27,13 @@ export default {
         if (mutation.type === 'activateInternetShare') {
           this.$store.commit('destroyP2PT')
           this.startP2PT(this.$store.state.roomID)
+
+          this.$buefy.toast.open({
+            duration: 4000,
+            message: `Joined Room <b>${this.$store.state.roomID}</b>`,
+            position: 'is-top',
+            type: 'is-info'
+          })
         }
       })
 
@@ -43,22 +50,30 @@ export default {
     setUpP2PT () {
       // for testing purposes
       // this.startP2PT('a')
-      publicIP.v4().then((ip) => {
-        const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
-        this.$store.commit('setRoom', roomID)
+
+      // If user came from a room invite link
+      const roomID = this.$route.query.room
+      if (roomID && this.$validateRoomCode(roomID)) {
+        this.$store.commit('activateInternetShare', roomID)
         this.startP2PT(roomID)
-      }).catch(error => {
-        console.log(error)
-        this.$buefy.snackbar.open({
-          message: 'Could not find your IP address',
-          position: 'is-top',
-          type: 'is-danger',
-          queue: true,
-          indefinite: true,
-          actionText: 'Retry',
-          onAction: this.setUpP2PT
+      } else {
+        publicIP.v4().then((ip) => {
+          const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
+          this.$store.commit('setRoom', roomID)
+          this.startP2PT(roomID)
+        }).catch(error => {
+          console.log(error)
+          this.$buefy.snackbar.open({
+            message: 'Could not find your IP address',
+            position: 'is-top',
+            type: 'is-danger',
+            queue: true,
+            indefinite: true,
+            actionText: 'Retry',
+            onAction: this.setUpP2PT
+          })
         })
-      })
+      }
     },
 
     startP2PT (identifier) {

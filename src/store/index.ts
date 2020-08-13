@@ -189,7 +189,9 @@ export default new Vuex.Store({
   // We use Vuex Actions as cross component event bus
   // ----
   actions: {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    uploadProgress () {}
+    /* eslint-disable @typescript-eslint/no-empty-function */
+    uploadProgress () {},
+    invalidRoomCode () {}
+    /* esline-enable @typescript-eslint/no-empty-function */
   }
 })

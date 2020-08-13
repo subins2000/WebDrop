@@ -630,6 +630,14 @@ export default {
           payload.userID,
           payload.progress
         )
+      } else if (type === 'invalidRoomCode') {
+        this.$buefy.toast.open({
+          duration: 2000,
+          message: 'Invalid Room Code',
+          position: 'is-top',
+          type: 'is-danger',
+          queue: false
+        })
       }
     })
 
