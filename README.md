@@ -37,7 +37,9 @@ yarn install
 yarn start
 ```
 
-WebShare trackers list is included in `src/main.ts`. You may want to change that or add/start your [own tracker](https://github.com/subins2000/p2pt/blob/master/startTracker.js) locally for development.
+WebTorrent trackers list is included in `src/main.ts`. You may want to change that or add/start your [own tracker](https://github.com/subins2000/p2pt/blob/master/startTracker.js) locally for development.
+
+File is shared via streams using [simple-peer-files library](https://github.com/subins2000/simple-peer-files).
 
 #### Starting Local Tracker
 
