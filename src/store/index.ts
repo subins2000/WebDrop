@@ -62,6 +62,7 @@ export default new Vuex.Store({
       const color = state.settings.color
       if (!color || color.length > 20) {
         // random color
+        console.log('aaa')
         state.settings.color = `hsla(${~~(360 * Math.random())},60%,60%,1)`
       }
     },
