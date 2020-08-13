@@ -16,7 +16,7 @@
     "public-ip": "^4.0.1",
     "qr-creator": "^1.0.0",
     "register-service-worker": "^1.7.1",
-    "simple-peer-files": "link:./../simple-peer-files",
+    "simple-peer-files": "^1.2.2",
     "streamsaver": "^2.0.4",
     "vue": "^2.6.11",
     "vue-clipboard2": "^0.3.1",
