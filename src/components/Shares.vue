@@ -67,8 +67,7 @@
             :data.sync="shares"
             :checked-rows.sync="tableCheckedRows"
             checkable
-            checkbox-position="left"
-            sortable>
+            checkbox-position="left">
             <template slot-scope="props">
               <b-table-column field="name" label="Name" width="40vw" v-bind:class="{ 'is-warning' : props.row.paused }" sortable>
                 <span style="word-break: break-word;max-width: 60vw;">{{ props.row.name }}</span>
@@ -748,6 +747,10 @@ export default {
 // Disabling overflow because .tags in last row causes an unneeded vertical scrollbar
 .table-wrapper
   overflow-y: hidden
+
+// No sorting in phone cause it needs select component to look good
+.table-mobile-sort
+  display: none
 
 @media screen and (max-width: 960px)
   .container
