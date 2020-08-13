@@ -6,11 +6,6 @@
           <h1 class="is-size-4">WebDrop</h1>
         </b-navbar-item>
         <div class="actions">
-          <b-tooltip label="Connected Devices Grid" position="is-bottom" type="is-primary">
-            <b-navbar-item tag="router-link" :to="{ path: '/grid' }" title="Show Grid">
-              <radar-icon class="icon is-medium"></radar-icon>
-            </b-navbar-item>
-          </b-tooltip>
           <b-tooltip :label="internetShare ? 'Joined An Internet Share Room' : 'Share via Internet'" position="is-bottom" :type="internetShare ? 'is-info' : 'is-primary'">
             <b-navbar-item tag="router-link" :to="{ path: '/room' }">
               <a class="button is-text" v-bind:class="{ 'is-info' : internetShare }" :aria-label="internetShare ? 'Joined An Internet Share Room' : 'Share via Internet'">
@@ -45,15 +40,13 @@
 <script>
 import CogIcon from 'vue-material-design-icons/Cog.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
-import RadarIcon from 'vue-material-design-icons/Radar.vue'
 
 export default {
   name: 'Header',
 
   components: {
     CogIcon,
-    EarthIcon,
-    RadarIcon
+    EarthIcon
   },
 
   computed: {
