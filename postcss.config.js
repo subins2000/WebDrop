@@ -21,7 +21,8 @@ module.exports = {
         /field$/,
         /has-text-white$/,
         /is-grouped$/,
-        /navbar/
+        /navbar/,
+        /table-mobile-sort/
       ],
       whitelistPatternsChildren: [
         /checkbox$/,
