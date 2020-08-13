@@ -161,8 +161,12 @@ export default new Vuex.Store({
       Vue.set(state.msgs, state.msgs.length, payload)
     }
   },
+
+  // ----
+  // We use Vuex Actions as cross component event bus
+  // ----
   actions: {
-  },
-  modules: {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    uploadProgress () {}
   }
 })

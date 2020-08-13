@@ -131,11 +131,12 @@ export default {
                 progress = parseInt(progress)
 
                 if (prevProgress !== progress) {
-                  this.$eventBus.$emit(
-                    'uploadProgress',
-                    peer.id,
-                    shareID,
-                    progress
+                  this.$store.dispatch(
+                    'uploadProgress', {
+                      userID: peer.id,
+                      shareID,
+                      progress
+                    }
                   )
                   prevProgress = progress
                 }

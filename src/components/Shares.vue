@@ -395,6 +395,15 @@ export default {
           this.stopSpeedUpdate()
         })
 
+        this.$store.commit('setTransfer', {
+          shareID,
+          transfer
+        })
+
+        this.startSpeedUpdate()
+
+        this.$set(this.shares[index], 'paused', false)
+
         if (this.$store.state.settings.autoBrowserDownload) {
           const fileStream = transfer.createReadStream()
 
@@ -409,15 +418,6 @@ export default {
             .on('data', chunk => writer.write(chunk))
             .on('end', () => writer.close())
         }
-
-        this.$store.commit('setTransfer', {
-          shareID,
-          transfer
-        })
-
-        this.startSpeedUpdate()
-
-        this.$set(this.shares[index], 'paused', false)
       })
 
       this.$store.state.p2pt.send(peer, {
@@ -589,13 +589,21 @@ export default {
       }
     })
 
-    this.$eventBus.$on('uploadProgress', (userID, shareID, progress) => {
-      const index = this.getIndexOfShare(shareID)
-      this.$set(
-        this.shares[index].users,
-        userID,
-        progress
-      )
+    // ----
+    // We use Vuex Actions as cross component event bus
+    // ----
+    this.$store.subscribeAction(action => {
+      const type = action.type
+      const payload = action.payload
+
+      if (type === 'uploadProgress') {
+        const index = this.getIndexOfShare(payload.shareID)
+        this.$set(
+          this.shares[index].users,
+          payload.userID,
+          payload.progress
+        )
+      }
     })
 
     // handle file drop on page
