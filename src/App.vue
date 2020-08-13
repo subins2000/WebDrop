@@ -350,9 +350,6 @@ $speed-slower: 250ms !default
 
 @import "~buefy/src/scss/components/_checkbox.scss";
 
-@import "~bulma/sass/components/modal.sass";
-@import "~buefy/src/scss/components/_modal.scss";
-
 @import "~buefy/src/scss/components/_notices.scss";
 @import "~buefy/src/scss/components/_progress.scss";
 

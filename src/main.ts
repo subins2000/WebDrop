@@ -14,7 +14,6 @@ import Button from 'buefy/dist/components/button'
 import Checkbox from 'buefy/dist/components/checkbox'
 import Field from 'buefy/dist/components/field'
 import Input from 'buefy/dist/components/input'
-import Modal from 'buefy/dist/components/modal'
 import Navbar from 'buefy/dist/components/navbar'
 import Progress from 'buefy/dist/components/progress'
 import Tabs from 'buefy/dist/components/tabs'
@@ -33,7 +32,6 @@ const comps = [
   Checkbox,
   Field,
   Input,
-  Modal,
   Navbar,
   Progress,
   Tabs,
