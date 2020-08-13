@@ -1,30 +1,27 @@
 <template>
   <div class="container">
-    <div class="content">
-      <center class="card">
-        <div class="card-content content">
-          <b-tabs v-model="activeTab" type="is-boxed" expanded>
-            <b-tab-item label="Invite People">
-              <p>Share the room code <b class="is-size-4">{{ roomID }}</b> or this link with people you want to share stuff with :</p>
-              <b-field grouped group-multiline>
-                <div class="control is-expanded">
-                  <input class="input is-info is-medium is-flat" onclick="this.select()" v-bind:value='internetInviteLink' readonly />
-                </div>
-                <div class="control">
-                  <span class="button is-info is-primary is-medium" @click="copyInviteLink" v-clipboard="internetInviteLink">Copy</span>
-                </div>
-              </b-field>
-              <img aria-label="Qr Code Image" v-bind:src="qrURL" />
-              <p>Or scan the above Qr Code</p>
-            </b-tab-item>
-            <b-tab-item label="Join Room">
-              <input class="input is-info is-medium is-flat" placeholder="Paste the room code here" v-model="internetRoomInput" v-on:keyup.enter="onJoinClick" /><br/><br/>
-              <div class="button is-info is-medium" @click="onJoinClick" style="width: 100%;">Join</div>
-            </b-tab-item>
-          </b-tabs>
-        </div>
-      </center>
-    </div>
+    <center>
+      <b-tabs v-model="activeTab" type="is-boxed" expanded>
+        <b-tab-item label="Invite People" class="content">
+          <p>Share the room code <b class="is-size-4">{{ roomID }}</b> or this link with people you want to share stuff with :</p>
+          <div class="control is-expanded">
+            <input class="input is-info is-medium is-flat" onclick="this.select()" v-bind:value='internetInviteLink' readonly />
+          </div><br/>
+          <div class="control">
+            <span class="button is-info is-primary is-medium" @click="copyInviteLink" v-clipboard="internetInviteLink" style="width: 100%;">Copy</span>
+          </div><br/>
+          <img aria-label="Qr Code Image" v-bind:src="qrURL" />
+          <p>Or scan the above Qr Code</p>
+        </b-tab-item>
+        <b-tab-item label="Join Room" class="content">
+          <p>Room code is a <b>{{ $INTERNET_ROOM_CODE_LENGTH }}</b> letter word</p>
+          <div class="control is-expanded">
+            <input class="input is-info is-medium is-flat" placeholder="Paste the room code here" v-model="internetRoomInput" v-on:keyup.enter="onJoinClick" />
+          </div><br/>
+          <div class="button is-info is-medium" @click="onJoinClick" style="width: 100%;">Join</div>
+        </b-tab-item>
+      </b-tabs>
+    </center>
   </div>
 </template>
 

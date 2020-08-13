@@ -93,8 +93,8 @@
                 <p id="drop-area">Drop your files here or click to upload</p>
               </b-upload>
               <center>
-                <p>Open <a href="https://WebDrop.Space">WebDrop</a> on your devices to join this room. Devices under the same WiFi will auto join the same room.</p>
-                <p><span style="display: inline-block;vertical-align: top;">Use the Internet icon </span><span style="display: inline-block;vertical-align: bottom;"><earth-icon></earth-icon></span><span  style="display: inline-block;vertical-align: top;"> above to transfer files over internet</span></p>
+                <p>Open <a href="https://WebDrop.Space">WebDrop.Space</a> on your devices to join this room. Devices under the same WiFi will auto join the same room.</p>
+                <p>Do you want to transfer files over internet ?<earth-icon></earth-icon><br/><router-link to="/room">Share Invite Link or Join Room</router-link></p>
               </center>
             </template>
           </b-table>
