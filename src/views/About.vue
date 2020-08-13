@@ -62,6 +62,8 @@
             </b-field><br/>
             <p>Check out this <a href="https://vett.space" target="_blank">Dots game</a> which is also P2P.</p>
             <p><a href="https://subinsb.com/projects/">See my other projects</a></p>
+            <img src="https://WebDrop.Space/favicon.png" />
+            <p>May the web be with you</p>
           </center>
         </b-tab-item>
       </b-tabs>

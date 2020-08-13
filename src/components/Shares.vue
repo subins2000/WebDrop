@@ -170,7 +170,10 @@
             <p></p>
           </div>
           <p v-show="usersCount === 0">
-            <center>Open WebDrop on your devices and make sure the devices are connected to the same WiFi.</center>
+            <center class="content">
+              <p>Open <a href="https://WebDrop.Space">WebDrop.Space</a> on your devices and make sure the devices are connected to the same WiFi.</p>
+              <p>Do you want to transfer files over internet ?<br/><earth-icon></earth-icon><br/><router-link to="/room">Share Invite Link or Join Room</router-link></p>
+            </center>
           </p>
           <b-field v-for="(user, userID) in users" :key="userID" grouped group-multiline>
             <b-taglist attached class="control noselect">
@@ -752,9 +755,6 @@ export default {
 
   .b-tabs .tab-content
     padding: 1rem 0 1rem 0
-
-  .modal .card-content
-    padding: 0 1rem
 
 @media screen and (min-width: 900px)
   .container

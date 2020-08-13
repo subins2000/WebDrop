@@ -6,14 +6,15 @@ Simply go to the website [WebDrop.Space](https://WebDrop.Space) on the devices, 
 
 No installations whatsoever, just a website !
 
-Made with [P2PT](https://github.com/subins2000/p2pt), WebRTC 🔥. No servers involved, 99% your browser, 1% WebTrackers.
+Made with [P2PT](https://github.com/subins2000/p2pt), WebRTC 🔥. No servers involved, 99% your browser, 1% WebTorrent Trackers.
 
 ## Features
 
 * Easy to use
 * Auto discover devices in the same network (LAN)
-* Shared transfer of files (Share 🔥)
 * Resume connection interrupted downloads
+* No file download limit
+* Download straight to your downloads folder without waiting
 * Share through internet with a room code !
 * Easily share Text Messages too !
 
@@ -40,16 +41,17 @@ WebShare trackers list is included in `src/main.ts`. You may want to change that
 
 #### Starting Local Tracker
 
-Install [bitshare-tracker] globally :
+Install [bittorrent-tracker] globally :
 
 ```
-yarn global add bitshare-tracker
+yarn global add bittorrent-tracker
 ```
 
-Download [this script](https://github.com/subins2000/p2pt/blob/master/startTracker.js) and run it. It only requires `bitshare-tracker`.
+Download [this script](https://github.com/subins2000/p2pt/blob/master/startTracker.js) and run it. It only requires `bittorrent-tracker`.
 
 ## Thanks
 
+* [Radhika Sharma](https://twitter.com/radhikaa2001) for the [logo](https://WebDrop.Space/favicon.png)
 * [Buefy](https://buefy.org/)
 * [Material Design Icons](https://materialdesignicons.com/)
-* [WebShare](https://webshare.io)
+* [WebTorrent](https://webtorrent.io)
