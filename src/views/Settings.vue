@@ -9,7 +9,7 @@
         <label class="label">Device Color</label>
         <div class="control">
           <span class="device-color" v-for="(color, index) in colors" :key="index" v-bind:class="{ selected: color == settings.color }" v-bind:style="{ 'background-color': color }" @click="settings.color = color"></span>
-          <p>Requires a reload for color change to take effect</p>
+          <p>A reload is required for color change to take effect</p>
         </div>
       </div>
       <div class="field card card-content">
