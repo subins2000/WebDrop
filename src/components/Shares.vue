@@ -537,12 +537,6 @@ export default {
         this.$store.state.p2pt.send(user.conn, data)
       }
 
-      this.$buefy.toast.open({
-        duration: 2000,
-        message: 'Sent !',
-        position: 'is-top',
-        type: 'is-primary'
-      })
       this.msg = ''
     },
 

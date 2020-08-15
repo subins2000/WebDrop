@@ -86,6 +86,7 @@ export default {
         type: 'is-primary'
       })
       this.$store.commit('updateSettings', this.settings)
+      this.$router.push('/')
     }
   },
 
