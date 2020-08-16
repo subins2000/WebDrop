@@ -290,15 +290,8 @@ export default {
     },
 
     activeTab (value) {
-      const f = () => {
-        this.$refs.msgInput.focus()
-      }
       if (value === 1) {
-        if (this.$store.state.settings.anim) {
-          setTimeout(f, 1000)
-        } else {
-          this.$nextTick(f)
-        }
+        this.focusMsgInput()
       }
     }
   },
@@ -338,6 +331,17 @@ export default {
       }
       this.files = []
       noSleep.enable()
+    },
+
+    focusMsgInput () {
+      const f = () => {
+        this.$refs.msgInput.focus()
+      }
+      if (this.$store.state.settings.anim) {
+        setTimeout(f, 1000)
+      } else {
+        this.$nextTick(f)
+      }
     },
 
     addShareToList (share, mine = false) {
@@ -698,6 +702,9 @@ export default {
         })
       }
     })
+
+    // focus msg input
+    if (this.activeTab === 1) this.focusMsgInput()
 
     // handle file drop on page
     const target = document.documentElement
