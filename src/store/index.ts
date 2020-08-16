@@ -182,6 +182,10 @@ export default new Vuex.Store({
 
     addMessage (state, payload) {
       Vue.set(state.msgs, state.msgs.length, payload)
+    },
+
+    clearMessages (state) {
+      state.msgs = []
     }
   },
 

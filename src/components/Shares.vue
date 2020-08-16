@@ -127,10 +127,21 @@
             </div>
           </b-field>
           <b-field>
-            <b-button type="button is-primary" @click="sendMsg">Send</b-button>
-            <router-link to="/settings">
-              <b-button type="button is-text">Auto copy to clipboard</b-button>
-            </router-link>
+            <div class="control">
+              <b-button type="button is-primary" @click="sendMsg">Send</b-button>
+              <div class="is-pulled-right">
+                <b-tooltip label="Auto copy to clipboard" position="is-left" type="is-dark">
+                  <router-link to="/settings" tag="div" class="button is-dark">
+                    <robot-icon class="icon is-small"></robot-icon>
+                  </router-link>
+                </b-tooltip>&nbsp;
+                <b-tooltip label="Clear all messages" position="is-left" type="is-dark">
+                  <a class="button is-danger" aria-label="Clear all messages" title="Clear all messages" @click="clearAllMsgs">
+                    <notification-clear-all-icon class="icon is-small"></notification-clear-all-icon>
+                  </a>
+                </b-tooltip>
+              </div>
+            </div>
           </b-field>
           <div id="messages">
             <p v-show="msgs.length === 0">
@@ -203,8 +214,10 @@ import DevicesIcon from 'vue-material-design-icons/Devices.vue'
 import EarthIcon from 'vue-material-design-icons/Earth.vue'
 import FileMultipleIcon from 'vue-material-design-icons/FileMultiple.vue'
 import FileUploadIcon from 'vue-material-design-icons/FileUpload.vue'
+import NotificationClearAllIcon from 'vue-material-design-icons/NotificationClearAll.vue'
 import PauseIcon from 'vue-material-design-icons/Pause.vue'
 import PlayIcon from 'vue-material-design-icons/Play.vue'
+import RobotIcon from 'vue-material-design-icons/Robot.vue'
 import SpeedIcon from 'vue-material-design-icons/Speedometer.vue'
 import UploadIcon from 'vue-material-design-icons/Upload.vue'
 
@@ -240,8 +253,10 @@ export default {
     EarthIcon,
     FileMultipleIcon,
     FileUploadIcon,
+    NotificationClearAllIcon,
     PauseIcon,
     PlayIcon,
+    RobotIcon,
     SpeedIcon,
     UploadIcon
   },
@@ -522,6 +537,11 @@ export default {
         position: 'is-top',
         type: 'is-primary'
       })
+    },
+
+    // Delete all msgs
+    clearAllMsgs () {
+      this.$store.commit('clearMessages')
     },
 
     sendMsg () {
