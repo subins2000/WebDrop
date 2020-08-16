@@ -122,6 +122,7 @@
                 placeholder="Type message here..."
                 class="textarea"
                 v-model="msg"
+                ref="msgInput"
                 @keydown.enter.exact.prevent
                 @keyup.enter.exact="sendMsg"></textarea>
             </div>
@@ -286,6 +287,19 @@ export default {
         name: 'autoStart',
         value
       })
+    },
+
+    activeTab (value) {
+      const f = () => {
+        this.$refs.msgInput.focus()
+      }
+      if (value === 1) {
+        if (this.$store.state.settings.anim) {
+          setTimeout(f, 1000)
+        } else {
+          this.$nextTick(f)
+        }
+      }
     }
   },
 
