@@ -117,7 +117,14 @@
             <span><span class="icon-text">Messages</span> <b-tag class="countTag" v-bind:class="{ 'is-danger': glowMsgsBtn }" rounded>{{ msgs.length }}</b-tag></span>
           </template>
           <b-field label="Message" class="is-floating-label">
-            <b-input type="textarea" v-model="msg" placeholder="Type message here..."></b-input>
+            <div class="control is-clearfix">
+              <textarea
+                placeholder="Type message here..."
+                class="textarea"
+                v-model="msg"
+                @keydown.enter.exact.prevent
+                @keyup.enter.exact="sendMsg"></textarea>
+            </div>
           </b-field>
           <b-field>
             <b-button type="button is-primary" @click="sendMsg">Send</b-button>
@@ -140,7 +147,7 @@
                 </a>
               </header>
               <div class="card-content">
-                <div class="content" v-html="msg.msg" v-linkified></div>
+                <div class="content" v-html="msg.msg" v-linkified style="white-space: pre-line;"></div>
               </div>
             </div>
           </div>
