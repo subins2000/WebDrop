@@ -47,7 +47,7 @@ export default {
       })
     },
 
-    setUpP2PT () {
+    async setUpP2PT () {
       // for testing purposes
       // this.startP2PT('a')
 
@@ -57,11 +57,22 @@ export default {
         this.$store.commit('activateInternetShare', roomID)
         this.startP2PT(roomID)
       } else {
-        publicIP.v4().then((ip) => {
+        try {
+          let ip
+
+          // https://github.com/subins2000/WebDrop/issues/8
+          try {
+            ip = await publicIP.v4()
+          } catch (_) {
+            ip = await publicIP.v6()
+          }
+
           const roomID = hashSum(ip).substr(0, this.$INTERNET_ROOM_CODE_LENGTH)
+
           this.$store.commit('setRoom', roomID)
+
           this.startP2PT(roomID)
-        }).catch(error => {
+        } catch (error) {
           console.log(error)
           this.$buefy.snackbar.open({
             message: 'Could not find your IP address',
@@ -72,7 +83,7 @@ export default {
             actionText: 'Retry',
             onAction: this.setUpP2PT
           })
-        })
+        }
       }
     },
 
