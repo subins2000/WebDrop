@@ -3469,7 +3469,7 @@ dns-packet@^5.1.2:
   dependencies:
     ip "^1.1.5"
 
-dns-socket@^4.2.1:
+dns-socket@^4.2.0:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/dns-socket/-/dns-socket-4.2.1.tgz#c260f46e5649d1c2476763b78e2ee48f7abef531"
   integrity sha512-fNvDq86lS522+zMbh31X8cQzYQd6xumCNlxsuZF5TKxQThF/e+rJbVM6K8mmlsdcSm6yNjKJQq3Sf38viAJj8g==
@@ -7721,12 +7721,11 @@ public-encrypt@^4.0.0:
     randombytes "^2.0.1"
     safe-buffer "^5.1.2"
 
-public-ip@^4.0.1:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/public-ip/-/public-ip-4.0.2.tgz#83158edd7665da6d51138ccdfa0413f0936fb7ff"
-  integrity sha512-ZHqUjaYT/+FuSiy5/o2gBxvj0PF7M3MXGnaLJBsJNMCyXI4jzuXXHJKrk0gDxx1apiF/jYsBwjTQOM9V8G6oCQ==
+"public-ip@https://github.com/subins2000/public-ip.git#v6or4":
+  version "4.0.1"
+  resolved "https://github.com/subins2000/public-ip.git#81a9361cd4d678e8e28ff79cceb19c51d0340866"
   dependencies:
-    dns-socket "^4.2.1"
+    dns-socket "^4.2.0"
     got "^9.6.0"
     is-ip "^3.1.0"
 

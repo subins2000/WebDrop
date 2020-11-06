@@ -13,7 +13,7 @@
     "hash-sum": "^1.0.2",
     "nosleep.js": "^0.11.0",
     "p2pt": "1.4.1",
-    "public-ip": "^4.0.1",
+    "public-ip": "https://github.com/subins2000/public-ip.git#v6or4",
     "qr-creator": "^1.0.0",
     "register-service-worker": "^1.7.1",
     "simple-peer-files": "^1.2.3",
