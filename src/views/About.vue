@@ -26,6 +26,9 @@
             <li>Do I need to wait for devices to get discovered before adding files ?</li><br/>
             <p><b>Ans:</b>&nbsp;<b>No</b>, you can add files even if the device count is <b>0</b>. When a new device joins the room, they will receive the already added files in the room.</p>
 
+            <li>Devices are not detected on Windows</li><br/>
+            <p><b>Ans:</b>&nbsp;Windows Firewall sometime block P2P (WebRTC) connections. Users have reported this problem and disabling the firewall has helped solve this.</p>
+
             <li>Isn't file passed through internet ? Wouldn't it be slow ?</li><br/>
             <p><b>Ans:</b>&nbsp;Internet is only required for discovering devices. Your devices are connected <b>Peer To Peer</b>. This P2P connection can be made through your local network using the same WiFi hotspot, thus increasing transfer speed ! Files are not shared through internet unless you use "Share via Internet" feature.</p>
 
