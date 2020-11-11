@@ -11,7 +11,7 @@
           <div class="field content is-grouped is-grouped-multiline">
             <div class="control">
               <b-upload v-model="files" :multiple="true" @input="onFileChange">
-                <a class="button is-info" aria-label="Add File/Folder" title="Add File/Folder">
+                <a class="button is-primary" aria-label="Add File/Folder" title="Add File/Folder">
                   <file-upload-icon class="icon is-small"></file-upload-icon>
                   <span class="icon-text">Add File</span>
                 </a>
@@ -93,8 +93,8 @@
                   </div>
                   <div class="control" v-for="(progress, userID) in props.row.users" :key="userID">
                     <div class="tags has-addons" v-if="$store.state.users[userID]">
-                      <span class="tag" v-bind:style="{ 'background-color': $store.state.users[userID].color }">{{ $store.state.users[userID].name }}</span>
                       <span class="tag is-dark">{{ progress }}%</span>
+                      <span class="tag" v-if="Object.keys(props.row.users).length > 1" v-bind:style="{ 'background-color': $store.state.users[userID].color }">{{ $store.state.users[userID].name }}</span>
                     </div>
                   </div>
                 </b-field>
@@ -105,7 +105,7 @@
                 <p id="drop-area">Drop your files here or click to upload</p>
               </b-upload>
               <center>
-                <p>Open <a href="https://WebDrop.Space">WebDrop.Space</a> on your devices to join this room. Devices under the same WiFi will auto join the same room.</p>
+                <p>Open <a href="https://WebDrop.Space">WebDrop.Space</a> on your devices to join this room. Devices under the same WiFi/network will auto join the same room.</p>
                 <p>Do you want to transfer files over internet ?<br/><earth-icon></earth-icon><br/><router-link to="/room">Share Invite Link or Join Room</router-link></p>
               </center>
             </template>
@@ -189,7 +189,7 @@
           </div>
           <p v-show="usersCount === 0">
             <center class="content">
-              <p>Open <a href="https://WebDrop.Space">WebDrop.Space</a> on your devices and make sure the devices are connected to the same WiFi.</p>
+              <p>Open <a href="https://WebDrop.Space">WebDrop.Space</a> on your devices and make sure they are connected to the same WiFi/network.</p>
               <p>Do you want to transfer files over internet ?<br/><earth-icon></earth-icon><br/><router-link to="/room">Share Invite Link or Join Room</router-link></p>
             </center>
           </p>
