@@ -887,5 +887,5 @@ body.dragging:after
     top: -0.775em
     padding-left: 0.125em
     padding-right: 0.125em
-    font-size: calc(1rem * 3 / 4);
+    font-size: calc(1rem * 3 / 4)
 </style>

@@ -332,8 +332,8 @@ $link-invert: $primary-invert;
 $link-focus-border: $primary;
 
 // For buefy
-$speed-slow: 150ms !default
-$speed-slower: 250ms !default
+$speed-slow: 150ms !default;
+$speed-slower: 250ms !default;
 
 // Import Bulma
 @import "~bulma/sass/base/_all.sass";
