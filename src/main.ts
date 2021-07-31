@@ -54,8 +54,8 @@ let announceURLs = [
   'wss://tracker.openwebtorrent.com',
   'wss://wsswt.herokuapp.com',
   'wss://tracker.btorrent.xyz',
-  'wss://tracker.sloppyta.co:443/announce',
-  'wss://tracker.novage.com.ua:443/announce'
+  'wss://tracker.sloppyta.co:443/',
+  'wss://tracker.novage.com.ua:443/'
   // 'ws://192.168.100.7:5000'
 ]
 
