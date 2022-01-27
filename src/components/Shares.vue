@@ -563,25 +563,33 @@ export default {
     },
 
     sendMsg () {
-      const data = {
-        type: 'msg',
-        msg: this.msg,
-        time: new Date().toLocaleTimeString()
-      }
-
-      this.$store.commit('addMessage', {
-        ...data,
-        ...{
-          name: this.$store.state.settings.name,
-          color: this.$store.state.settings.color
+      // Check if message is empty
+      if (this.msg === '') {
+        this.$buefy.toast.open({
+          duration: 2000,
+          message: 'Message cannot be empty!',
+          position: 'is-top',
+          type: 'is-danger'
+        })
+      } else {
+        const data = {
+          type: 'msg',
+          msg: this.msg,
+          time: new Date().toLocaleTimeString()
         }
-      })
+        this.$store.commit('addMessage', {
+          ...data,
+          ...{
+            name: this.$store.state.settings.name,
+            color: this.$store.state.settings.color
+          }
+        })
 
-      for (const key in this.$store.state.users) {
-        const user = this.$store.state.users[key]
-        this.$store.state.p2pt.send(user.conn, data)
+        for (const key in this.$store.state.users) {
+          const user = this.$store.state.users[key]
+          this.$store.state.p2pt.send(user.conn, data)
+        }
       }
-
       this.msg = ''
     },
 
