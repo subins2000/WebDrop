@@ -14,6 +14,9 @@
                 <a class="button is-primary" aria-label="Add File/Folder" title="Add File/Folder">
                   <file-upload-icon class="icon is-small"></file-upload-icon>
                   <span class="icon-text">Add File</span>
+                  <form class="form" action="./upload" enctype="multipart/form-data" method="POST">
+                    <input type="file" id="file" name="file" multiple>
+                  </form>
                 </a>
               </b-upload>
             </div>

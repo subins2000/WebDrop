@@ -19,6 +19,28 @@ module.exports = {
           purpose: "any maskable",
         },
       ],
+      share_targets: [
+        {
+          action: "./upload",
+          method: "POST",
+          enctype: "multipart/form-data",
+          params: {
+            title: "WebDrop",
+            text: "WebDrop",
+            url: "https://webdrop.space",
+            files: [
+              {
+                name: "image",
+                accept: ["image/*"],
+              },
+              {
+                name: "pdf",
+                accept: "application/pdf",
+              },
+            ],
+          },
+        },
+      ],
     },
     themeColor: "#23D160",
     msTileColor: "#000000",
