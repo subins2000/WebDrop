@@ -54,7 +54,8 @@ module.exports = {
       new GoogleFontsPlugin({
         fonts: [
           { family: 'Ubuntu', variants: ['300', '400'] }
-        ]
+        ],
+        apiUrl: "https://gwfh.mranftl.com/api/fonts"
       })
     ]
   }
