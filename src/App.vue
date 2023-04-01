@@ -217,8 +217,8 @@ export default {
       let warningMsg = false
 
       p2pt.on('trackerwarning', (error, stats) => {
-        warningCount++
-        console.log(error)
+        if (error.message.includes('connection error to ws')) warningCount++
+        console.warn(error)
 
         if (warningCount >= stats.total && !trackerConnected && !warningMsg) {
           warningMsg = this.$buefy.snackbar.open({
