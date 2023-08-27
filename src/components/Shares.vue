@@ -888,4 +888,5 @@ body.dragging:after
     padding-left: 0.125em
     padding-right: 0.125em
     font-size: calc(1rem * 3 / 4)
+    background-color: rgb(255, 255, 255)
 </style>
