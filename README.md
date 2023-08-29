@@ -34,7 +34,7 @@ Clone the repo and do :
 
 ```
 yarn install
-yarn start
+yarn serve
 ```
 
 WebTorrent trackers list is included in `src/main.ts`. You may want to change that or add/start your [own tracker](https://github.com/subins2000/p2pt/blob/master/startTracker.js) locally for development.
