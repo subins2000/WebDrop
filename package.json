@@ -54,5 +54,8 @@
     "vue-cli-plugin-webpack-bundle-analyzer": "^2.0.0",
     "vue-property-decorator": "^8.4.1",
     "vue-template-compiler": "^2.6.11"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }
