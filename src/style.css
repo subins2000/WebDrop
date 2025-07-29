@@ -1,3 +1,7 @@
+:root {
+  --primary-color: #23d160;
+}
+
 html, body {
   font-family: Ubuntu, sans-serif;
   line-height: 1.5;
@@ -67,7 +71,7 @@ body {
 }
 
 .bg-green {
-  background-color: #23d160;
+  background-color: var(--primary-color);
   color: #fff;
 }
 
@@ -77,5 +81,38 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
+}
+
+/* Tab styles */
+.tab-nav {
+  border-bottom: 2px solid #e5e5e5;
+  margin-bottom: 1rem;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-button:hover {
+  background-color: #f5f5f5;
+}
+
+.tab-button.active {
+  border-bottom-color: var(--primary-color);
+  color: var(--primary-color);
+  font-weight: 500;
 }
 
