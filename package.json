@@ -1,61 +1,26 @@
 {
   "name": "webdrop",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@beyonk/google-fonts-webpack-plugin": "^1.4",
-    "buefy": "^0.8.19",
-    "hash-sum": "^1.0.2",
-    "nosleep.js": "^0.11.0",
-    "p2pt": "https://github.com/subins2000/p2pt#master",
-    "public-ip": "https://github.com/subins2000/public-ip.git#v6or4",
-    "qr-creator": "^1.0.0",
-    "register-service-worker": "^1.7.1",
-    "simple-peer-files": "^1.2.3",
-    "streamsaver": "^2.0.4",
-    "vue": "^2.6.11",
-    "vue-clipboard2": "^0.3.1",
-    "vue-linkify": "^1.0.1",
-    "vue-material-design-icons": "^4.7.1",
-    "vue-router": "^3.1.6",
-    "vuex": "^3.1.3",
-    "web-streams-polyfill": "^3.0.0"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@fullhuman/postcss-purgecss": "^2.1.0",
-    "@fullhuman/vue-cli-plugin-purgecss": "^2.2.0",
-    "@typescript-eslint/eslint-plugin": "^3.8.0",
-    "@typescript-eslint/parser": "^3.8.0",
-    "@vue/cli-plugin-babel": "^4.3.0",
-    "@vue/cli-plugin-eslint": "^4.3.0",
-    "@vue/cli-plugin-pwa": "^4.3.0",
-    "@vue/cli-plugin-typescript": "^4.3.0",
-    "@vue/cli-service": "^4.3.0",
-    "@vue/eslint-config-standard": "^5.1.2",
-    "@vue/eslint-config-typescript": "^5.0.2",
-    "eslint": "^7.6.0",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "eslint-plugin-vue": "^6.2.2",
-    "glob-all": "^3.2.1",
-    "sass": "^1.37.0",
-    "prerender-spa-plugin": "^3.2.1",
-    "purgecss-webpack-plugin": "^2.3.0",
-    "sass-loader": "^8.0.2",
-    "typescript": "~3.8.3",
-    "vue-cli-plugin-prerender-spa": "^1.1.6",
-    "vue-cli-plugin-webpack-bundle-analyzer": "^2.0.0",
-    "vue-property-decorator": "^8.4.1",
-    "vue-template-compiler": "^2.6.11"
-  },
-  "engines": {
-    "node": ">=14.0.0"
+    "@eslint/js": "^9.30.1",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.6.0",
+    "eslint": "^9.30.1",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "vite": "^7.0.4"
   }
 }
