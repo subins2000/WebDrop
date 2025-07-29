@@ -1,7 +1,10 @@
-:root {
+html, body {
   font-family: system-ui, Ubuntu, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 a {
@@ -16,4 +19,42 @@ a:hover {
 
 body {
   margin: 0;
+}
+
+#header a {
+  color: #fff;
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.bg-green {
+  background-color: #23d160;
+  color: #fff;
+}
+
+.text-md {
+  font-size: 1.5rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
 }
