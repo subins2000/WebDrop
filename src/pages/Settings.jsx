@@ -1,5 +1,5 @@
 import React from 'react'
-import useLocalStorageStore from '../store';
+import { useLocalStorageStore } from '../store';
 
 const Settings = () => {
   const { setValue } = useLocalStorageStore();

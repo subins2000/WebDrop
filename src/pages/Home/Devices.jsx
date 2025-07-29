@@ -1,8 +1,16 @@
 import React from 'react'
+import { useMainStore } from '../../store'
 
 const Devices = () => {
+  const { users } = useMainStore()
+  console.log(users)
+
   return (
-    <div>Devices</div>
+    <div>
+      {Object.values(users).map((user) => (
+        <div key={user.id}>{user.name}</div>
+      ))}
+    </div>
   )
 }
 
