@@ -13,10 +13,12 @@ const App = () => {
     <>
       <BrowserRouter>
         <Header />
-        <Routes>
-          <Route path="/" component={Home} />
-          <Route path="/settings" component={Settings} />
-        </Routes>
+        <div id="container">
+          <Routes>
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/" element={<Home />} />
+          </Routes>
+        </div>
       </BrowserRouter>
     </>
   );

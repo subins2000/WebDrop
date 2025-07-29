@@ -1,9 +1,7 @@
 html, body {
-  font-family: system-ui, Ubuntu, sans-serif;
+  font-family: Ubuntu, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
 }
 
@@ -25,8 +23,30 @@ body {
   color: #fff;
 }
 
+#container {
+  max-width: 900px;
+  padding: 20px 0;
+  margin: 0 auto;
+}
+
+#container h2:first-child {
+  margin-top: 0;
+}
+
 .flex {
   display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
 }
 
 .justify-between {
@@ -58,3 +78,4 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
 }
+
