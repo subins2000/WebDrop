@@ -29,6 +29,8 @@ export const startP2PT = (roomId, persistentStore, mainStore) => {
   p2pt.on('msg', (peer, msg) => {
     if (typeof msg !== 'object') return
 
+    console.log(msg)
+
     const type = msg.type
 
     if (type === 'getShares') {

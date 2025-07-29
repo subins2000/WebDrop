@@ -3,9 +3,12 @@
 }
 
 html, body {
-  font-family: Ubuntu, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+}
+
+* {
+  font-family: Ubuntu, sans-serif;
   box-sizing: border-box;
 }
 
@@ -75,6 +78,15 @@ body {
   color: #fff;
 }
 
+.bg-red {
+  background-color: #ff1f4b;
+  color: #fff;
+}
+
+.w-full {
+  width: 100%;
+}
+
 .text-md {
   font-size: 1.5rem;
 }
@@ -116,3 +128,29 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 500;
 }
 
+/* inputs */
+input, textarea {
+  border: 2px solid #e5e5e5;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  padding: .625em;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+/* buttons */
+button {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #1a8c40;
+}
