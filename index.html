@@ -2,12 +2,41 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>WebDrop - Easily share files across devices!</title>
+    
+    <!-- Google / Search Engine Tags -->
+    <meta itemprop="name" content="WebDrop - Easily share files across devices!">
+    <meta itemprop="description" content="Easily share files and messages across different devices. No installation, just a website!">
+    <meta itemprop="image" content="https://WebDrop.Space/favicon.png">
+    
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://WebDrop.Space/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="WebDrop - Easily share files across devices!">
+    <meta property="og:description" content="Easily share files and messages across different devices. No installation, just a website!">
+    <meta property="og:image" content="https://WebDrop.Space/favicon.png">
+    
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:title" content="WebDrop - Easily share files across devices!">
+    <meta name="twitter:description" content="Easily share files and messages across different devices. No installation, just a website!">
+    <meta name="twitter:image" content="https://WebDrop.Space/favicon.png">
   </head>
   <body>
+    <noscript>
+      <strong>We're sorry but WebDrop doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
     <div id="app"></div>
+    <script>
+      if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1" && location.hostname.substr(0, 7) !== '192.168') {
+        var gc = document.createElement('script');
+        gc.setAttribute('data-goatcounter', 'https://webdrop.goatcounter.com/count');
+        gc.async = true;
+        gc.src = '//gc.zgo.at/count.js';
+        document.body.appendChild(gc);
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

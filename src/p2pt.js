@@ -9,7 +9,7 @@ let announceURLs = [
 ]
 
 if (window.location.hostname === 'localhost') {
-  announceURLs = ['ws://0.0.0.0:5000']
+  announceURLs = ['ws://localhost:5000']
 }
 
 export const startP2PT = (roomId, persistentStore, mainStore) => {

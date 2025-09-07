@@ -1,21 +1,11 @@
 import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
+import path from 'path'
 
 export default defineConfig({
-  optimizeDeps: {
-    esbuildOptions: {
-      // Node.js global to browser globalThis
-      // necessary for randombytes lib to work
-      define: {
-        global: 'globalThis'
-      },
-      // Enable esbuild polyfill plugins
-      // necessary for some libs to work
-      plugins: [
-        NodeGlobalsPolyfillPlugin({
-          buffer: true
-        })
-      ]
-    }
+  plugins: [react()],
+  server: {
+    host: "127.0.0.1",
   }
 })
