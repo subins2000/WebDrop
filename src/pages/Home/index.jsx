@@ -35,7 +35,9 @@ const Home = () => {
           >
             <span style={{ marginRight: '0.5rem' }}>{tab.icon}</span>
             {tab.label}&nbsp;&nbsp;
-            <div className="tag tag-gray">{tab.count}</div>
+            <div>
+              <div className="tag tag-teal">{tab.count}</div>
+            </div>
           </Link>
         ))}
       </div>

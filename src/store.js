@@ -4,7 +4,8 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 export const usePersistentStore = create(
   persist(
     (set) => ({
-      name: "Device",
+      name: null,
+      color: null,
       setValue: (key, value) => set({ [key]: value })
     }), {
       name: 'store',

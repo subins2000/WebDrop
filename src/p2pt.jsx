@@ -1,7 +1,7 @@
 import P2PT from 'p2pt'
 import { toast } from 'react-toastify'
 import { usePersistentStore, useMainStore } from './store'
-import { sendMsgsState, sendSharesState } from './utils'
+import { sendMsgsState, sendSharesState, initPersistentStore } from './utils'
 
 // Utility function to copy text to clipboard
 const copyText = async (text) => {
@@ -37,7 +37,7 @@ export const startP2PT = (roomId) => {
     p2pt.send(peer, {
       type: 'init',
       name: usePersistentStore.getState().name,
-      // color: this.$store.state.settings.color,
+      color: usePersistentStore.getState().color,
       sharesCount: Object.keys(currentState.shares).length,
       msgsCount: currentState.msgs.length
     })
@@ -58,7 +58,7 @@ export const startP2PT = (roomId) => {
       useMainStore.getState().addUser({
         id: peer.id,
         name: msg.name,
-        // color: msg.color,
+        color: msg.color,
         conn: peer
       })
 
@@ -189,6 +189,8 @@ export const startP2PT = (roomId) => {
     trackerConnected = true
     toast.dismiss('tracker-warning')
   })
+
+  initPersistentStore()
 
   useMainStore.getState().setValue('p2pt', p2pt)
   p2pt.start()

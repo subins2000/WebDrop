@@ -3,7 +3,7 @@ import { useMainStore, usePersistentStore } from '../../store'
 
 const Devices = () => {
   const { users, p2pt } = useMainStore()
-  const { name } = usePersistentStore()
+  const { name, color } = usePersistentStore()
 
   const ping = (id) => {
     const user = users[id]
@@ -16,7 +16,7 @@ const Devices = () => {
     <div>
       <div>
         <span className="tag tag-grouped">
-          <span className="tag tag-gray">{name}</span>
+          <span className="tag" style={{ backgroundColor: color }}>{name}</span>
           <span className="tag tag-yellow">Me</span>
         </span>
       </div>
@@ -26,7 +26,7 @@ const Devices = () => {
       <div className="flex flex-col">
         {Object.values(users).map((user) => (
           <div className="tag tag-grouped" key={user.id}>
-            <span className="tag tag-gray">{user.name}</span>
+            <span className="tag" style={{ backgroundColor: user.color }}>{user.name}</span>
             <span className="tag tag-yellow">
               <a onClick={() => ping(user.id)}>Ping!</a>
             </span>
