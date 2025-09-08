@@ -73,6 +73,10 @@ body {
   padding: 0.5rem;
 }
 
+.my-4 {
+  margin: 1.5rem 0;
+}
+
 .mt-4 {
   margin-top: 1rem;
 }
@@ -97,6 +101,13 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
+}
+
+a {
+  color: #8c67ef;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: normal;
 }
 
 /* Tab styles */
@@ -181,10 +192,11 @@ button:hover {
 }
 
 .tag {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
-  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  height: 2rem;
+  line-height: 1.5;
 }
 
 .tag-teal {
@@ -195,4 +207,19 @@ button:hover {
 .tag-gray {
   background-color: #E0E0E0;
   color: #666;
+}
+
+.tag-yellow {
+  background-color: #ffdd57;
+  color: #000;
+}
+
+.tag-grouped .tag:nth-child(1) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.tag-grouped .tag:nth-child(2) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
