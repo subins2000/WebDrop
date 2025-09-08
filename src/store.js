@@ -23,7 +23,15 @@ export const useMainStore = create(
 
     setValue: (key, value) => set({ [key]: value }),
 
-    addUser: (user) => set((state) => ({ users: { ...state.users, [user.id]: user } })),
+    addUser: (user) => set((state) => {
+      // If user with same id exists, replace it; otherwise, add new user
+      return {
+        users: {
+          ...state.users,
+          [user.id]: { ...state.users[user.id], ...user }
+        }
+      }
+    }),
     removeUser: (id) => set((state) => {
       const users = { ...state.users }
       delete users[id]

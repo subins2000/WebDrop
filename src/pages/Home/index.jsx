@@ -3,14 +3,16 @@ import { Link, Route, Routes, useLocation } from "react-router";
 import Messages from "./Messages";
 import Devices from "./Devices";
 import Files from "./Files";
+import { useMainStore } from "../../store";
 
 const Home = () => {
   const location = useLocation();
+  const { shares, msgs, users } = useMainStore();
 
   const tabs = [
-    { id: 'files', label: 'Files', icon: '📁', path: '/' },
-    { id: 'messages', label: 'Messages', icon: '💬', path: '/messages' },
-    { id: 'devices', label: 'Devices', icon: '📱', path: '/devices' }
+    { id: 'files', label: 'Files', icon: '📁', path: '/', count: Object.keys(shares).length },
+    { id: 'messages', label: 'Messages', icon: '💬', path: '/messages', count: msgs.length },
+    { id: 'devices', label: 'Devices', icon: '📱', path: '/devices', count: Object.keys(users).length }
   ];
 
   const getActiveTab = () => {
@@ -32,7 +34,8 @@ const Home = () => {
             className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
           >
             <span style={{ marginRight: '0.5rem' }}>{tab.icon}</span>
-            {tab.label}
+            {tab.label}&nbsp;&nbsp;
+            <div className="tag tag-gray">{tab.count}</div>
           </Link>
         ))}
       </div>
