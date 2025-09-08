@@ -1,9 +1,20 @@
 import React, { useState } from 'react'
-import { useLocalStorageStore, useMainStore } from '../../store'
+import { usePersistentStore, useMainStore } from '../../store'
+
+// Utility function to copy text to clipboard
+const copyText = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch (err) {
+    console.error('Failed to copy text: ', err)
+    return false
+  }
+}
 
 const Messages = () => {
-  const mainStore = useMainStore()
-  const persistentStore = useLocalStorageStore()
+  const { msgs, addMessage, users, p2pt } = useMainStore(state => state)
+  const persistentStore = usePersistentStore()
 
   const [message, setMessage] = useState('')
 
@@ -18,10 +29,10 @@ const Messages = () => {
       color: persistentStore.color
     }
 
-    mainStore.addMessage(msgData)
+    addMessage(msgData)
 
-    Object.entries(mainStore.users).forEach(([_, user]) => {
-      mainStore.p2pt.send(user.conn, msgData)
+    Object.entries(users).forEach(([_, user]) => {
+      p2pt.send(user.conn, msgData)
     })
 
     setMessage('')
@@ -47,11 +58,24 @@ const Messages = () => {
           <button className='bg-red'>🧹</button>
         </div>
       </form>
-      <div>
-        {mainStore.msgs.map((msg) => (
-          <div key={msg.time}>
-            <p>{msg.name}</p>
-            <p>{msg.msg}</p>
+      <div className="mt-4">
+        {msgs.slice().reverse().map((msg, index) => (
+          <div key={msg.time || index} className="card">
+            <div className="card-header flex justify-between">
+              <div className="flex gap-2">
+                <div className="tag tag-teal">{msg.time}</div>
+                <div className="tag tag-gray">{msg.name}</div>
+              </div>
+              <button
+                onClick={() => copyText(msg.msg)}
+                title="Copy message"
+              >
+                Copy
+              </button>
+            </div>
+            <div className="card-content">
+              <p>{msg.msg}</p>
+            </div>
           </div>
         ))}
       </div>

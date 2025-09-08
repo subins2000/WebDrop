@@ -32,7 +32,7 @@ body {
 
 #container {
   max-width: 900px;
-  padding: 20px 0;
+  padding: 20px 10px;
   margin: 0 auto;
 }
 
@@ -71,6 +71,10 @@ body {
 
 .p-2 {
   padding: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
 }
 
 .bg-green {
@@ -153,4 +157,42 @@ button {
 
 button:hover {
   background-color: #1a8c40;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+  margin-bottom: 1rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.card-content {
+  padding: 1rem;
+}
+
+.tag {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.tag-teal {
+  background-color: #50C8B8;
+  color: white;
+}
+
+.tag-gray {
+  background-color: #E0E0E0;
+  color: #666;
 }

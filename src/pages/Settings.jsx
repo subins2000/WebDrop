@@ -1,8 +1,8 @@
 import React from 'react'
-import { useLocalStorageStore } from '../store';
+import { usePersistentStore } from '../store';
 
 const Settings = () => {
-  const { setValue } = useLocalStorageStore();
+  const { setValue } = usePersistentStore();
 
   const handleSubmit = (e) => {
     e.preventDefault();

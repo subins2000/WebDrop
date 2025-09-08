@@ -1,4 +1,6 @@
-import React, { useEffect } from 'react'
+import React from 'react'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 import Header from './components/Header'
 
@@ -7,17 +9,8 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import './style.css'
 import Home from './pages/Home';
 import Settings from './pages/Settings';
-import { startP2PT } from './p2pt';
-import { useLocalStorageStore, useMainStore } from './store';
 
 const App = () => {
-  const persistentStore = useLocalStorageStore()
-  const mainStore = useMainStore()
-
-  useEffect(() => {
-    startP2PT(1, persistentStore, mainStore)
-  }, []);
-
   return (
     <>
       <BrowserRouter>
@@ -29,6 +22,17 @@ const App = () => {
           </Routes>
         </div>
       </BrowserRouter>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </>
   );
 }

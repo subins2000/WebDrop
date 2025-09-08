@@ -1,4 +1,18 @@
 import P2PT from 'p2pt'
+import { toast } from 'react-toastify'
+import { usePersistentStore, useMainStore } from './store'
+import { sendMsgsState, sendSharesState } from './utils'
+
+// Utility function to copy text to clipboard
+const copyText = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch (err) {
+    console.error('Failed to copy text: ', err)
+    return false
+  }
+}
 
 let announceURLs = [
   'wss://tracker.openwebtorrent.com',
@@ -12,69 +26,74 @@ if (window.location.hostname === 'localhost') {
   announceURLs = ['ws://localhost:5000']
 }
 
-export const startP2PT = (roomId, persistentStore, mainStore) => {
+export const startP2PT = (roomId) => {
   const p2pt = new P2PT(announceURLs)
   p2pt.setIdentifier('webdrop' + roomId)
 
   p2pt.on('peerconnect', (peer) => {
+    // Get current state from the store
+    const currentState = useMainStore.getState()
+
     p2pt.send(peer, {
       type: 'init',
-      name: persistentStore.name,
+      name: usePersistentStore.getState().name,
       // color: this.$store.state.settings.color,
-      // sharesCount: Object.keys(mainStore.shares).length,
-      // msgsCount: mainStore.msgs.length
+      sharesCount: Object.keys(currentState.shares).length,
+      msgsCount: currentState.msgs.length
     })
   })
 
   p2pt.on('msg', (peer, msg) => {
     if (typeof msg !== 'object') return
 
-    console.log(msg)
-
     const type = msg.type
 
     if (type === 'getShares') {
-      this.sendSharesState(p2pt, peer)
+      sendSharesState(p2pt, peer)
     } else if (type === 'getMsgs') {
-      this.sendMsgsState(p2pt, peer)
+      sendMsgsState(p2pt, peer)
     } else if (type === 'init') {
-      mainStore.addUser({
+      console.log(msg)
+
+      useMainStore.getState().addUser({
         id: peer.id,
         name: msg.name,
         // color: msg.color,
         conn: peer
       })
 
-      if (msg.sharesCount > Object.keys(mainStore.shares).length) {
+      const currentState = useMainStore.getState()
+      if (msg.sharesCount > Object.keys(currentState.shares).length) {
         p2pt.send(peer, {
           type: 'getShares'
         })
       }
 
-      if (msg.msgsCount > mainStore.msgs.length) {
+      if (msg.msgsCount > currentState.msgs.length) {
         p2pt.send(peer, {
           type: 'getMsgs'
         })
       }
     } else if (type === 'ping') {
-      this.$buefy.snackbar.open({
-        duration: 3000,
-        message: `<b>${this.$store.state.users[peer.id].name}</b> pinged!`,
-        type: 'is-warning',
-        queue: false
+      const currentState = useMainStore.getState()
+      const userName = currentState.users[peer.id]?.name || 'Unknown'
+      toast.warning(`${userName} pinged!`, {
+        autoClose: 3000,
+        position: 'top-right'
       })
     } else if (type === 'newShare') {
       delete msg.type
       msg.peer = peer
 
-      mainStore.newShare(msg)
+      useMainStore.getState().newShare(msg)
     } else if (type === 'startSending') {
       const shareId = msg.shareId
-      const share = mainStore.shares[shareId]
+      const currentState = useMainStore.getState()
+      const share = currentState.shares[shareId]
 
       if (share && share.file && !share.paused) {
         p2pt.send(peer, shareId, share.file).then(transfer => {
-          mainStore.setTransfer({
+          useMainStore.getState().setTransfer({
             shareId,
             transfer
           })
@@ -87,17 +106,16 @@ export const startP2PT = (roomId, persistentStore, mainStore) => {
             const bytesTransferred = receivedBytes - prevBytes
             prevBytes = receivedBytes
 
-            this.$store.dispatch(
-              'uploadProgress', {
-                shareId,
-                userId: peer.id,
-                progress,
-                bytes: bytesTransferred
-              }
-            )
+            // Note: You'll need to implement uploadProgress in your store
+            // mainStore.uploadProgress({
+            //   shareId,
+            //   userId: peer.id,
+            //   progress,
+            //   bytes: bytesTransferred
+            // })
           })
 
-          transfer.on('done', () => mainStore.removeTransfer({
+          transfer.on('done', () => useMainStore.getState().removeTransfer({
             shareId,
             userId: transfer.peer._id
           }))
@@ -106,37 +124,39 @@ export const startP2PT = (roomId, persistentStore, mainStore) => {
         })
       }
     } else if (type === 'msg') {
+      const currentState = useMainStore.getState()
+      
       // msg exist check
-      if (msg.id && mainStore.msgs[msg.id]) {
+      if (msg.id && currentState.msgs[msg.id]) {
         return
       }
 
       // msgs being restored will have name & color with them
       if (!msg.name) {
-        msg.name = mainStore.users[peer.id].name
-        msg.color = mainStore.users[peer.id].color
+        msg.name = currentState.users[peer.id].name
+        msg.color = currentState.users[peer.id].color
       }
 
       delete msg.type
 
-      mainStore.addMessage(msg)
+      useMainStore.getState().addMessage(msg)
 
       // copy to clipboard ?
-      if (persistentStore.autoCopy) {
-        this.$copyText(msg.msg).then(_ => {
-          this.$buefy.toast.open({
-            duration: 2000,
-            message: 'Message Copied !',
-            position: 'is-top',
-            type: 'is-primary'
-          })
+      if (usePersistentStore.getState().autoCopy) {
+        copyText(msg.msg).then(success => {
+          if (success) {
+            toast.success('Message Copied!', {
+              autoClose: 2000,
+              position: 'top-right'
+            })
+          }
         })
       }
     }
   })
 
   p2pt.on('peerclose', (peer) => {
-    mainStore.removeUser(peer.id)
+    useMainStore.getState().removeUser(peer.id)
   })
 
   let warningCount = 0
@@ -148,20 +168,21 @@ export const startP2PT = (roomId, persistentStore, mainStore) => {
     console.log(error)
 
     if (warningCount >= stats.total && !trackerConnected && !warningMsg) {
-      warningMsg = this.$buefy.snackbar.open({
-        message: 'We couldn\'t connect to any WebTorrent trackers. Your ISP might be blocking them 🤔',
-        position: 'is-top',
-        type: 'is-danger',
-        queue: false,
-        indefinite: true,
-        actionText: 'Retry',
-        onAction: () => {
-          if (!trackerConnected) {
-            this.$store.commit('destroyP2PT')
-            p2pt.destroy()
-            // this.startP2PT(identifier)
+      warningMsg = toast.error('We couldn\'t connect to any WebTorrent trackers. Your ISP might be blocking them 🤔', {
+        position: 'top-right',
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        action: {
+          label: 'Retry',
+          onClick: () => {
+            if (!trackerConnected) {
+              useMainStore.getState().destroyP2PT()
+              p2pt.destroy()
+              // startP2PT(roomId, persistentStore, mainStore)
+            }
+            warningMsg = null
           }
-          warningMsg.close()
         }
       })
     }
@@ -169,9 +190,12 @@ export const startP2PT = (roomId, persistentStore, mainStore) => {
 
   p2pt.on('trackerconnect', () => {
     trackerConnected = true
-    if (warningMsg) warningMsg.close()
+    if (warningMsg) {
+      toast.dismiss(warningMsg)
+      warningMsg = null
+    }
   })
 
-  mainStore.setValue('p2pt', p2pt)
+  useMainStore.getState().setValue('p2pt', p2pt)
   p2pt.start()
 }

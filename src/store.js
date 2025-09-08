@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware';
 
-export const useLocalStorageStore = create(
+export const usePersistentStore = create(
   persist(
     (set) => ({
       name: "Device",
