@@ -13,7 +13,7 @@ const copyText = async (text) => {
 }
 
 const Messages = () => {
-  const { msgs, addMessage, users, p2pt } = useMainStore(state => state)
+  const { msgs, addMessage, users, p2pt, setValue } = useMainStore(state => state)
   const persistentStore = usePersistentStore()
 
   const [message, setMessage] = useState('')
@@ -55,7 +55,7 @@ const Messages = () => {
         ></textarea>
         <div className="flex justify-between w-full">
           <button type="submit">Send</button>
-          <button className='bg-red'>🧹</button>
+          <button type="button" className='bg-red' onClick={() => setValue('msgs', [])}>🧹</button>
         </div>
       </form>
       <div className="mt-4">

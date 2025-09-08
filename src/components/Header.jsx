@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { Link } from 'react-router';
 import { usePersistentStore, useMainStore } from '../store';
-import { startP2PT } from '../p2pt';
+import { startP2PT } from '../p2pt.jsx';
 
 const Header = () => {
   useEffect(() => {

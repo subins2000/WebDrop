@@ -22,7 +22,7 @@ let announceURLs = [
   // 'ws://192.168.100.7:5000'
 ]
 
-if (window.location.hostname === 'localhost') {
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
   announceURLs = ['ws://localhost:5000']
 }
 
@@ -77,10 +77,7 @@ export const startP2PT = (roomId) => {
     } else if (type === 'ping') {
       const currentState = useMainStore.getState()
       const userName = currentState.users[peer.id]?.name || 'Unknown'
-      toast.warning(`${userName} pinged!`, {
-        autoClose: 3000,
-        position: 'top-right'
-      })
+      toast.warning(`${userName} pinged!`)
     } else if (type === 'newShare') {
       delete msg.type
       msg.peer = peer
@@ -125,7 +122,7 @@ export const startP2PT = (roomId) => {
       }
     } else if (type === 'msg') {
       const currentState = useMainStore.getState()
-      
+
       // msg exist check
       if (msg.id && currentState.msgs[msg.id]) {
         return
@@ -145,10 +142,7 @@ export const startP2PT = (roomId) => {
       if (usePersistentStore.getState().autoCopy) {
         copyText(msg.msg).then(success => {
           if (success) {
-            toast.success('Message Copied!', {
-              autoClose: 2000,
-              position: 'top-right'
-            })
+            toast.success('Message Copied!')
           }
         })
       }
@@ -156,6 +150,7 @@ export const startP2PT = (roomId) => {
   })
 
   p2pt.on('peerclose', (peer) => {
+    console.log("zzzz", peer.id)
     useMainStore.getState().removeUser(peer.id)
   })
 
@@ -167,33 +162,32 @@ export const startP2PT = (roomId) => {
     warningCount++
     console.log(error)
 
+    const handleRetry = () => {
+      if (!trackerConnected) {
+        useMainStore.getState().destroyP2PT()
+        startP2PT(roomId)
+      }
+    }
+
     if (warningCount >= stats.total && !trackerConnected && !warningMsg) {
-      warningMsg = toast.error('We couldn\'t connect to any WebTorrent trackers. Your ISP might be blocking them 🤔', {
-        position: 'top-right',
-        autoClose: false,
-        closeOnClick: false,
-        draggable: false,
-        action: {
-          label: 'Retry',
-          onClick: () => {
-            if (!trackerConnected) {
-              useMainStore.getState().destroyP2PT()
-              p2pt.destroy()
-              // startP2PT(roomId, persistentStore, mainStore)
-            }
-            warningMsg = null
-          }
+      toast.error(
+        <div className="flex flex-col gap-2">
+          <span>We couldn't connect to any WebTorrent trackers. Your ISP might be blocking them 🤔</span>
+          <button onClick={handleRetry}>
+            Retry
+          </button>
+        </div>,
+        {
+          autoClose: false,
+          toastId: 'tracker-warning'
         }
-      })
+      )
     }
   })
 
   p2pt.on('trackerconnect', () => {
     trackerConnected = true
-    if (warningMsg) {
-      toast.dismiss(warningMsg)
-      warningMsg = null
-    }
+    toast.dismiss('tracker-warning')
   })
 
   useMainStore.getState().setValue('p2pt', p2pt)
