@@ -1,0 +1,85 @@
+/* Utility Classes - Tailwind-like utilities */
+
+/* Layout utilities */
+.hidden {
+  display: none;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+/* Spacing utilities */
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 1rem;
+}
+
+.my-4 {
+  margin: 1.5rem 0;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+/* Sizing utilities */
+.w-full {
+  width: 100%;
+}
+
+/* Typography utilities */
+.text-md {
+  font-size: 1.5rem;
+}
+
+/* Alignment utilities */
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
+}
+
+/* Background utilities */
+.bg-green {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.bg-red {
+  background-color: #ff1f4b;
+  color: #fff;
+}
+
+/* Responsive utilities */
+@media (min-width: 768px) {
+  .md\:inline-block {
+    display: inline-block;
+  }
+}

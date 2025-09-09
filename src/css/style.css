@@ -1,9 +1,14 @@
 :root {
   --primary-color: #23d160;
+  --primary-color-text: #fff;
+  --secondary-color: #8c67ef;
+  --secondary-color-text: #fff;
 }
 
 html, body {
   line-height: 1.5;
+  min-height: 100vh;
+  min-width: 100vw;
 }
 
 * {
@@ -39,64 +44,6 @@ body {
   margin-top: 0;
 }
 
-.flex {
-  display: flex;
-}
-
-.flex-col {
-  flex-direction: column;
-}
-
-.gap-2 {
-  gap: 0.5rem;
-}
-
-.gap-4 {
-  gap: 1rem;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.items-center {
-  align-items: center;
-}
-
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.p-2 {
-  padding: 0.5rem;
-}
-
-.my-4 {
-  margin: 1.5rem 0;
-}
-
-.mt-4 {
-  margin-top: 1rem;
-}
-
-.bg-green {
-  background-color: var(--primary-color);
-  color: #fff;
-}
-
-.bg-red {
-  background-color: #ff1f4b;
-  color: #fff;
-}
-
-.w-full {
-  width: 100%;
-}
-
-.text-md {
-  font-size: 1.5rem;
-}
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
@@ -169,6 +116,27 @@ button:hover {
   background-color: #1a8c40;
 }
 
+button.btn-primary {
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+}
+
+button.btn-secondary {
+  background-color:var(--secondary-color);
+  color: var(--secondary-color-text);
+}
+
+button.btn-danger {
+  background-color: #ff1f4b;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+}
+
 .card {
   background: white;
   border-radius: 12px;
@@ -215,6 +183,11 @@ button:hover {
   color: #000;
 }
 
+.tag-black {
+  background-color: #000;
+  color: #fff;
+}
+
 .tag-grouped .tag:nth-child(1) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
@@ -223,4 +196,45 @@ button:hover {
 .tag-grouped .tag:nth-child(2) {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
+}
+
+/* Drag and Drop Overlay */
+.drag-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 235, 59, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.drag-overlay-content {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #333;
+  border: 3px dashed #ffc107;
+}
+
+table {
+  width: 100%;
+  text-align: left;
+}
+
+thead th {
+  border-bottom: 2px solid #e5e5e5;
+  margin: 0;
+}
+
+th, td {
+  padding: 0.5rem 0;
 }

@@ -3,6 +3,8 @@ import { Link, Route, Routes, useLocation } from "react-router";
 import Messages from "./Messages";
 import Devices from "./Devices";
 import Files from "./Files";
+import DragDrop from "../../components/DragDrop";
+import FilesDropAcceptor from "../../components/FilesDropAcceptor";
 import { useMainStore } from "../../store";
 
 const Home = () => {
@@ -25,30 +27,33 @@ const Home = () => {
   const activeTab = getActiveTab();
 
   return (
-    <div>
-      <div className="flex tab-nav">
-        {tabs.map(tab => (
-          <Link
-            key={tab.id}
-            to={tab.path}
-            className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
-          >
-            <span style={{ marginRight: '0.5rem' }}>{tab.icon}</span>
-            {tab.label}&nbsp;&nbsp;
-            <div>
-              <div className="tag tag-teal">{tab.count}</div>
-            </div>
-          </Link>
-        ))}
+    <>
+      <FilesDropAcceptor />
+      <div id="container">
+        <div className="flex tab-nav mb-2">
+          {tabs.map(tab => (
+            <Link
+              key={tab.id}
+              to={tab.path}
+              className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+            >
+              <span style={{ marginRight: '0.5rem' }}>{tab.icon}</span>
+              <span className="hidden md:inline-block">{tab.label}</span>&nbsp;&nbsp;
+              <div>
+                <div className="tag tag-teal">{tab.count}</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <div>
+          <Routes>
+            <Route path="/devices" element={<Devices />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/" element={<Files />} />
+          </Routes>
+        </div>
       </div>
-      <div>
-        <Routes>
-          <Route path="/devices" element={<Devices />} />
-          <Route path="/messages" element={<Messages />} />
-          <Route path="/" element={<Files />} />
-        </Routes>
-      </div>
-    </div>
+    </>
   )
 }
 

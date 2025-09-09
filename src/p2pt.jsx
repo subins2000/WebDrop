@@ -79,10 +79,8 @@ export const startP2PT = (roomId) => {
       const userName = currentState.users[peer.id]?.name || 'Unknown'
       toast.warning(`${userName} pinged!`)
     } else if (type === 'newShare') {
-      delete msg.type
-      msg.peer = peer
-
-      useMainStore.getState().newShare(msg)
+      msg.shareInfo.peer = peer
+      useMainStore.getState().newShare(msg.shareInfo)
     } else if (type === 'startSending') {
       const shareId = msg.shareId
       const currentState = useMainStore.getState()
@@ -150,7 +148,6 @@ export const startP2PT = (roomId) => {
   })
 
   p2pt.on('peerclose', (peer) => {
-    console.log("zzzz", peer.id)
     useMainStore.getState().removeUser(peer.id)
   })
 

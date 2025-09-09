@@ -6,7 +6,9 @@ import Header from './components/Header'
 
 import { BrowserRouter, Routes, Route } from "react-router";
 
-import './style.css'
+import './css/utils.css'
+import './css/style.css'
+
 import Home from './pages/Home';
 import Settings from './pages/Settings';
 import { startP2PT } from './p2pt';
@@ -20,12 +22,10 @@ const App = () => {
     <>
       <BrowserRouter>
         <Header />
-        <div id="container">
-          <Routes>
-            <Route path="/settings" element={<Settings />} />
-            <Route path="*" element={<Home />} />
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/settings" element={<Settings />} />
+          <Route path="*" element={<Home />} />
+        </Routes>
       </BrowserRouter>
       <ToastContainer
         position="bottom-left"
