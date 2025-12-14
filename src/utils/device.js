@@ -3,7 +3,9 @@
 const ua = navigator.userAgent
 
 let browser = ''
-let os = navigator.platform
+let os = navigator.userAgentData && navigator.userAgentData.platform
+  ? navigator.userAgentData.platform
+  : navigator.platform
 
 let m = ua.match(/(MSIE|Trident|(?!Gecko.+)Firefox|(?!AppleWebKit.+Chrome.+)Safari(?!.+Edge)(?!.+OPR)|(?!AppleWebKit.+)Chrome(?!.+Edge)(?!.+OPR)|(?!AppleWebKit.+Chrome.+Safari.+)Edge|OPR|AppleWebKit(?!.+Chrome|.+Safari)|Gecko(?!.+Firefox))(?: |\/)([\d]+)/)
 

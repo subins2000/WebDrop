@@ -1,11 +1,11 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WebDrop - Easily share files across devices!</title>
-
+    
     <!-- Google / Search Engine Tags -->
     <meta itemprop="name" content="WebDrop - Easily share files across devices!">
     <meta itemprop="description" content="Easily share files and messages across different devices. No installation, just a website!">
@@ -30,12 +30,13 @@
     <div id="app"></div>
     <script>
       if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1" && location.hostname.substr(0, 7) !== '192.168') {
-          var id = "webdrop";
-          (function(i,s,o,g,r,a,m){i['ccc']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','https://demos.subinsb.com/sanders/s.js?id='+id,'ga');
+        var gc = document.createElement('script');
+        gc.setAttribute('data-goatcounter', 'https://webdrop.goatcounter.com/count');
+        gc.async = true;
+        gc.src = '//gc.zgo.at/count.js';
+        document.body.appendChild(gc);
       }
     </script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
